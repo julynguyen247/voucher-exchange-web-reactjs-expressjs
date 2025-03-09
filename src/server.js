@@ -2,9 +2,12 @@ const express = require("express");
 const apiRoutes = require("./routes/api");
 const connection = require("./config/database");
 require("dotenv").config();
+const cors = require('cors')
 const app = express();
 const port = process.env.PORT || 8888;
 const hostname = process.env.HOST_NAME;
+//config cors
+app.use(cors());
 //config req.body
 app.use(express.json()); // for json
 app.use(express.urlencoded({ extended: true })); // for form data
