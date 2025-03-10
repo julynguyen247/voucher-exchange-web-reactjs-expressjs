@@ -1,4 +1,5 @@
-const Voucher=require('../models/voucher')
+const Voucher = require("../models/voucher");
+const User=require("../models/user")
 const path = require("path");
 const uploadImgService = async (image) => {
   let uploadPath = path.resolve(__dirname, "../public/images/upload");
@@ -21,13 +22,21 @@ const uploadImgService = async (image) => {
     };
   }
 };
-const createVoucherService=async(title,category,image,discountValue,expirationDate,createdBy,status)=>{
+const createVoucherService = async (
+  title,
+  category,
+  image,
+  discountValue,
+  expirationDate,
+  createdBy,
+  status
+) => {
   try {
-    let uploadFile=await uploadImgService(image);
+    let uploadFile = await uploadImgService(image);
     let result = await Voucher.create({
       title,
       category,
-      image: uploadFile.path, 
+      image: uploadFile.path,
       discountValue,
       expirationDate,
       createdBy,
@@ -35,8 +44,21 @@ const createVoucherService=async(title,category,image,discountValue,expirationDa
     });
     return result;
   } catch (error) {
-    console.log(error)
+    return null;
   }
-
+};
+const getVoucherService=async()=>{
+  const vouchers=await Voucher.find().populate('createdBy').exec();
+  return vouchers;
 }
-module.exports = { uploadImgService,createVoucherService };
+const deleteAVoucherService = async (id) => {
+  try {
+      let result = await Voucher.deleteById(id);
+      return result;
+
+  } catch (error) {
+      console.log("error >>>> ", error);
+      return null;
+  }
+}
+module.exports = { uploadImgService, createVoucherService,getVoucherService,deleteAVoucherService };
