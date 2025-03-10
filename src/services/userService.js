@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 const saltRounds = 10;
 const jwt = require("jsonwebtoken");
+const aqp = require('api-query-params');
 const createUserService = async (name, email, password) => {
   try {
     const user = await User.findOne({ email });
@@ -62,8 +63,53 @@ const loginService = async (email, password) => {
     return null;
   }
 };
-const getUserService=async ()=>{
-  const data= await User.find();
-  return data;
+const getUserService = async (limit,page,query) => {
+  try {
+    let result=null;
+    if(limit && page){
+      let offset=(page-1) * limit;
+      const {filter}=aqp(query);
+      delete filter.page;
+      result=await User.find(filter).skip(offset).limit(limit).exec()
+      
+    }else{
+      result=await User.find({})
+    }
+    return result;
+  } catch (error) {
+    return null;
+  }
 };
-module.exports = { createUserService,loginService,getUserService };
+const deleteAUserService = async (id) => {
+  try {
+    let result = await User.deleteById(id);
+    return result;
+  } catch (error) {
+    console.log("error >>>> ", error);
+    return null;
+  }
+};
+const updateAUserService = async (id, name, email, password) => {
+  const hashPassword = await bcrypt.hash(password, saltRounds);
+  try {
+    const result = await User.updateOne(
+      { _id: id },
+      { name, email, password: hashPassword }
+    );
+    return result;
+  } catch (error) {
+    return null;
+  }
+};
+const fetchAccountService=async(user)=>{
+  const data=await User.find({email:user.email});
+  return data
+}
+module.exports = {
+  createUserService,
+  loginService,
+  getUserService,
+  deleteAUserService,
+  updateAUserService,
+  fetchAccountService
+};
