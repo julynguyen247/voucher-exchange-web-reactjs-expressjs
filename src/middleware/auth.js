@@ -12,7 +12,7 @@ const auth = (req, res, next) => {
         req.user = {
           email: decoded.email,
           name: decoded.name,
-          role: decoded.role,
+          role: "USER",
         };
         next();
       } catch (error) {
