@@ -8,6 +8,7 @@ const voucherSchema = new mongoose.Schema(
     discountValue: Number,
     expirationDate: Date,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+    price: Number,
     status: String,
   },
   { timestamps: true }
