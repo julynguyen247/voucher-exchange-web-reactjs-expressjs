@@ -1,7 +1,7 @@
 const express = require('express');
 const {createUser,handleLogin,getUser,deleteUser,updateUser,handleLogout,handleFetchAccount}=require("../controllers/userController");
 const auth = require('../middleware/auth');
-const { handleUploadImg,createVoucher,getVoucher,deleteVoucher} = require('../controllers/voucherController');
+const { handleUploadImg,createVoucher,getVoucher,deleteVoucher,getPlatform,getCategory} = require('../controllers/voucherController');
 const routerAPI = express.Router();
 routerAPI.all("*",auth)
 routerAPI.get("/",(req,res)=>{
@@ -22,4 +22,6 @@ routerAPI.post("/image",handleUploadImg);
 routerAPI.post("/voucher",createVoucher);
 routerAPI.get("/voucher",getVoucher);
 routerAPI.delete("/voucher",deleteVoucher);
+routerAPI.get("/voucher/platform",getPlatform);
+routerAPI.get("/voucher/category",getCategory);
 module.exports = routerAPI; //export default 
