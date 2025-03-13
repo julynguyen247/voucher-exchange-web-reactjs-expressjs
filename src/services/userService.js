@@ -29,7 +29,7 @@ const loginService = async (email, password) => {
   try {
     const user = await User.findOne({ email });
     if (user) {
-      const compare = bcrypt.compare(password, user.password);
+      const compare = await bcrypt.compare(password, user.password);
       if (!compare) {
         return {
           EC: 2,
@@ -38,7 +38,7 @@ const loginService = async (email, password) => {
       } else {
         const payload = {
           email: user.email,
-          password: user.password,
+          name: user.name,
         };
         const access_token = jwt.sign(payload, process.env.JWT_SECRET, {
           expiresIn: process.env.JWT_EXPIRED,
@@ -102,8 +102,9 @@ const updateAUserService = async (id, name, email, password) => {
   }
 };
 const fetchAccountService=async(user)=>{
-  const data=await User.find({email:user.email});
-  return data
+  const data=await User.findOne({email:user.email}).lean();
+
+  return data;
 }
 module.exports = {
   createUserService,

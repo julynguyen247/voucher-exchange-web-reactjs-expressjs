@@ -1,5 +1,5 @@
 const express = require('express');
-const {createUser,handleLogin,getUser,deleteUser,updateUser,handleLogout,handleFetchAccount}=require("../controllers/userController");
+const {createUser,handleLogin,getUser,deleteUser,updateUser,handleLogout,handleFetchAccount,getAccount}=require("../controllers/userController");
 const auth = require('../middleware/auth');
 const { handleUploadImg,createVoucher,getVoucher,deleteVoucher,getPlatform,getCategory} = require('../controllers/voucherController');
 const routerAPI = express.Router();
@@ -12,11 +12,13 @@ routerAPI.post("/register",createUser);
 routerAPI.post ("/login",handleLogin);
 routerAPI.post ("/logout",handleLogout);
 routerAPI.get ("/account",handleFetchAccount);
+routerAPI.get ("/account-fetch",getAccount);
 //admin
 routerAPI.post ("/user",createUser)
 routerAPI.get ("/user",getUser)
 routerAPI.delete("/user",deleteUser)
 routerAPI.put("/user",updateUser)
+
 //voucher
 routerAPI.post("/image",handleUploadImg);
 routerAPI.post("/voucher",createVoucher);
