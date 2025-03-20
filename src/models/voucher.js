@@ -3,7 +3,9 @@ const mongoose_delete = require('mongoose-delete');
 const voucherSchema = new mongoose.Schema(
   {
     title: String,
+    platform:String,
     category: String,
+    code:String,
     image: String,
     discountValue: Number,
     expirationDate: Date,
