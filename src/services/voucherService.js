@@ -25,7 +25,9 @@ const uploadImgService = async (image) => {
 };
 const createVoucherService = async (
   title,
+  platform,
   category,
+  code,
   image,
   discountValue,
   expirationDate,
@@ -38,7 +40,9 @@ const createVoucherService = async (
     let uploadFile = await uploadImgService(image);
     let result = await Voucher.create({
       title,
+      platform,
       category,
+      code,
       image: uploadFile.path,
       discountValue,
       expirationDate,

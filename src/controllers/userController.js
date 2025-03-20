@@ -12,7 +12,6 @@ const createUser = async (req, res) => {
   const data = await createUserService(name, email, password);
   return res.status(200).json({
     result: data,
-    message: `${email} đã tồn tại.`,
   });
 };
 const handleLogin = async (req, res) => {
@@ -62,7 +61,7 @@ const handleFetchAccount = async (req, res) => {
   });
 };
 const getAccount=async(req,res)=>{
-  console.log(req.user)
+  
   return res.status(200).json(req.user)
 }
 module.exports = {

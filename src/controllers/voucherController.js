@@ -5,11 +5,13 @@ const {
   deleteAVoucherService
 } = require("../services/voucherService");
 const createVoucher = async (req, res) => {
-  const { title, category, discountValue, expirationDate, status } = req.body;
+  const { title, category, discountValue, expirationDate, status,platform,code } = req.body;
   const image = req.files.image;
   const result = await createVoucherService(
     title,
+    platform,
     category,
+    code,
     image,
     discountValue,
     expirationDate,
