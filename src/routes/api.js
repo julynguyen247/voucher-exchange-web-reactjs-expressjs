@@ -17,7 +17,7 @@ routerAPI.get ("/account-fetch",getAccount);
 routerAPI.post ("/user",createUser)
 routerAPI.get ("/user",getUser)
 routerAPI.delete("/user",deleteUser)
-routerAPI.put("/user",updateUser)
+routerAPI.put("/user",updateUser);
 
 //voucher
 routerAPI.post("/image",handleUploadImg);
