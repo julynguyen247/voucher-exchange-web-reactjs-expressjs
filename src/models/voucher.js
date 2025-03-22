@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const mongoose_delete = require('mongoose-delete');
 const voucherSchema = new mongoose.Schema(
   {
-    title: String,
+    minimumOrder: Number,
     platform:String,
     category: String,
     code:String,
