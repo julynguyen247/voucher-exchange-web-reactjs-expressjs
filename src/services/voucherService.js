@@ -24,7 +24,7 @@ const uploadImgService = async (image) => {
   }
 };
 const createVoucherService = async (
-  title,
+  minimumOrder,
   platform,
   category,
   code,
@@ -32,14 +32,15 @@ const createVoucherService = async (
   discountValue,
   expirationDate,
   email,
-  status
+  status,
+  price
 ) => {
   try {
     let user = await User.findOne({ email: email });
     let userId = user._id;
     let uploadFile = await uploadImgService(image);
     let result = await Voucher.create({
-      title,
+      minimumOrder,
       platform,
       category,
       code,
@@ -48,6 +49,7 @@ const createVoucherService = async (
       expirationDate,
       createdBy: userId,
       status,
+      price,
     });
     return result;
   } catch (error) {
