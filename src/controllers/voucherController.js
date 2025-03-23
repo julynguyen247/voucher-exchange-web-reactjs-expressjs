@@ -34,16 +34,16 @@ const createVoucher = async (req, res) => {
   });
 };
 const handleUploadImg = async (req, res) => {
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send("No files were uploaded.");
+  const image = req.files?.file;
+
+  if (!image) {
+    return res.status(400).json({ message: "No file uploaded!" });
   }
 
-  let result = await uploadImgService(req.files.image);
-
-  return res.status(200).json({
-    data: result,
-  });
+  const result = await uploadImgService(image);
+  return res.json(result);
 };
+
 const getVoucher = async (req, res) => {
   let limit = req.query.limit;
   let page = req.query.page;
