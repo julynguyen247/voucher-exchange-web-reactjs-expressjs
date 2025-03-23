@@ -2,6 +2,7 @@ const express = require("express");
 const apiRoutes = require("./routes/api");
 const connection = require("./config/database");
 require("dotenv").config();
+
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const helmet = require("helmet");
@@ -42,6 +43,9 @@ app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
+
+app.use("/images", express.static(path.join(__dirname, "public/images")));
 app.use("/v1/api", apiRoutes);
 
 app.get("/", (req, res) => {
