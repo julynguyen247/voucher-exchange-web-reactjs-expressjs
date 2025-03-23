@@ -3,17 +3,29 @@ const User = require("../models/user");
 const path = require("path");
 const aqp = require("api-query-params");
 const uploadImgService = async (image) => {
-  let uploadPath = path.resolve(__dirname, "../public/images/upload");
-  let extname = path.extname(image.name);
-  let basename = path.basename(image.name, extname);
-  let finalName = `${basename}-${Date.now()}${extname}`;
-  let finalPath = `${uploadPath}/${finalName}`;
+  if (!image || !image.name) {
+    return {
+      status: "failed",
+      path: null,
+      error: "File không tồn tại hoặc không hợp lệ",
+    };
+  }
+
+  const path = require("path");
+  const uploadPath = path.resolve(__dirname, "../public/images/upload");
+
+  const extname = path.extname(image.name);
+  const basename = path.basename(image.name, extname);
+  const finalName = `${basename}-${Date.now()}${extname}`;
+  const finalPath = `${uploadPath}/${finalName}`;
+
   try {
-    await image.mv(finalPath);
+    await image.mv(finalPath); 
     return {
       status: "success",
-      path: finalPath,
+      path: `/images/upload/${finalName}`, 
       error: null,
+      name:finalName
     };
   } catch (error) {
     return {
@@ -23,6 +35,7 @@ const uploadImgService = async (image) => {
     };
   }
 };
+
 const createVoucherService = async (
   minimumOrder,
   platform,
