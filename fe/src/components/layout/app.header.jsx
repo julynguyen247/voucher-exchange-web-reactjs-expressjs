@@ -25,23 +25,22 @@ const AppHeader = () => {
     }
   };
   return (
-    <Navbar expand="lg" className="bg-success navbar-dark ">
+    <Navbar expand="lg" className="bg-primary navbar-dark ">
       <Container>
         <Navbar.Brand
           href="/"
-          style={{ width: "50px", height: "50px", marginBottom: "4px" }}
+          style={{ width: "50px", height: "50px", marginBottom: "5px" }}
         >
           {auth.isAuthenticated ? (
             <Image
-              src={`${import.meta.env.VITE_BACKEND_URL}/images/upload/${
-                auth.user.image
-              }`}
+              src={`${import.meta.env.VITE_BACKEND_URL}/images/upload/logo.jpg`}
               style={{
                 width: "50px",
                 height: "50px",
                 border: "1px solid white",
                 borderRadius: "50%",
                 objectFit: "cover",
+            
               }}
             />
           ) : (

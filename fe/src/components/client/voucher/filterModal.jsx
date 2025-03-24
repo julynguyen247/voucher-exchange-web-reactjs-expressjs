@@ -25,7 +25,7 @@ const FilterModal = ({
   };
 
   const handleCancel = () => {
-    setSelected(selectedCategories); // Giữ trạng thái trước đó nếu bấm hủy
+    setSelected(selectedCategories); 
     setOpenModal(false);
   };
 

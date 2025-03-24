@@ -52,14 +52,14 @@ const VoucherPage = () => {
     <div className="p-2">
       <div className="flex items-center gap-2 mb-2">
         <FaArrowLeft
-          color="green"
+          color="#3685f9"
           size={24}
           onClick={() => navigate("/")}
           className="cursor-pointer"
         />
         <Input className="flex-1" placeholder="Tìm kiếm..." />
         <FaFilter
-          color="green"
+          color="#3685f9"
           size={20}
           className="cursor-pointer"
           onClick={() => setOpenModal(true)}
