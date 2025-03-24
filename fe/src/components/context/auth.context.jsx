@@ -4,7 +4,10 @@ export const AuthContext = createContext({
     isAuthenticated:false,
     user:{
         email:"",
-        name:""
+        name:"",
+        phone:"",
+        id:"",
+        image:"",
     },
 });
 
@@ -13,7 +16,10 @@ export const AuthWrapper=(props)=> {
         isAuthenticated:false,
     user:{
         email:"",
-        name:""
+        name:"",
+        phone:"",
+        id:"",
+        image:"",
     },
     });
     

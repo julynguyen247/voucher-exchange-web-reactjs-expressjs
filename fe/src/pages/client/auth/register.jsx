@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { registerApi } from "../../../utils/api";
 import { Link, useNavigate } from "react-router-dom";
-import { Form, Input, Button, notification, Divider, App } from "antd";
+import { Form, Input, Button, notification, Divider, App, message } from "antd";
 
 const RegisterPage = () => {
   const [pass, setPass] = useState("");
@@ -9,27 +9,27 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const onFinish = async (values) => {
     if (pass !== confirmPassword) {
-      notification.error({
-        message: "Mật khẩu không khớp!",
-      });
+      message.error(
+       "Mật khẩu không khớp!",
+      );
     } else {
-      const { name, email, password } = values;
-      const res = await registerApi(name, email, password);
+      const { name, email, password,phone } = values;
+      const res = await registerApi(name, email, password,phone);
       if (res && res.data) {
         if (res.data.result === null) {
-          notification.error({
-            message: "Email đã tồn tại!",
-          });
+          message.error(
+           "Email đã tồn tại!"
+          );
         } else {
-          notification.success({
-            message: "Register successfully",
-          });
+          message.success(
+        "Register successfully"
+          );
           navigate("/login");
         }
       } else {
-        notification.error({
-          message: "Error email/password",
-        });
+        message.error(
+         "Error email/password"
+        );
       }
     }
   };
@@ -74,6 +74,21 @@ const RegisterPage = () => {
               {
                 required: true,
                 message: "Vui lòng nhập họ và tên!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="SDT"
+            name="phone"
+            labelCol={{
+              span: 24,
+            }}
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập SDT!",
               },
             ]}
           >

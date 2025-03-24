@@ -11,13 +11,15 @@ const Layout = () => {
     const fetchAcc = async () => {
       try {
         const res = await fetchAccountApi();
-
         if (res?.data) {
           setAuth({
             isAuthenticated: true,
             user: {
-              email: res.data.email ?? "",
-              name: res.data.name ?? "",
+              email: res.data.data.email ?? "",
+              name: res.data.data.name ?? "",
+              phone: res.data.data.phone ?? "",
+              id: res.data.data._id ?? "",
+              image: res.data.data.image ?? "",
             },
           });
         } else {
@@ -26,11 +28,13 @@ const Layout = () => {
             user: {
               email: "",
               name: "",
+              phone:"",
+              id:"",
+              image:"",
             },
           });
         }
       } catch (err) {
-       
         setAuth({
           isAuthenticated: false,
           user: {
