@@ -10,22 +10,22 @@ const createVoucher = async (req, res) => {
     category,
     discountValue,
     expirationDate,
-    status,
     platform,
     code,
     price,
+    image
   } = req.body;
-  const image = req.files.image;
+
+
   const result = await createVoucherService(
     minimumOrder,
     platform,
     category,
-    code,
     image,
+    code,
     discountValue,
     expirationDate,
     req.user.email,
-    status,
     price
   );
   return res.status(200).json({

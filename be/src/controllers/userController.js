@@ -6,21 +6,9 @@ const {
   updateAUserService,
   fetchAccountService,
 } = require("../services/userService");
-const { uploadImgService } = require("../services/voucherService");
 const createUser = async (req, res) => {
-  const { name, email, password, phone } = req.body;
-  const image = req.files.image;
-  const imageUploadResult = await uploadImgService(image);
-  if (imageUploadResult.status === "failed") {
-    return res.status(400).json({
-      status: "failed",
-      message: imageUploadResult.error,
-    });
-  }
-
-  const imageUrl = imageUploadResult.name;
-
-  const data = await createUserService(name, email, password, phone, imageUrl);
+  const { name, email, password, phone ,image} = req.body;
+  const data = await createUserService(name, email, password, phone, image);
   return res.status(200).json({
     result: data,
   });
