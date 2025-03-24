@@ -113,7 +113,7 @@ const HomePage = () => {
         </Paragraph>
 
         <button
-          className="bg-green-600 hover:bg-green-700 text-white  rounded  mt-1 text-sm transition p-2"
+          className="bg-primary hover:bg-green-700 text-white  rounded  mt-1 text-sm transition p-2"
           onClick={() => navigate("/voucher")}
         >
           Start Shopping
