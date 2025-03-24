@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { loginApi } from "../../../utils/api";
 import { Link, useNavigate } from "react-router-dom";
-import { Form, Input, Button, notification, Divider } from "antd";
+import { Form, Input, Button, notification, Divider, message } from "antd";
 import { AuthContext } from "../../../components/context/auth.context";
 
 const LoginPage = () => {
@@ -14,9 +14,7 @@ const LoginPage = () => {
     const res = await loginApi(email, password);
     if (res && res.data.EC === 0) {
       localStorage.setItem("access_token", res.data.access_token);
-      notification.success({
-        message: "Login successfully",
-      });
+      message.success("Login successfully");
       setAuth({
         isAuthenticated: true,
         user: {
@@ -27,9 +25,7 @@ const LoginPage = () => {
       console.log(res);
       navigate("/");
     } else {
-      notification.error({
-        message: "Error email/password",
-      });
+      message.error("Error email/password");
     }
     setIsSubmit(false);
   };

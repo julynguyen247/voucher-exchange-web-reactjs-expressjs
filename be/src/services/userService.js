@@ -3,8 +3,9 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 const saltRounds = 10;
 const jwt = require("jsonwebtoken");
-const aqp = require('api-query-params');
-const createUserService = async (name, email, password) => {
+const aqp = require("api-query-params");
+
+const createUserService = async (name, email, password, phone, image) => {
   try {
     const user = await User.findOne({ email });
     if (user) {
@@ -16,6 +17,8 @@ const createUserService = async (name, email, password) => {
         name,
         email,
         password: hashPassword,
+        phone,
+        image,
         role: "USER",
       });
       return result;
@@ -63,17 +66,16 @@ const loginService = async (email, password) => {
     return null;
   }
 };
-const getUserService = async (limit,page,query) => {
+const getUserService = async (limit, page, query) => {
   try {
-    let result=null;
-    if(limit && page){
-      let offset=(page-1) * limit;
-      const {filter}=aqp(query);
+    let result = null;
+    if (limit && page) {
+      let offset = (page - 1) * limit;
+      const { filter } = aqp(query);
       delete filter.page;
-      result=await User.find(filter).skip(offset).limit(limit).exec()
-      
-    }else{
-      result=await User.find({})
+      result = await User.find(filter).skip(offset).limit(limit).exec();
+    } else {
+      result = await User.find({});
     }
     return result;
   } catch (error) {
@@ -89,28 +91,36 @@ const deleteAUserService = async (id) => {
     return null;
   }
 };
-const updateAUserService = async (id, name, email, password) => {
-  const hashPassword = await bcrypt.hash(password, saltRounds);
-  try {
+const updateAUserService = async (id, name, email, password, phone, image) => {
+  if (password) {
+    const hashPassword = await bcrypt.hash(password, saltRounds);
     const result = await User.updateOne(
       { _id: id },
-      { name, email, password: hashPassword }
+      { name, email, password: hashPassword, phone, image }
     );
     return result;
-  } catch (error) {
-    return null;
+  } else {
+    try {
+      const result = await User.updateOne(
+        { _id: id },
+        { name, email, phone, image }
+      );
+      return result;
+    } catch (error) {
+      return null;
+    }
   }
 };
-const fetchAccountService=async(user)=>{
-  const data=await User.findOne({email:user.email}).lean();
+const fetchAccountService = async (user) => {
+  const data = await User.findOne({ email: user.email }).lean();
 
   return data;
-}
+};
 module.exports = {
   createUserService,
   loginService,
   getUserService,
   deleteAUserService,
   updateAUserService,
-  fetchAccountService
+  fetchAccountService,
 };

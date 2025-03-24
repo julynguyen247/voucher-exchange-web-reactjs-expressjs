@@ -16,17 +16,18 @@ const loginApi = (email, password) => {
   };
   return axios.post(URL_API, data);
 };
-const registerApi = (name, email, password) => {
+const registerApi = (name, email, password,phone) => {
   const URL_API = "/v1/api/register";
   const data = {
     name,
     email,
     password,
+    phone
   };
   return axios.post(URL_API, data);
 };
 const fetchAccountApi = () => {
-  const URL_API = "/v1/api/account-fetch";
+  const URL_API = "/v1/api/account";
   return axios.get(URL_API);
 };
 const getVoucherCategory = () => {
@@ -38,29 +39,33 @@ const getVoucherPlatform = () => {
   return axios.get(URL_API);
 };
 const createVoucher = (voucherData) => {
-  const URL_API = "/v1/api/voucher"; 
+  const URL_API = "/v1/api/voucher";
   return axios.post(URL_API, voucherData);
 };
-const getVoucher=()=>{
-  const URL_API = "/v1/api/voucher"; 
-  return axios.get(URL_API)
-}
-const logoutApi=()=>{
-  const URL_API = "/v1/api/logout"; 
-  return axios.post(URL_API)
-}
+const getVoucher = () => {
+  const URL_API = "/v1/api/voucher";
+  return axios.get(URL_API);
+};
+const logoutApi = () => {
+  const URL_API = "/v1/api/logout";
+  return axios.post(URL_API);
+};
 const uploadApi = (file, folder) => {
   const URL_API = "/v1/api/image";
   const formData = new FormData();
 
-  formData.append("file", file);      
-  formData.append("folder", folder);  
+  formData.append("file", file);
+  formData.append("folder", folder);
 
   return axios.post(URL_API, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
   });
+};
+const updateUserApi = (id, name, email, password, phone, image) => {
+  const URL_API = "/v1/api/user";
+  return axios.put(URL_API, {id, name, email, password, phone, image});
 };
 export {
   createUserApi,
@@ -70,5 +75,8 @@ export {
   getVoucherCategory,
   getVoucherPlatform,
   createVoucher,
-  getVoucher,logoutApi,uploadApi
+  getVoucher,
+  logoutApi,
+  uploadApi,
+  updateUserApi,
 };

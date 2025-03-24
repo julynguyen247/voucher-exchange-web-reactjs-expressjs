@@ -6,14 +6,26 @@ const {
   updateAUserService,
   fetchAccountService,
 } = require("../services/userService");
-
+const { uploadImgService } = require("../services/voucherService");
 const createUser = async (req, res) => {
-  const { name, email, password } = req.body;
-  const data = await createUserService(name, email, password);
+  const { name, email, password, phone } = req.body;
+  const image = req.files.image;
+  const imageUploadResult = await uploadImgService(image);
+  if (imageUploadResult.status === "failed") {
+    return res.status(400).json({
+      status: "failed",
+      message: imageUploadResult.error,
+    });
+  }
+
+  const imageUrl = imageUploadResult.name;
+
+  const data = await createUserService(name, email, password, phone, imageUrl);
   return res.status(200).json({
     result: data,
   });
 };
+
 const handleLogin = async (req, res) => {
   const { email, password } = req.body;
   const data = await loginService(email, password);
@@ -46,8 +58,8 @@ const deleteUser = async (req, res) => {
   });
 };
 const updateUser = async (req, res) => {
-  const { id, name, email, password } = req.body;
-  let result = await updateAUserService(id, name, email, password);
+  const { id, name, email, password,phone,image } = req.body;
+  let result = await updateAUserService(id, name, email, password,phone,image);
   return res.status(200).json({
     EC: 0,
     data: result,
@@ -60,10 +72,10 @@ const handleFetchAccount = async (req, res) => {
     data: result,
   });
 };
-const getAccount=async(req,res)=>{
-  
-  return res.status(200).json(req.user)
-}
+const getAccount = async (req, res) => {
+  req.user.id = req.user._id;
+  return res.status(200).json(req.user);
+};
 module.exports = {
   createUser,
   handleLogin,
@@ -72,5 +84,5 @@ module.exports = {
   updateUser,
   handleLogout,
   handleFetchAccount,
-  getAccount
+  getAccount,
 };
