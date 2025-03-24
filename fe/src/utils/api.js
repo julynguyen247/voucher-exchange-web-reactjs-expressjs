@@ -16,13 +16,14 @@ const loginApi = (email, password) => {
   };
   return axios.post(URL_API, data);
 };
-const registerApi = (name, email, password,phone) => {
+const registerApi = (name, email, password, phone,image) => {
   const URL_API = "/v1/api/register";
   const data = {
     name,
     email,
     password,
-    phone
+    phone,
+    image
   };
   return axios.post(URL_API, data);
 };
@@ -38,10 +39,32 @@ const getVoucherPlatform = () => {
   const URL_API = "/v1/api/voucher/platform";
   return axios.get(URL_API);
 };
-const createVoucher = (voucherData) => {
+const createVoucher = (
+  minimumOrder,
+  platform,
+  category,
+  code,
+  image,
+  discountValue,
+  expirationDate,
+  price
+) => {
   const URL_API = "/v1/api/voucher";
-  return axios.post(URL_API, voucherData);
+
+  expirationDate = expirationDate.format("YYYY-MM-DD");
+
+  return axios.post(URL_API, {
+    minimumOrder,
+    platform,
+    category,
+    image,
+    code,
+    discountValue,
+    expirationDate,
+    price,
+  });
 };
+
 const getVoucher = () => {
   const URL_API = "/v1/api/voucher";
   return axios.get(URL_API);
@@ -65,7 +88,7 @@ const uploadApi = (file, folder) => {
 };
 const updateUserApi = (id, name, email, password, phone, image) => {
   const URL_API = "/v1/api/user";
-  return axios.put(URL_API, {id, name, email, password, phone, image});
+  return axios.put(URL_API, { id, name, email, password, phone, image });
 };
 export {
   createUserApi,

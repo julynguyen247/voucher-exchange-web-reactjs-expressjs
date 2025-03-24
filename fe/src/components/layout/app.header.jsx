@@ -8,6 +8,7 @@ import { logoutApi } from "../../utils/api";
 import { Image } from "antd";
 const AppHeader = () => {
   const { auth, setAuth } = useContext(AuthContext);
+  
   const handleLogout = async () => {
     const res = await logoutApi();
     if (res && res.data) {
@@ -42,6 +43,7 @@ const AppHeader = () => {
                 objectFit: "cover",
             
               }}
+              preview={false}
             />
           ) : (
             <div className="mt-2">Welcome</div>

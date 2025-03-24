@@ -20,12 +20,12 @@ const uploadImgService = async (image) => {
   const finalPath = `${uploadPath}/${finalName}`;
 
   try {
-    await image.mv(finalPath); 
+    await image.mv(finalPath);
     return {
       status: "success",
-      path: `/images/upload/${finalName}`, 
+      path: `/images/upload/${finalName}`,
       error: null,
-      name:finalName
+      name: finalName,
     };
   } catch (error) {
     return {
@@ -40,28 +40,26 @@ const createVoucherService = async (
   minimumOrder,
   platform,
   category,
-  code,
   image,
+  code,
   discountValue,
   expirationDate,
   email,
-  status,
   price
 ) => {
   try {
     let user = await User.findOne({ email: email });
     let userId = user._id;
-    let uploadFile = await uploadImgService(image);
     let result = await Voucher.create({
       minimumOrder,
       platform,
       category,
+      image,
       code,
-      image: uploadFile.path,
       discountValue,
       expirationDate,
       createdBy: userId,
-      status,
+      status: "Available",
       price,
     });
     return result;
