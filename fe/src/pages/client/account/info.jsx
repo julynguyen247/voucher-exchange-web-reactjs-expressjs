@@ -4,14 +4,14 @@ import { AntDesignOutlined, UploadOutlined } from "@ant-design/icons";
 import { AuthContext } from "../../../components/context/auth.context";
 import { updateUserApi, uploadApi } from "../../../utils/api";
 import { message } from "antd";
-import { useNavigate } from "react-router-dom";
 
 const Info = () => {
-  const { auth ,setAuth} = useContext(AuthContext);
+  const { auth, setAuth } = useContext(AuthContext);
   const [form] = Form.useForm();
   const [userAvatar, setUserAvatar] = useState("");
-  const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/images/upload/${userAvatar}`;
-const navigate=useNavigate();
+  const urlAvatar = `${
+    import.meta.env.VITE_BACKEND_URL
+  }/images/upload/${userAvatar}`;
 
   useEffect(() => {
     form.setFieldsValue({
@@ -20,11 +20,9 @@ const navigate=useNavigate();
       phone: auth.user.phone,
       id: auth.user.id,
     });
-    setUserAvatar(auth.user.image)
+    setUserAvatar(auth.user.image);
   }, [auth.user]);
-  
- 
-  
+
   const handleUploadFile = async (options) => {
     const { onSuccess } = options;
     const file = options.file;
@@ -53,23 +51,27 @@ const navigate=useNavigate();
     },
   };
   const onFinish = async (values) => {
-    const { name,id,phone ,email} = values;
-    const res = await updateUserApi(id,name,email,undefined,phone,userAvatar);
-    if(res && res.data){
-      message.success("Cập nhật thành công")
-      localStorage.removeItem("access_token")
-      setAuth({
-        isAuthenticated: false,
+    const { name, id, phone, email } = values;
+    const res = await updateUserApi(
+      id,
+      name,
+      email,
+      undefined,
+      phone,
+      userAvatar
+    );
+    if (res && res.data) {
+      message.success("Cập nhật thành công");
+      setAuth((prevAuth) => ({
+        ...prevAuth,
         user: {
-          email: "",
-          name: "",
-          phone:"",
-          id:"",
-          image:"",
+          ...prevAuth.user,
+          name,
+          phone,
+          image: userAvatar,
         },
-      })
-      navigate("/")
-    }else{
+      }));
+    } else {
       message.error(`Cập nhật thất bại`);
     }
   };
