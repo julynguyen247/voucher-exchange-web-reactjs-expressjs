@@ -114,6 +114,7 @@ const VoucherPage = () => {
                 block
                 size="small"
                 className="mt-3 border-black text-black text-xs"
+                onClick={()=>navigate("/order")}
               >
                 Buy now
               </Button>
