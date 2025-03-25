@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 import { registerApi, uploadApi } from "../../../utils/api";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Form,
-  Input,
-  Button,
-  Divider,
-  message,
-  Avatar,
-  Upload,
-} from "antd";
+import { Form, Input, Button, Divider, message, Avatar, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
 const RegisterPage = () => {
@@ -70,7 +62,7 @@ const RegisterPage = () => {
 
   return (
     <div className="flex justify-center items-center h-[100vh] w-full flex-col">
-      <div className="font-bold text-4xl mb-6 text-[#198754] text-center">
+      <div className="font-bold text-4xl mb-6 text-[##3685f9] text-center">
         Đăng ký
       </div>
       <div className="bg-gray-300 p-8 sm:p-10 w-[70vw] rounded-lg shadow-lg sm:w-[30vw] md:w-[25vw] lg:w-[400px] h-auto sm:h-[60vh] flex justify-center items-center flex-col">
@@ -99,7 +91,11 @@ const RegisterPage = () => {
             name="email"
             labelCol={{ span: 24 }}
             rules={[
-              { type: "email", required: true, message: "Vui lòng nhập email!" },
+              {
+                type: "email",
+                required: true,
+                message: "Vui lòng nhập email!",
+              },
             ]}
           >
             <Input />
@@ -118,12 +114,13 @@ const RegisterPage = () => {
             label="Số điện thoại"
             name="phone"
             labelCol={{ span: 24 }}
-            rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập số điện thoại!" },
+            ]}
           >
             <Input />
           </Form.Item>
 
-      
           <Form.Item
             label="Mật khẩu"
             name="password"
@@ -132,7 +129,8 @@ const RegisterPage = () => {
               { required: true, message: "Vui lòng nhập mật khẩu!" },
               { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự!" },
               {
-                pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+                pattern:
+                  /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
                 message:
                   "Mật khẩu phải chứa ít nhất một chữ hoa, một số và một ký tự đặc biệt!",
               },
@@ -141,7 +139,6 @@ const RegisterPage = () => {
             <Input.Password />
           </Form.Item>
 
-        
           <Form.Item
             label="Xác nhận mật khẩu"
             name="confirmPassword"
@@ -166,7 +163,7 @@ const RegisterPage = () => {
             <Button
               type="primary"
               htmlType="submit"
-              className="w-full mt-4 bg-[#198754]"
+              className="w-full mt-4 bg-[##3685f9]"
             >
               Đăng ký
             </Button>

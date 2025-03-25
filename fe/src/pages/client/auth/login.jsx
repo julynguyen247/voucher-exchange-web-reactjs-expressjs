@@ -32,7 +32,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex justify-center items-center w-full px-4 flex-col h-[70vh]">
-      <div className="font-bold text-4xl mb-6 text-[#198754] text-center">
+      <div className="font-bold text-4xl mb-6 text-[##3685f9] text-center">
         Đăng nhập
       </div>
       <br />
@@ -79,8 +79,8 @@ const LoginPage = () => {
             <Button
               type="primary"
               htmlType="submit"
-              className="w-full mt-4 bg-[#198754]"
-              style={{ backgroundColor: "#198754" }}
+              className="w-full mt-4 bg-[##3685f9]"
+              style={{ backgroundColor: "##3685f9" }}
             >
               Đăng nhập
             </Button>
