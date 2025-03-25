@@ -10,8 +10,8 @@ import Layout from "./layout";
 import LoginPage from "../src/pages/client/auth/login"
 import RegisterPage from "../src/pages/client/auth/register"
 import { createRoot } from 'react-dom/client';
+import OrderPage from "./pages/client/order";
 
-// Khởi tạo router
 const router = createBrowserRouter([
   {
     path: "/",
@@ -33,6 +33,10 @@ const router = createBrowserRouter([
         path: "/account",
         element: <AccountPage />,
       },
+      {
+        path: "/order",
+        element: <OrderPage />,
+      },
     ],
   },
   {
@@ -45,7 +49,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-// Render ứng dụng
+
 createRoot(document.getElementById("root")).render(
   // <React.StrictMode>
   <App>
