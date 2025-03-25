@@ -15,7 +15,14 @@ const ChangePassword = () => {
 
   const onFinish = async (values) => {
     const { password, id } = values;
-    const res = await updateUserApi(id, undefined, undefined, password, undefined, undefined);
+    const res = await updateUserApi(
+      id,
+      undefined,
+      undefined,
+      password,
+      undefined,
+      undefined
+    );
 
     if (res) {
       message.success("Updated Successfully");
@@ -44,36 +51,34 @@ const ChangePassword = () => {
           <Input />
         </Form.Item>
 
-   
         <Form.Item
           label="Password"
           name="password"
           rules={[
-            { required: true, message: "Please enter your password!" },
-            { min: 6, message: "Password must be at least 6 characters!" },
+            { required: true, message: "Vui lòng nhập mật khẩu mới!" },
+            { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự!" },
             {
-              pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
-              message: "Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number!",
+              pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+              message:
+                "Mật khẩu phải chứa ít nhất một chữ hoa, một số và một ký tự đặc biệt!",
             },
           ]}
-
         >
           <Input.Password />
         </Form.Item>
 
-    
         <Form.Item
           label="Confirm Password"
           name="confirmPassword"
           dependencies={["password"]}
           rules={[
-            { required: true, message: "Please confirm your password!" },
+            { required: true, message: "Vui lòng nhập lại mật khẩu!" },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue("password") === value) {
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error("Passwords do not match!"));
+                return Promise.reject(new Error("Mật khẩu không khớp!"));
               },
             }),
           ]}
