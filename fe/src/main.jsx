@@ -7,10 +7,12 @@ import CreateVoucherPage from "./pages/client/createVoucher";
 import { App } from "antd";
 import AccountPage from "./pages/client/account/account";
 import Layout from "./layout";
-import LoginPage from "../src/pages/client/auth/login"
-import RegisterPage from "../src/pages/client/auth/register"
-import { createRoot } from 'react-dom/client';
+import LoginPage from "../src/pages/client/auth/login";
+import RegisterPage from "../src/pages/client/auth/register";
+import { createRoot } from "react-dom/client";
 import OrderPage from "./pages/client/order";
+import TransactionPage from "./pages/client/transaction";
+import TransactionHistory from "./pages/client/transactionHistory";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +39,14 @@ const router = createBrowserRouter([
         path: "/order",
         element: <OrderPage />,
       },
+      {
+        path: "/transaction",
+        element: <TransactionPage />,
+      },
+      {
+        path: "/transaction-history",
+        element: <TransactionHistory />,
+      },
     ],
   },
   {
@@ -48,7 +58,6 @@ const router = createBrowserRouter([
     element: <RegisterPage />,
   },
 ]);
-
 
 createRoot(document.getElementById("root")).render(
   // <React.StrictMode>
