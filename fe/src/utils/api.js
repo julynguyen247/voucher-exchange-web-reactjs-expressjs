@@ -16,14 +16,14 @@ const loginApi = (email, password) => {
   };
   return axios.post(URL_API, data);
 };
-const registerApi = (name, email, password, phone,image) => {
+const registerApi = (name, email, password, phone, image) => {
   const URL_API = "/v1/api/register";
   const data = {
     name,
     email,
     password,
     phone,
-    image
+    image,
   };
   return axios.post(URL_API, data);
 };
@@ -90,6 +90,14 @@ const updateUserApi = (id, name, email, password, phone, image) => {
   const URL_API = "/v1/api/user";
   return axios.put(URL_API, { id, name, email, password, phone, image });
 };
+const getTransactions = (userId) => {
+  const URL_API = `/v1/api/transactions/${userId}`;
+  return axios.get(URL_API);
+};
+const processTransaction = (userId, voucherId) => {
+  const URL_API = "/v1/api/transaction";
+  return axios.post(URL_API, { userId, voucherId });
+};
 export {
   createUserApi,
   loginApi,
@@ -102,4 +110,6 @@ export {
   logoutApi,
   uploadApi,
   updateUserApi,
+  getTransactions,
+  processTransaction,
 };
