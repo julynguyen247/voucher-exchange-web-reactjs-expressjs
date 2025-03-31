@@ -1,11 +1,13 @@
 import { Outlet } from "react-router-dom";
 import AppHeader from "./components/layout/app.header";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./components/context/auth.context";
 import { fetchAccountApi } from "./utils/api";
+import Chatbot from "./components/chatbot"; // Import Chatbot
 
 const Layout = () => {
   const { setAuth } = useContext(AuthContext);
+  const [showChatbot, setShowChatbot] = useState(false); // Trạng thái bật/tắt Chatbot
 
   useEffect(() => {
     const fetchAcc = async () => {
@@ -28,13 +30,14 @@ const Layout = () => {
             user: {
               email: "",
               name: "",
-              phone:"",
-              id:"",
-              image:"",
+              phone: "",
+              id: "",
+              image: "",
             },
           });
         }
-      } catch (err) {
+      } catch(error) {
+        console.error("Error fetching account data:", error);
         setAuth({
           isAuthenticated: false,
           user: {
@@ -46,12 +49,37 @@ const Layout = () => {
     };
 
     fetchAcc();
-  }, []);
+  }, [setAuth]);
 
   return (
     <div>
       <AppHeader />
       <Outlet />
+
+      {/* Nút bật/tắt chatbot */}
+      <button
+        onClick={() => setShowChatbot(!showChatbot)}
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          padding: "10px 15px",
+          borderRadius: "50%",
+          backgroundColor: "#007bff",
+          color: "white",
+          border: "none",
+          cursor: "pointer",
+          fontSize: "18px",
+          transition: "background-color 0.3s ease",
+        }}
+        onMouseEnter={(e) => (e.target.style.backgroundColor = "#0056b3")}
+        onMouseLeave={(e) => (e.target.style.backgroundColor = "#007bff")}
+      >
+        💬
+      </button>
+
+      {/* Hiển thị Chatbot khi showChatbot === true */}
+      {showChatbot && <Chatbot />}
     </div>
   );
 };

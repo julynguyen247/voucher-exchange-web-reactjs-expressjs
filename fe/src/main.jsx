@@ -12,6 +12,9 @@ import RegisterPage from "../src/pages/client/auth/register"
 import { createRoot } from 'react-dom/client';
 import OrderPage from "./pages/client/order";
 
+import Chatbot from "./components/chatbot";
+import React from "react";
+
 const router = createBrowserRouter([
   {
     path: "/",
