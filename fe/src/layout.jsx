@@ -79,7 +79,8 @@ const Layout = () => {
       </button>
 
       {/* Hiển thị Chatbot khi showChatbot === true */}
-      {showChatbot && <Chatbot />}
+      {showChatbot && <Chatbot showChatbot={showChatbot} setShowChatbot={setShowChatbot} />}
+
     </div>
   );
 };

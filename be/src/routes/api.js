@@ -44,8 +44,8 @@ routerAPI.delete("/voucher", deleteVoucher);
 routerAPI.get("/voucher/platform", getPlatform);
 routerAPI.get("/voucher/category", getCategory);
 
-//transaction
-routerAPI.post("/transaction", transactionController.processTransaction);
-routerAPI.get("/transactions/:userId", transactionController.getTransactions);
+//chatbot
+const chatbotRoutes = require("./chatbotRoutes"); 
+routerAPI.use("/chatbot", chatbotRoutes);
 
 module.exports = routerAPI; //export default
