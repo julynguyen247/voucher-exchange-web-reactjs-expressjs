@@ -1,10 +1,18 @@
 const mongoose = require("mongoose");
+const mongoose_delete = require("mongoose-delete");
 
 const transactionSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
   voucherId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Voucher",
+    ref: "voucher",
+    required: true,
+  },
+  voucherName: { type: String, required: true },
+  price: { type: Number, required: true },
+  paymentMethod: {
+    type: String,
+    enum: ["cash", "bank_transfer"],
     required: true,
   },
   status: {
@@ -14,5 +22,7 @@ const transactionSchema = new mongoose.Schema({
   },
   createdAt: { type: Date, default: Date.now },
 });
+transactionSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
-module.exports = mongoose.model("Transaction", transactionSchema);
+const Transaction = mongoose.model("Transaction", transactionSchema);
+module.exports = Transaction;

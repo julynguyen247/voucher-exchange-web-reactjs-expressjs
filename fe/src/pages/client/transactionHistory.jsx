@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Table, Tag } from "antd";
-import { getTransactions } from "../../utils/api"; // Import the named export
+import { getTransactions } from "../../utils/api";
+import { AuthContext } from "../../components/context/auth.context";
 
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState([]);
+  const { auth } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const userId = "USER_ID"; // Replace with the logged-in user's ID
-        const response = await getTransactions(userId); // Use the named export
+        const userId = auth?.user?.id;
+        console.log("Fetching transactions for userId:", userId);
+        const response = await getTransactions(userId);
         setTransactions(response.data);
       } catch (error) {
         console.error("Failed to fetch transactions:", error);
@@ -17,14 +20,31 @@ const TransactionHistory = () => {
     };
 
     fetchTransactions();
-  }, []);
+  }, [auth]);
 
   const columns = [
     {
-      title: "Voucher",
-      dataIndex: "voucher",
-      key: "voucher",
-      render: (text, record) => record.voucherId?.name || "N/A",
+      title: "Voucher Name",
+      dataIndex: "voucherName",
+      key: "voucherName",
+      render: (text, record) => record.voucherName || "N/A",
+    },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+      render: (price) => `${price} VND`,
+    },
+    {
+      title: "Payment Method",
+      dataIndex: "paymentMethod",
+      key: "paymentMethod",
+      render: (method) =>
+        method === "cash"
+          ? "Cash"
+          : method === "bank_transfer"
+          ? "Bank Transfer"
+          : "N/A",
     },
     {
       title: "Status",
@@ -45,7 +65,11 @@ const TransactionHistory = () => {
   return (
     <div>
       <h1>Transaction History</h1>
-      <Table dataSource={transactions} columns={columns} rowKey="_id" />
+      <Table
+        dataSource={Array.isArray(transactions) ? transactions : []}
+        columns={columns}
+        rowKey="_id"
+      />
     </div>
   );
 };

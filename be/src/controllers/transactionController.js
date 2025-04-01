@@ -1,55 +1,69 @@
-const mongoose = require("mongoose");
-const Transaction = require("../models/transaction");
-const User = require("../models/user");
-const Voucher = require("../models/voucher");
+const {
+  createTransactionService,
+  getTransactionsService,
+} = require("../services/transactionService");
 
-exports.processTransaction = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
+const processTransaction = async (req, res) => {
   try {
-    const { userId, voucherId } = req.body;
+    console.log("Received transaction data:", req.body);
 
-    // Check validation
-    const user = await User.findById(userId).session(session);
-    const voucher = await Voucher.findById(voucherId).session(session);
+    const { userId, voucherId, voucherName, price, paymentMethod } = req.body;
 
-    if (!user || !voucher) throw new Error("Invalid user or voucher");
-    if (user.balance < voucher.price) throw new Error("Insufficient balance");
+    if (!userId || !voucherId || !voucherName || !price || !paymentMethod) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields",
+      });
+    }
 
-    // Deduct balance from user and update voucher status
-    user.balance -= voucher.price;
-    voucher.status = "Sold";
-
-    await user.save({ session });
-    await voucher.save({ session });
-
-    // Save transaction details
-    const transaction = new Transaction({
+    const data = await createTransactionService(
       userId,
       voucherId,
-      status: "Completed",
+      voucherName,
+      price,
+      paymentMethod
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Transaction successful",
+      transaction: data.transaction,
     });
-    await transaction.save({ session });
-
-    await session.commitTransaction();
-    session.endSession();
-
-    res.status(200).json({ success: true, message: "Transaction completed" });
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    res.status(400).json({ success: false, message: error.message });
+    console.error("Error processing transaction:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
   }
 };
-exports.getTransactions = async (req, res) => {
+
+const getTransactions = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const transactions = await Transaction.find({ userId }).populate(
-      "voucherId"
-    );
-    res.status(200).json(transactions);
+    const { userId } = req.query;
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or missing userId",
+      });
+    }
+
+    const result = await getTransactionsService(userId);
+    return res.status(200).json({
+      success: true,
+      message: "Transactions fetched successfully",
+      data: result.transactions,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Error fetching transactions:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
   }
+};
+module.exports = {
+  processTransaction,
+  getTransactions,
 };
