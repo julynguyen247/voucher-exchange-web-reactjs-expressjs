@@ -18,7 +18,10 @@ const {
   getPlatform,
   getCategory,
 } = require("../controllers/voucherController");
-const transactionController = require("../controllers/transactionController");
+const {
+  processTransaction,
+  getTransactions,
+} = require("../controllers/transactionController");
 const routerAPI = express.Router();
 routerAPI.all("*", auth);
 routerAPI.get("/", (req, res) => {
@@ -43,6 +46,10 @@ routerAPI.get("/voucher", getVoucher);
 routerAPI.delete("/voucher", deleteVoucher);
 routerAPI.get("/voucher/platform", getPlatform);
 routerAPI.get("/voucher/category", getCategory);
+
+//transaction
+routerAPI.post("/transaction", transactionController.processTransaction);
+routerAPI.get("/transactions/:userId", transactionController.getTransactions);
 
 //chatbot
 const chatbotRoutes = require("./chatbotRoutes"); 

@@ -91,12 +91,16 @@ const updateUserApi = (id, name, email, password, phone, image) => {
   return axios.put(URL_API, { id, name, email, password, phone, image });
 };
 const getTransactions = (userId) => {
-  const URL_API = `/v1/api/transactions/${userId}`;
+  const URL_API = `/v1/api/transaction/get?userId=${userId}`;
   return axios.get(URL_API);
 };
-const processTransaction = (userId, voucherId) => {
-  const URL_API = "/v1/api/transaction";
-  return axios.post(URL_API, { userId, voucherId });
+const processTransaction = (transactionData) => {
+  const URL_API = "/v1/api/transaction/process";
+  return axios.post(URL_API, transactionData, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 };
 export {
   createUserApi,

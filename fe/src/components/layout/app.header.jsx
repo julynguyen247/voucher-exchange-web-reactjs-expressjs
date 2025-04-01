@@ -8,7 +8,7 @@ import { logoutApi } from "../../utils/api";
 import { Image } from "antd";
 const AppHeader = () => {
   const { auth, setAuth } = useContext(AuthContext);
-  
+
   const handleLogout = async () => {
     const res = await logoutApi();
     if (res && res.data) {
@@ -41,7 +41,6 @@ const AppHeader = () => {
                 border: "1px solid white",
                 borderRadius: "50%",
                 objectFit: "cover",
-            
               }}
               preview={false}
             />
@@ -56,13 +55,13 @@ const AppHeader = () => {
             <Nav.Link href="/voucher">Voucher</Nav.Link>
             {auth.isAuthenticated ? (
               <NavDropdown title={"Options"} id="basic-nav-dropdown">
-                 <NavDropdown.Item href="/account">
-                 Manage Account
+                <NavDropdown.Item href="/account">
+                  Manage Account
                 </NavDropdown.Item>
                 <NavDropdown.Item href="/create-voucher">
                   Create Voucher{" "}
                 </NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.3">
+                <NavDropdown.Item href="/transaction-history">
                   Exchange History
                 </NavDropdown.Item>
 
