@@ -22,6 +22,8 @@ const {
   processTransaction,
   getTransactions,
 } = require("../controllers/transactionController");
+
+const transactionController = require("../controllers/transactionController");
 const routerAPI = express.Router();
 routerAPI.all("*", auth);
 routerAPI.get("/", (req, res) => {
