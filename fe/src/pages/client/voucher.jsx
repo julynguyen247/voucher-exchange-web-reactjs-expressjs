@@ -114,7 +114,15 @@ const VoucherPage = () => {
                 block
                 size="small"
                 className="mt-3 border-black text-black text-xs"
-                onClick={()=>navigate("/order")}
+                onClick={() =>
+                  navigate("/order", {
+                    state: {
+                      voucherId: item._id,
+                      voucherName: `Giảm ${item.discountValue}% đơn tối thiểu ${item.minimumOrder}đ`,
+                      price: item.price,
+                    },
+                  })
+                }
               >
                 Buy now
               </Button>
@@ -123,14 +131,12 @@ const VoucherPage = () => {
         ))}
       </Row>
 
-
       <FilterModal
         openModal={openModal}
         setOpenModal={setOpenModal}
         selectedCategories={selectedCategories}
         onFilterChange={handleFilterChange}
       />
-
     </div>
   );
 };
