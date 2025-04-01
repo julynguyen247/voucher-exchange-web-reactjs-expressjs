@@ -14,6 +14,9 @@ import OrderPage from "./pages/client/order";
 import TransactionPage from "./pages/client/transaction";
 import TransactionHistory from "./pages/client/transactionHistory";
 
+import Chatbot from "./components/chatbot";
+import React from "react";
+
 const router = createBrowserRouter([
   {
     path: "/",
