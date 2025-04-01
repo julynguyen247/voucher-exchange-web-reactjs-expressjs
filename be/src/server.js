@@ -40,7 +40,7 @@ app.post("/chat", async (req, res) => {
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
-        model: "gpt-4",
+        model: "gpt-4o",
         messages: [{ role: "user", content: message }],
       },
       {
@@ -60,7 +60,7 @@ app.post("/chat", async (req, res) => {
 
 // Trang chủ API
 app.get("/", (req, res) => {
-  res.send("Hello! API đang chạy...");
+  res.send("API đang chạy rồi nè bro.");
 });
 
 // Kết nối Database & Chạy server

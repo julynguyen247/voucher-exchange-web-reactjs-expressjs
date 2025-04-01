@@ -7,6 +7,12 @@ import userImg from "../assets/user.png";
 const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8081";
 
 const Chatbot = () => {
+  const [isVisible, setIsVisible] = useState(true); // State kiểm soát hiển thị chatbot
+
+  const toggleChatbot = () => {
+    setIsVisible((prev) => !prev); // Đảo trạng thái hiển thị
+  };
+
   const [inputText, setInputText] = useState("");
   const [chatMessages, setChatMessages] = useState([
     { message: "Xin chào! Tôi có thể giúp gì cho bạn?", sender: "robot", id: "id1" },
@@ -40,33 +46,38 @@ const Chatbot = () => {
         ]);
     }
 };
-  return (
-    <div className="chatbot-container">
-      <div className="chatbot-header">
-        <span>Chatbot</span>
+return (
+  <>
+    {isVisible && (
+      <div className="chatbot-container">
+        <div className="chatbot-header" onClick={toggleChatbot}>
+          <span> 🤖 AI Chatbot</span>
+        </div>
+        <div className="chat-messages-container" ref={chatMessagesRef}>
+          {chatMessages.map(({ message, sender, id }) => (
+            <div key={id} className={sender === "user" ? "chat-message-user" : "chat-message-robot"}>
+              {sender === "robot" && <img src={robotImg} alt="Robot" className="chat-message-profile" />}
+              <div className="chat-message-text">{message}</div>
+              {sender === "user" && <img src={userImg} alt="User" className="chat-message-profile" />}
+            </div>
+          ))}
+        </div>
+        <div className="chat-input-container">
+          <input
+            type="text"
+            placeholder="Nhập tin nhắn..."
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            className="chat-input"
+          />
+          <button onClick={handleSendMessage} className="send-button">Gửi</button>
+        </div>
       </div>
+    )}
+  </>
+);
 
-      <div className="chat-messages-container" ref={chatMessagesRef}>
-        {chatMessages.map(({ message, sender, id }) => (
-          <div key={id} className={sender === "user" ? "chat-message-user" : "chat-message-robot"}>
-            {sender === "robot" && <img src={robotImg} alt="Robot" className="chat-message-profile" />}
-            <div className="chat-message-text">{message}</div>
-            {sender === "user" && <img src={userImg} alt="User" className="chat-message-profile" />}
-          </div>
-        ))}
-      </div>
-      <div className="chat-input-container">
-        <input
-          type="text"
-          placeholder="Nhập tin nhắn..."
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          className="chat-input"
-        />
-        <button onClick={handleSendMessage} className="send-button">Gửi</button>
-      </div>
-    </div>
-  );
+
 };
 
 export default Chatbot;
