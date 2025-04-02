@@ -90,8 +90,8 @@ const updateUserApi = (id, name, email, password, phone, image) => {
   const URL_API = "/v1/api/user";
   return axios.put(URL_API, { id, name, email, password, phone, image });
 };
-const getTransactions = (userId) => {
-  const URL_API = `/v1/api/transaction/get?userId=${userId}`;
+const getTransactions = () => {
+  const URL_API = `/v1/api/transaction/get`;
   return axios.get(URL_API);
 };
 const processTransaction = (transactionData) => {
