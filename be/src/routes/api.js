@@ -50,11 +50,11 @@ routerAPI.get("/voucher/platform", getPlatform);
 routerAPI.get("/voucher/category", getCategory);
 
 //transaction
-routerAPI.post("/transaction", transactionController.processTransaction);
-routerAPI.get("/transactions/:userId", transactionController.getTransactions);
+routerAPI.post("/transaction/process", processTransaction);
+routerAPI.get("/transaction/get", getTransactions);
 
 //chatbot
-const chatbotRoutes = require("./chatbotRoutes"); 
+const chatbotRoutes = require("./chatbotRoutes");
 routerAPI.use("/chatbot", chatbotRoutes);
 
 module.exports = routerAPI; //export default
