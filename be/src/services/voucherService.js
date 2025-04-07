@@ -45,7 +45,9 @@ const createVoucherService = async (
   discountValue,
   expirationDate,
   email,
-  price
+  price,
+  bankAccount,
+  bankName
 ) => {
   try {
     let user = await User.findOne({ email: email });
@@ -61,6 +63,8 @@ const createVoucherService = async (
       createdBy: userId,
       status: "Available",
       price,
+      bankAccount,
+      bankName,
     });
     return result;
   } catch (error) {

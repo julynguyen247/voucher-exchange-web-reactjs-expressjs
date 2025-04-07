@@ -1,8 +1,9 @@
 import React, { useState, useContext } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { processTransaction } from "../../utils/api";
 import { AuthContext } from "../../components/context/auth.context";
 import "../../style/transactionPage.css";
+import { QRCode } from "antd";
 
 const TransactionPage = () => {
   const location = useLocation();
@@ -11,6 +12,10 @@ const TransactionPage = () => {
   const [selectedBank, setSelectedBank] = useState("");
   const [message, setMessage] = useState("");
   const { auth } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [sellerPhone, setSellerPhone] = useState("");
+  const [sellerBankAccount, setSellerBankAccount] = useState("");
+  const [sellerBankName, setSellerBankName] = useState("");
 
   const handlePaymentMethodChange = (event) => {
     setPaymentMethod(event.target.value);
@@ -39,20 +44,19 @@ const TransactionPage = () => {
         ...(paymentMethod === "bank_transfer" &&
           selectedBank && { bank: selectedBank }),
       };
-      console.log("userId:", userId);
-      console.log("voucherId:", voucherId);
-      console.log("voucherName:", voucherName);
-      console.log("price:", price);
-      console.log("paymentMethod:", paymentMethod);
-      if (paymentMethod === "bank_transfer") {
-        console.log("selectedBank:", selectedBank);
-      }
-
-      console.log("Sending transaction data:", transactionData);
 
       const response = await processTransaction(transactionData);
-      console.log("API Response:", response);
+
       setMessage(response.data.message);
+      if (response.data.sellerPhone) {
+        setSellerPhone(response.data.sellerPhone);
+      }
+      if (response.data.sellerBankAccount) {
+        setSellerBankAccount(response.data.sellerBankAccount);
+      }
+      if (response.data.sellerBankName) {
+        setSellerBankName(response.data.sellerBankName);
+      }
     } catch (error) {
       console.error(
         "Giao dịch thất bại:",
@@ -63,7 +67,6 @@ const TransactionPage = () => {
       setMessage(errorMessage);
     }
   };
-
   return (
     <div className="transaction-container">
       <h1 className="transaction-title">Xác Nhận Thanh Toán</h1>
@@ -115,6 +118,67 @@ const TransactionPage = () => {
               <option value="vietcombank">Vietcombank</option>
               <option value="techcombank">Techcombank</option>
             </select>
+          </div>
+        )}
+
+        {/* Hiển thị thông tin thanh toán tương ứng với ngân hàng được chọn */}
+        {paymentMethod === "bank_transfer" && selectedBank && (
+          <div className="payment-instruction">
+            {selectedBank === "momo" && (
+              <div>
+                <h3>Quét mã QR để thanh toán bằng Momo</h3>
+                <QRCode
+                  value={`2|99|${sellerPhone}||0|0|${
+                    price * 1000
+                  }|Thanh toan voucher ${voucherName}`}
+                  size={256}
+                />
+                <p>
+                  <strong>SĐT người nhận:</strong> {sellerPhone}
+                </p>
+                <p>
+                  <strong>Nội dung:</strong> Thanh toan voucher {voucherName}
+                </p>
+              </div>
+            )}
+
+            {selectedBank === "zalo_pay" && (
+              <div>
+                <h3>Quét mã QR để thanh toán bằng Zalo Pay</h3>
+                <QRCode
+                  value={`https://pay.zalopay.vn/qr-code?vnp_Amount=${
+                    price * 100000
+                  }&vnp_OrderInfo=Thanh toan voucher ${voucherName}`}
+                  size={256}
+                />
+                <p>
+                  <strong>SĐT người nhận:</strong> {sellerPhone}
+                </p>
+                <p>
+                  <strong>Nội dung:</strong> Thanh toan voucher {voucherName}
+                </p>
+              </div>
+            )}
+
+            {(selectedBank === "vietcombank" ||
+              selectedBank === "techcombank") && (
+              <div>
+                <h3>Thông tin chuyển khoản</h3>
+                <p>
+                  <strong>Ngân hàng:</strong> {sellerBankName}
+                </p>
+                <p>
+                  <strong>Chủ tài khoản:</strong>{" "}
+                  {auth?.user?.name || "Người bán"}
+                </p>
+                <p>
+                  <strong>Số tài khoản:</strong> {sellerBankAccount}
+                </p>
+                <p>
+                  <strong>Nội dung:</strong> Thanh toan voucher {voucherName}
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
