@@ -1,7 +1,9 @@
+const mongoose = require("mongoose");
 const {
   createTransactionService,
   getTransactionsService,
 } = require("../services/transactionService");
+const User = require("../models/user");
 
 const processTransaction = async (req, res) => {
   try {
@@ -40,8 +42,9 @@ const processTransaction = async (req, res) => {
 
 const getTransactions = async (req, res) => {
   try {
-    const { userId } = req.query;
-
+    const userEmail = req.user.email;
+    const user = await User.findOne({ email: userEmail });
+    const userId = user._id;
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
         success: false,

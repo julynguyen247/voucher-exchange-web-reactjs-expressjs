@@ -5,17 +5,31 @@ import { AuthContext } from "../../components/context/auth.context";
 
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState([]);
+  const [message, setMessage] = useState("");
   const { auth } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
         const userId = auth?.user?.id;
+
         console.log("Fetching transactions for userId:", userId);
-        const response = await getTransactions(userId);
-        setTransactions(response.data);
+
+        const response = await getTransactions();
+        console.log("API Response:", response);
+        if (response.data) {
+          setTransactions(response.data.data || []);
+        } else {
+          setMessage(response.data.message || "Failed to fetch transactions.");
+        }
       } catch (error) {
-        console.error("Failed to fetch transactions:", error);
+        console.error(
+          "Failed to fetch transactions:",
+          error.response?.data || error.message
+        );
+        setMessage(
+          error.response?.data?.message || "Failed to fetch transactions."
+        );
       }
     };
 
@@ -27,7 +41,7 @@ const TransactionHistory = () => {
       title: "Voucher Name",
       dataIndex: "voucherName",
       key: "voucherName",
-      render: (text, record) => record.voucherName || "N/A",
+      render: (text) => text || "N/A",
     },
     {
       title: "Price",
@@ -65,6 +79,7 @@ const TransactionHistory = () => {
   return (
     <div>
       <h1>Transaction History</h1>
+      {message && <p style={{ color: "red" }}>{message}</p>}
       <Table
         dataSource={Array.isArray(transactions) ? transactions : []}
         columns={columns}
