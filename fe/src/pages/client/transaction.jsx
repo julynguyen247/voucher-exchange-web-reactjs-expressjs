@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import { processTransaction } from "../../utils/api";
 import { AuthContext } from "../../components/context/auth.context";
-import "../../style/transactionPage.css"; // Import file CSS module
+import "../../style/transactionPage.css";
 
 const TransactionPage = () => {
   const location = useLocation();
@@ -14,7 +14,7 @@ const TransactionPage = () => {
 
   const handlePaymentMethodChange = (event) => {
     setPaymentMethod(event.target.value);
-    setSelectedBank(""); // Reset selected bank when payment method changes
+    setSelectedBank("");
   };
 
   const handleBankChange = (event) => {
@@ -37,7 +37,7 @@ const TransactionPage = () => {
         price,
         paymentMethod,
         ...(paymentMethod === "bank_transfer" &&
-          selectedBank && { bank: selectedBank }), // Thêm thông tin ngân hàng nếu có
+          selectedBank && { bank: selectedBank }),
       };
       console.log("userId:", userId);
       console.log("voucherId:", voucherId);
@@ -114,7 +114,6 @@ const TransactionPage = () => {
               <option value="zalo_pay">Zalo Pay</option>
               <option value="vietcombank">Vietcombank</option>
               <option value="techcombank">Techcombank</option>
-              {/* Thêm các ngân hàng khác nếu cần */}
             </select>
           </div>
         )}
