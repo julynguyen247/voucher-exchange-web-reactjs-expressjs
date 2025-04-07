@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import "../../style/orderPage.css"; // Đảm bảo bạn có file CSS riêng để cải thiện giao diện
 
 const OrderPage = () => {
   const navigate = useNavigate();
@@ -11,11 +12,21 @@ const OrderPage = () => {
   };
 
   return (
-    <div>
-      <h1>Order Confirmation</h1>
-      <p>Voucher Name: {voucherName}</p>
-      <p>Price: {price} VND</p>
-      <button onClick={handlePayment}>Proceed to Payment</button>
+    <div className="order-container">
+      <div className="order-card">
+        <h1 className="order-title">Thông tin đơn hàng</h1>
+        <div className="order-details">
+          <p className="order-detail">
+            <strong>Voucher:</strong> {voucherName}
+          </p>
+          <p className="order-detail">
+            <strong>Giá:</strong> {price} VND
+          </p>
+        </div>
+        <button className="payment-button" onClick={handlePayment}>
+          Xác nhận thanh toán
+        </button>
+      </div>
     </div>
   );
 };

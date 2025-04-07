@@ -38,30 +38,30 @@ const TransactionHistory = () => {
 
   const columns = [
     {
-      title: "Voucher Name",
+      title: "Voucher",
       dataIndex: "voucherName",
       key: "voucherName",
       render: (text) => text || "N/A",
     },
     {
-      title: "Price",
+      title: "Giá",
       dataIndex: "price",
       key: "price",
       render: (price) => `${price} VND`,
     },
     {
-      title: "Payment Method",
+      title: "Phương thức thanh toán",
       dataIndex: "paymentMethod",
       key: "paymentMethod",
       render: (method) =>
         method === "cash"
-          ? "Cash"
+          ? "Tiền mặt"
           : method === "bank_transfer"
-          ? "Bank Transfer"
+          ? "Chuyển khoản"
           : "N/A",
     },
     {
-      title: "Status",
+      title: "Trạng thái",
       dataIndex: "status",
       key: "status",
       render: (status) => (
@@ -69,7 +69,7 @@ const TransactionHistory = () => {
       ),
     },
     {
-      title: "Date",
+      title: "Ngày",
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date) => new Date(date).toLocaleString(),
