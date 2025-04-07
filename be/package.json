@@ -13,6 +13,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1",
     "mongoose-delete": "1.0.2",
+    "qrcode.react": "^4.2.0",
     "sharp": "^0.33.5"
   },
   "name": "backen-voucher-exchange",

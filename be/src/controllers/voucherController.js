@@ -4,6 +4,8 @@ const {
   getVoucherService,
   deleteAVoucherService,
 } = require("../services/voucherService");
+const Voucher = require("../models/voucher");
+const User = require("../models/user");
 const createVoucher = async (req, res) => {
   const {
     minimumOrder,
@@ -13,9 +15,10 @@ const createVoucher = async (req, res) => {
     platform,
     code,
     price,
-    image
+    image,
+    bankAccount,
+    bankName,
   } = req.body;
-
 
   const result = await createVoucherService(
     minimumOrder,
@@ -26,7 +29,9 @@ const createVoucher = async (req, res) => {
     discountValue,
     expirationDate,
     req.user.email,
-    price
+    price,
+    bankAccount,
+    bankName
   );
   return res.status(200).json({
     message: "Success",

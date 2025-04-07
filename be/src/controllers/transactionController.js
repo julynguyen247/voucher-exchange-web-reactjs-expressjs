@@ -4,19 +4,29 @@ const {
   getTransactionsService,
 } = require("../services/transactionService");
 const User = require("../models/user");
+const Voucher = require("../models/voucher");
 
 const processTransaction = async (req, res) => {
   try {
-    console.log("Received transaction data:", req.body);
-
     const { userId, voucherId, voucherName, price, paymentMethod } = req.body;
 
     if (!userId || !voucherId || !voucherName || !price || !paymentMethod) {
-      return res.status(400).json({
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required fields" });
+    }
+
+    const voucher = await Voucher.findById(voucherId).populate("uploaderId");
+    if (!voucher || !voucher.uploaderId || !voucher.uploaderId.phone) {
+      return res.status(404).json({
         success: false,
-        message: "Missing required fields",
+        message: "Không tìm thấy thông tin người bán",
       });
     }
+
+    const sellerPhone = voucher.uploaderId.phone;
+    const sellerBankAccount = voucher.uploaderId.bankAccount || "Đang cập nhật";
+    const sellerBankName = voucher.uploaderId.bankName || "Đang cập nhật";
 
     const data = await createTransactionService(
       userId,
@@ -30,6 +40,9 @@ const processTransaction = async (req, res) => {
       success: true,
       message: "Transaction successful",
       transaction: data.transaction,
+      sellerPhone,
+      sellerBankAccount,
+      sellerBankName,
     });
   } catch (error) {
     console.error("Error processing transaction:", error);

@@ -1,20 +1,22 @@
 const mongoose = require("mongoose");
-const mongoose_delete = require('mongoose-delete');
+const mongoose_delete = require("mongoose-delete");
 const voucherSchema = new mongoose.Schema(
   {
     minimumOrder: Number,
-    platform:String,
+    platform: String,
     category: String,
-    code:String,
+    code: String,
     image: String,
     discountValue: Number,
     expirationDate: Date,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
     price: Number,
     status: String,
+    bankAccount: String,
+    bankName: String,
   },
   { timestamps: true }
 );
-voucherSchema.plugin(mongoose_delete,{ overrideMethods: 'all' });
+voucherSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 const Voucher = mongoose.model("voucher", voucherSchema);
 module.exports = Voucher;
