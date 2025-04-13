@@ -129,7 +129,7 @@ const Info = () => {
           name="email"
           rules={[
             {
-              required: true,
+              required: false,
               message: "Please input your email!",
             },
           ]}

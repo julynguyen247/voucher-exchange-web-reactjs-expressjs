@@ -2,12 +2,15 @@ import React, { useContext, useState } from "react";
 import { loginApi } from "../../../utils/api";
 import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, notification, Divider, message } from "antd";
+import { GoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 import { AuthContext } from "../../../components/context/auth.context";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { setAuth } = useContext(AuthContext);
   const [isSubmit, setIsSubmit] = useState(false);
+
   const onFinish = async (values) => {
     setIsSubmit(true);
     const { email, password } = values;
@@ -22,12 +25,37 @@ const LoginPage = () => {
           name: res.data.user.name ?? "",
         },
       });
-      console.log(res);
       navigate("/");
     } else {
       message.error("Error email/password");
     }
     setIsSubmit(false);
+  };
+
+  const handleGoogleSuccess = async (response) => {
+    const credential = response.credential;
+
+    try {
+      const res = await axios.post(
+        "http://localhost:8081/api/v1/auth/google-login",
+        { credential }
+      );
+
+      if (res.data && res.data.EC === 0) {
+        localStorage.setItem("access_token", res.data.access_token);
+        setAuth({
+          isAuthenticated: true,
+          user: res.data.user,
+        });
+        message.success("Đăng nhập bằng Google thành công");
+        navigate("/");
+      } else {
+        message.error("Đăng nhập Google thất bại");
+      }
+    } catch (err) {
+      console.error("Google login error:", err);
+      message.error("Lỗi hệ thống khi login Google");
+    }
   };
 
   return (
@@ -86,6 +114,14 @@ const LoginPage = () => {
             </Button>
           </Form.Item>
           <Divider>Or</Divider>
+          <div style={{ display: "flex", justifyContent: "center", marginTop: "16px" }}>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => {
+                message.error("Đăng nhập bằng Google thất bại");
+              }}
+            />
+          </div>
           <p className="text text-normal" style={{ textAlign: "center" }}>
             Chưa có tài khoản?
             <span>

@@ -1,20 +1,28 @@
 const express = require("express");
 const passport = require("passport");
-const authController = require("../controllers/authController"); // Import controller
+const authController = require("../controllers/authController");
 const router = express.Router();
 
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get(
+  "/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"], // BẮT BUỘC phải có
+  })
+);
 
 router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
+    if (!req.user) {
+      return res.redirect("http://localhost:5173/login-failed?reason=no-email");
+    }
+
     const user = req.user;
-    res.redirect(`http://localhost:3000?email=${user.emails[0].value}&name=${user.displayName}`);
+    res.redirect(`http://localhost:5173/login-success?email=${user.email}&name=${user.name}`);
   }
 );
 
-// Route xử lý Google Login từ frontend
 router.post("/google-login", authController.handleGoogleLogin);
 
 module.exports = router;

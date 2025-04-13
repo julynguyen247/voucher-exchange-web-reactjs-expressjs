@@ -43,12 +43,12 @@ const loginService = async (email, password) => {
           email: user.email,
           name: user.name,
         };
-        const access_token = jwt.sign(payload, process.env.JWT_SECRET, {
-          expiresIn: process.env.JWT_EXPIRED || '1d',
+        const token = jwt.sign(payload, process.env.JWT_SECRET, {
+          expiresIn: "1d", // Chuỗi hợp lệ
         });
         return {
           EC: 0,
-          access_token,
+          access_token: token,
           user: {
             email: user.email,
             name: user.name,

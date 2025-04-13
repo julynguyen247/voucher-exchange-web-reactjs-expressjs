@@ -16,6 +16,9 @@ import TransactionHistory from "./pages/client/transactionHistory";
 
 import Chatbot from "./components/chatbot";
 import React from "react";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
+const clientId = "672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com";
 
 const router = createBrowserRouter([
   {
@@ -63,11 +66,13 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  // <React.StrictMode>
-  <App>
-    <AuthWrapper>
-      <RouterProvider router={router} />
-    </AuthWrapper>
-  </App>
-  // </React.StrictMode>
+  <React.StrictMode>
+    <GoogleOAuthProvider clientId="672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com">
+      <App>
+        <AuthWrapper>
+          <RouterProvider router={router} />
+        </AuthWrapper>
+      </App>
+    </GoogleOAuthProvider>
+  </React.StrictMode>
 );
