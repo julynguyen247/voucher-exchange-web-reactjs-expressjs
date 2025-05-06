@@ -1,7 +1,14 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const auth = (req, res, next) => {
-  const white_lists = ["/login", "/register", "/","/logout","/image"];
+  const white_lists = [
+    "/login",
+    "/register",
+    "/",
+    "/logout",
+    "/image",
+    "/voucher",
+  ];
   if (white_lists.find((item) => "/v1/api" + item === req.originalUrl)) {
     next();
   } else {
@@ -10,7 +17,7 @@ const auth = (req, res, next) => {
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = {
-          id:"",
+          id: "",
           email: decoded.email,
           name: decoded.name,
           role: "USER",
@@ -18,13 +25,13 @@ const auth = (req, res, next) => {
         next();
       } catch (error) {
         return res.status(401).json({
-            message: "Token hết hạn hoặc token không hợp lệ ",
-          });
+          message: "Token hết hạn hoặc token không hợp lệ ",
+        });
       }
     } else {
-        return res.status(401).json({
-            message: "Bạn chưa truyền token hoặc token không hợp lệ ",
-          });
+      return res.status(401).json({
+        message: "Bạn chưa truyền token hoặc token không hợp lệ ",
+      });
     }
   }
 };
