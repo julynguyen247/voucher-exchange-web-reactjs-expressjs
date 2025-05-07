@@ -7,12 +7,14 @@ const {
   fetchAccountService,
 } = require("../services/userService");
 const { OAuth2Client } = require("google-auth-library");
-const client = new OAuth2Client("672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com");
+const client = new OAuth2Client(
+  "672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com"
+);
 const { createJWT } = require("../utils/jwt"); // Đảm bảo bạn có hàm tạo JWT
 const User = require("../models/user"); // Import trực tiếp model User
 
 const createUser = async (req, res) => {
-  const { name, email, password, phone ,image} = req.body;
+  const { name, email, password, phone, image } = req.body;
   const data = await createUserService(name, email, password, phone, image);
   return res.status(200).json({
     result: data,
@@ -51,8 +53,15 @@ const deleteUser = async (req, res) => {
   });
 };
 const updateUser = async (req, res) => {
-  const { id, name, email, password,phone,image } = req.body;
-  let result = await updateAUserService(id, name, email, password,phone,image);
+  const { id, name, email, password, phone, image } = req.body;
+  let result = await updateAUserService(
+    id,
+    name,
+    email,
+    password,
+    phone,
+    image
+  );
   return res.status(200).json({
     EC: 0,
     data: result,
@@ -76,7 +85,8 @@ const handleGoogleLogin = async (req, res) => {
   try {
     const ticket = await client.verifyIdToken({
       idToken: credential,
-      audience: "672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com",
+      audience:
+        "672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com",
     });
     const payload = ticket.getPayload();
 
@@ -89,7 +99,8 @@ const handleGoogleLogin = async (req, res) => {
 
     if (!user) {
       // Tạo user mới nếu chưa tồn tại
-      user = await User.create({ // Sửa thành User.create
+      user = await User.create({
+        // Sửa thành User.create
         name,
         email,
         password: null, // không có mật khẩu
@@ -116,6 +127,26 @@ const handleGoogleLogin = async (req, res) => {
     return res.status(500).json({ EC: 1, message: "Google login failed" });
   }
 };
+const getBank = () => {
+  return [
+    { name: "Vietcombank", code: "VCB" },
+    { name: "VietinBank", code: "CTG" },
+    { name: "BIDV", code: "BID" },
+    { name: "Agribank", code: "VBA" },
+    { name: "Techcombank", code: "TCB" },
+    { name: "ACB", code: "ACB" },
+    { name: "Sacombank", code: "STB" },
+    { name: "MB Bank", code: "MBB" },
+    { name: "VPBank", code: "VPB" },
+    { name: "SHB", code: "SHB" },
+    { name: "TPBank", code: "TPB" },
+    { name: "VIB", code: "VIB" },
+    { name: "HDBank", code: "HDB" },
+    { name: "OCB", code: "OCB" },
+    { name: "Eximbank", code: "EIB" },
+    { name: "SCB", code: "SCB" },
+  ];
+};
 
 module.exports = {
   createUser,
@@ -127,4 +158,5 @@ module.exports = {
   handleFetchAccount,
   getAccount,
   handleGoogleLogin,
+  getBank,
 };

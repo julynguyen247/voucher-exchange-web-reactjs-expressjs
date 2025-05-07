@@ -6,7 +6,7 @@ import { fetchAccountApi } from "./utils/api";
 import Chatbot from "./components/chatbot"; // Import Chatbot
 
 const Layout = () => {
-  const { setAuth } = useContext(AuthContext);
+  const { setAuth, auth } = useContext(AuthContext);
   const [showChatbot, setShowChatbot] = useState(false); // Trạng thái bật/tắt Chatbot
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const Layout = () => {
             },
           });
         }
-      } catch(error) {
+      } catch (error) {
         console.error("Error fetching account data:", error);
         setAuth({
           isAuthenticated: false,
@@ -79,8 +79,9 @@ const Layout = () => {
       </button>
 
       {/* Hiển thị Chatbot khi showChatbot === true */}
-      {showChatbot && <Chatbot showChatbot={showChatbot} setShowChatbot={setShowChatbot} />}
-
+      {showChatbot && (
+        <Chatbot showChatbot={showChatbot} setShowChatbot={setShowChatbot} />
+      )}
     </div>
   );
 };
