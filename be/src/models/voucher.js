@@ -14,6 +14,15 @@ const voucherSchema = new mongoose.Schema(
     status: String,
     bankAccount: String,
     bankName: String,
+    rating: {
+      type: Number,
+      min: 0,
+      max: 5,
+    },
+    totalRatings: {
+      type: Number,
+      default: 1,
+    },
   },
   { timestamps: true }
 );

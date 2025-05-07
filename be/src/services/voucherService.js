@@ -65,6 +65,7 @@ const createVoucherService = async (
       price,
       bankAccount,
       bankName,
+      rating: 5,
     });
     return result;
   } catch (error) {
@@ -78,7 +79,12 @@ const getVoucherService = async (limit, page, query) => {
     if (limit && page) {
       let offset = (page - 1) * limit;
       const { filter } = aqp(query);
+      const includeLowRating = query.includeLowRating === "true";
       delete filter.page;
+      delete filter.includeLowRating;
+      if (!includeLowRating) {
+        filter.rating = { ...(filter.rating || {}), $gte: 3 };
+      }
       result = await Voucher.find(filter)
         .limit(limit)
         .skip(offset)
@@ -87,11 +93,14 @@ const getVoucherService = async (limit, page, query) => {
     } else {
       result = await Voucher.find().populate("createdBy").exec();
     }
+
     return result;
   } catch (error) {
+    console.error("Error in getVoucherService:", error);
     return null;
   }
 };
+
 const deleteAVoucherService = async (id) => {
   try {
     let result = await Voucher.deleteById(id);
@@ -101,9 +110,40 @@ const deleteAVoucherService = async (id) => {
     return null;
   }
 };
+const rateVoucherService = async (voucherId, rating) => {
+  if (!rating || rating < 1 || rating > 5) {
+    throw new Error("Rating phải nằm trong khoảng từ 1 đến 5.");
+  }
+
+  const voucher = await Voucher.findById(voucherId);
+  if (!voucher) {
+    throw new Error("Voucher không tồn tại.");
+  }
+
+  const total = voucher.totalRatings || 0;
+  const currentAvg = voucher.rating || 0;
+
+  const newTotal = total + 1;
+  const newAvg = (currentAvg * total + rating) / newTotal;
+
+  voucher.rating = newAvg;
+  voucher.totalRatings = newTotal;
+
+  await voucher.save();
+  return {
+    updatedRating: Math.round(newAvg * 2) / 2,
+    totalRatings: newTotal,
+  };
+};
+
+module.exports = {
+  rateVoucherService,
+};
+
 module.exports = {
   uploadImgService,
   createVoucherService,
   getVoucherService,
   deleteAVoucherService,
+  rateVoucherService,
 };

@@ -121,7 +121,7 @@ const HomePage = () => {
       <div className="bg-gray-50 rounded-xl shadow-md py-24 px-10">
         <div className="max-w-7xl mx-auto">
           <Title level={4} className="text-center text-gray-800 mb-16">
-            🎉 Voucher nổi bật hôm nay
+            Voucher nổi bật hôm nay
           </Title>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {HOT_VOUCHERS.map((voucher, index) => (
@@ -149,7 +149,7 @@ const HomePage = () => {
         </div>
       </div>
 
-      <div className="relative overflow-hidden py-16 px-6 sm:px-12 rounded-xl shadow-xl max-w-5xl mx-auto  from-green-50 to-white">
+      <div className="relative overflow-hidden py-16 px-6 sm:px-12 rounded-xl shadow-xl max-w-5xl mx-auto  from-green-50 to-white mt-8">
         <div className="relative z-10 text-center">
           <Title level={3} className="text-green-700 mb-4">
             Sẵn sàng săn deal cực hot?
@@ -169,7 +169,7 @@ const HomePage = () => {
         <div className="absolute -bottom-4 -right-4 opacity-10 w-52 h-52 bg-[url('/assets/deal-icon.png')] bg-no-repeat bg-contain"></div>
       </div>
 
-      <footer className="bg-gray-100 text-center py-6 text-sm text-gray-700 rounded-xl shadow-inner mt-20">
+      <footer className="bg-gray-100 text-center py-6 text-sm text-gray-700 rounded-xl shadow-inner mt-8">
         <p className="font-semibold mb-1">📞 Liên hệ với chúng tôi</p>
         <p>Email: contact@voucher.com</p>
         <p>Hotline: 0123 456 789</p>

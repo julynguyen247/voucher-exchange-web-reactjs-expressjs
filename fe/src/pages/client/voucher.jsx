@@ -3,7 +3,7 @@ import { getVoucher } from "../../utils/api";
 import { FaArrowLeft, FaFilter } from "react-icons/fa";
 import { RiDiscountPercentLine } from "react-icons/ri";
 import { MdAccessTime, MdAttachMoney } from "react-icons/md";
-import { Input, Button, Pagination } from "antd";
+import { Input, Button, Pagination, Rate } from "antd";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import FilterModal from "../../components/client/voucher/filterModal";
@@ -30,7 +30,7 @@ const VoucherPage = () => {
   useEffect(() => {
     const fetchVoucher = async () => {
       const res = await getVoucher();
-      if (res && res.data.data) {
+      if (res?.data?.data) {
         setVoucherData(res.data.data);
         setFilteredVouchers(res.data.data);
       }
@@ -40,14 +40,11 @@ const VoucherPage = () => {
 
   const handleFilterChange = (selected) => {
     setSelectedCategories(selected);
-    if (selected.length === 0) {
-      setFilteredVouchers(voucherData);
-    } else {
-      const filtered = voucherData.filter((item) =>
-        selected.includes(item.category)
-      );
-      setFilteredVouchers(filtered);
-    }
+    const filtered =
+      selected.length === 0
+        ? voucherData
+        : voucherData.filter((item) => selected.includes(item.category));
+    setFilteredVouchers(filtered);
     setCurrentPage(1);
   };
 
@@ -89,11 +86,19 @@ const VoucherPage = () => {
                 className="w-full h-24 object-contain rounded-md mb-3"
               />
             )}
+
             <div className="text-sm flex-1">
               <p className="font-semibold mb-1">
                 Giảm {item.discountValue}% đơn tối thiểu {item.minimumOrder}đ
               </p>
               <p className="text-gray-500 text-xs mb-2">{item.platform}</p>
+
+              <div className="mb-2">
+                <Rate disabled allowHalf defaultValue={item.rating || 0} />
+                <span className="text-xs text-gray-500 ml-2">
+                  ({item.rating || 0}/5)
+                </span>
+              </div>
 
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-xs">
@@ -110,6 +115,7 @@ const VoucherPage = () => {
                 </div>
               </div>
             </div>
+
             <Button
               block
               size="small"
@@ -139,7 +145,6 @@ const VoucherPage = () => {
           showSizeChanger={false}
         />
       </div>
-
       <FilterModal
         openModal={openModal}
         setOpenModal={setOpenModal}

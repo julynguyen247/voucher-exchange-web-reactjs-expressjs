@@ -3,6 +3,7 @@ const {
   createVoucherService,
   getVoucherService,
   deleteAVoucherService,
+  rateVoucherService,
 } = require("../services/voucherService");
 const Voucher = require("../models/voucher");
 const User = require("../models/user");
@@ -99,6 +100,20 @@ const getCategory = async (req, res) => {
     data: data,
   });
 };
+const rateVoucher = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rating } = req.body;
+
+    const result = await rateVoucherService(id, rating);
+    return res.status(200).json({
+      message: "Đánh giá thành công.",
+      ...result,
+    });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
 module.exports = {
   handleUploadImg,
   createVoucher,
@@ -106,4 +121,5 @@ module.exports = {
   deleteVoucher,
   getPlatform,
   getCategory,
+  rateVoucher,
 };
