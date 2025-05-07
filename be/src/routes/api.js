@@ -8,6 +8,7 @@ const {
   handleLogout,
   handleFetchAccount,
   getAccount,
+  getBank,
 } = require("../controllers/userController");
 const auth = require("../middleware/auth");
 const {
@@ -36,6 +37,7 @@ routerAPI.post("/login", handleLogin);
 routerAPI.post("/logout", handleLogout);
 routerAPI.get("/account", handleFetchAccount);
 routerAPI.get("/account-fetch", getAccount);
+routerAPI.get("/bank", getBank);
 //admin
 routerAPI.post("/user", createUser);
 routerAPI.get("/user", getUser);

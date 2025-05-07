@@ -95,11 +95,15 @@ const AppHeader = () => {
           {auth.isAuthenticated ? (
             <Tooltip title="Tài khoản">
               <Link to="/account">
-                <img
-                  src={auth.user.image || "/default-avatar.png"}
-                  alt="avatar"
-                  className="w-8 h-8 rounded-full object-cover border"
-                />
+                <div className="w-12 h-12 object-cover">
+                  <img
+                    src={`${import.meta.env.VITE_BACKEND_URL}/images/upload/${
+                      auth.user.image
+                    }`}
+                    alt="avatar"
+                    className="rounded-full "
+                  />
+                </div>
               </Link>
             </Tooltip>
           ) : (
@@ -123,7 +127,7 @@ const AppHeader = () => {
         title="Menu"
         placement="right"
         onClose={() => setDrawerVisible(false)}
-        visible={drawerVisible}
+        open={drawerVisible}
         className="md:hidden"
       >
         <nav className="flex flex-col gap-4 text-gray-700 text-base">
@@ -156,7 +160,9 @@ const AppHeader = () => {
               <Tooltip title="Tài khoản">
                 <Link to="/account" onClick={() => setDrawerVisible(false)}>
                   <img
-                    src={auth.user.image || "/default-avatar.png"}
+                    src={`${import.meta.env.VITE_BACKEND_URL}/images/upload/${
+                      auth.user.image
+                    }`}
                     alt="avatar"
                     className="w-8 h-8 rounded-full object-cover border"
                   />
