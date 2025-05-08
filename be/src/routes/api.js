@@ -58,8 +58,5 @@ routerAPI.post("/voucher/:id/rate", rateVoucher);
 routerAPI.post("/transaction/process", processTransaction);
 routerAPI.get("/transaction/get", getTransactions);
 
-//chatbot
-const chatbotRoutes = require("./chatbotRoutes");
-routerAPI.use("/chatbot", chatbotRoutes);
 
 module.exports = routerAPI; //export default

@@ -48,8 +48,6 @@ app.get("/", (req, res) => {
   res.send("API đang chạy rồi nè bro.");
 });
 
-console.log("OpenAI API Key:", process.env.OPENAI_API_KEY);
-
 // Kết nối Database & Chạy server
 (async () => {
   try {
