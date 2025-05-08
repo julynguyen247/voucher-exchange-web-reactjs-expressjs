@@ -53,14 +53,17 @@ const deleteUser = async (req, res) => {
   });
 };
 const updateUser = async (req, res) => {
-  const { id, name, email, password, phone, image } = req.body;
+  const { id, name, email, password, phone, image, accountNumber, bank } =
+    req.body;
   let result = await updateAUserService(
     id,
     name,
     email,
     password,
     phone,
-    image
+    image,
+    accountNumber,
+    bank
   );
   return res.status(200).json({
     EC: 0,
@@ -127,8 +130,8 @@ const handleGoogleLogin = async (req, res) => {
     return res.status(500).json({ EC: 1, message: "Google login failed" });
   }
 };
-const getBank = () => {
-  return [
+const getBank = async (req, res) => {
+  return res.status(200).json([
     { name: "Vietcombank", code: "VCB" },
     { name: "VietinBank", code: "CTG" },
     { name: "BIDV", code: "BID" },
@@ -145,7 +148,7 @@ const getBank = () => {
     { name: "OCB", code: "OCB" },
     { name: "Eximbank", code: "EIB" },
     { name: "SCB", code: "SCB" },
-  ];
+  ]);
 };
 
 module.exports = {

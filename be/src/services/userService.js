@@ -91,19 +91,28 @@ const deleteAUserService = async (id) => {
     return null;
   }
 };
-const updateAUserService = async (id, name, email, password, phone, image) => {
+const updateAUserService = async (
+  id,
+  name,
+  email,
+  password,
+  phone,
+  image,
+  accountNumber,
+  bank
+) => {
   if (password) {
     const hashPassword = await bcrypt.hash(password, saltRounds);
     const result = await User.updateOne(
       { _id: id },
-      { name, email, password: hashPassword, phone, image }
+      { name, email, password: hashPassword, phone, image, accountNumber, bank }
     );
     return result;
   } else {
     try {
       const result = await User.updateOne(
         { _id: id },
-        { name, email, phone, image }
+        { name, email, phone, image, accountNumber, bank }
       );
       return result;
     } catch (error) {

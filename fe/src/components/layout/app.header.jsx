@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../context/auth.context";
 import { logoutApi } from "../../utils/api";
-import { Input, Tooltip, Drawer, Button } from "antd";
+import { Input, Tooltip, Drawer, Button, Dropdown, Menu } from "antd";
 import {
   HeartOutlined,
   StarOutlined,
@@ -31,6 +31,19 @@ const AppHeader = () => {
       });
     }
   };
+
+  const menu = (
+    <Menu>
+      <Menu.Item key="1">
+        <Link to="/account" style={{ textDecoration: "none" }}>
+          Chỉnh sửa thông tin
+        </Link>
+      </Menu.Item>
+      <Menu.Item key="2" onClick={handleLogout}>
+        Đăng xuất
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -91,21 +104,16 @@ const AppHeader = () => {
           <Tooltip title="Yêu thích">
             <HeartOutlined className="text-xl hover:text-green-600 cursor-pointer" />
           </Tooltip>
-
           {auth.isAuthenticated ? (
-            <Tooltip title="Tài khoản">
-              <Link to="/account">
-                <div className="w-12 h-12 object-cover">
-                  <img
-                    src={`${import.meta.env.VITE_BACKEND_URL}/images/upload/${
-                      auth.user.image
-                    }`}
-                    alt="avatar"
-                    className="rounded-full "
-                  />
-                </div>
-              </Link>
-            </Tooltip>
+            <Dropdown overlay={menu} placement="bottomRight">
+              <img
+                src={`${import.meta.env.VITE_BACKEND_URL}/images/upload/${
+                  auth.user.image
+                }`}
+                alt="avatar"
+                className="w-10 h-10 rounded-full border cursor-pointer object-cover"
+              />
+            </Dropdown>
           ) : (
             <Tooltip title="Đăng nhập">
               <Link to="/login">
@@ -114,6 +122,7 @@ const AppHeader = () => {
             </Tooltip>
           )}
         </div>
+
         <div className="md:hidden lg:hidden">
           <Button
             type="text"
@@ -149,7 +158,7 @@ const AppHeader = () => {
             placeholder="Tìm kiếm voucher..."
             suffix={<SearchOutlined />}
           />
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-center">
             <Tooltip title="Đã lưu">
               <StarOutlined className="text-xl hover:text-green-600 cursor-pointer" />
             </Tooltip>
@@ -157,17 +166,15 @@ const AppHeader = () => {
               <HeartOutlined className="text-xl hover:text-green-600 cursor-pointer" />
             </Tooltip>
             {auth.isAuthenticated ? (
-              <Tooltip title="Tài khoản">
-                <Link to="/account" onClick={() => setDrawerVisible(false)}>
-                  <img
-                    src={`${import.meta.env.VITE_BACKEND_URL}/images/upload/${
-                      auth.user.image
-                    }`}
-                    alt="avatar"
-                    className="w-8 h-8 rounded-full object-cover border"
-                  />
-                </Link>
-              </Tooltip>
+              <Dropdown overlay={menu} placement="bottomRight">
+                <img
+                  src={`${import.meta.env.VITE_BACKEND_URL}/images/upload/${
+                    auth.user.image
+                  }`}
+                  alt="avatar"
+                  className="w-8 h-8 rounded-full object-cover border cursor-pointer"
+                />
+              </Dropdown>
             ) : (
               <Tooltip title="Đăng nhập">
                 <Link to="/login" onClick={() => setDrawerVisible(false)}>

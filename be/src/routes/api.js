@@ -32,12 +32,13 @@ routerAPI.get("/", (req, res) => {
   return res.status(200).json("Hello world");
 });
 //user
+routerAPI.get("/bank", getBank);
 routerAPI.post("/register", createUser);
 routerAPI.post("/login", handleLogin);
 routerAPI.post("/logout", handleLogout);
 routerAPI.get("/account", handleFetchAccount);
 routerAPI.get("/account-fetch", getAccount);
-routerAPI.get("/bank", getBank);
+
 //admin
 routerAPI.post("/user", createUser);
 routerAPI.get("/user", getUser);

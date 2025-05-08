@@ -102,6 +102,10 @@ const processTransaction = (transactionData) => {
     },
   });
 };
+const getBank = () => {
+  const URL_API = `/v1/api/bank`;
+  return axios.get(URL_API);
+};
 export {
   createUserApi,
   loginApi,
@@ -116,4 +120,5 @@ export {
   updateUserApi,
   getTransactions,
   processTransaction,
+  getBank,
 };
