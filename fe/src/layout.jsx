@@ -56,7 +56,6 @@ const Layout = () => {
       <AppHeader />
       <Outlet />
 
-      {/* Nút bật/tắt chatbot */}
       <button
         onClick={() => setShowChatbot(!showChatbot)}
         style={{
@@ -78,7 +77,6 @@ const Layout = () => {
         💬
       </button>
 
-      {/* Hiển thị Chatbot khi showChatbot === true */}
       {showChatbot && (
         <Chatbot showChatbot={showChatbot} setShowChatbot={setShowChatbot} />
       )}
