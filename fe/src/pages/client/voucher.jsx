@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getVoucher } from "../../utils/api";
-import { FaArrowLeft, FaFilter } from "react-icons/fa";
+import { FaArrowLeft, FaFilter, FaHeart, FaRegHeart } from "react-icons/fa";
 import { RiDiscountPercentLine } from "react-icons/ri";
 import { MdAccessTime, MdAttachMoney } from "react-icons/md";
 import { Input, Button, Pagination, Rate } from "antd";
@@ -25,6 +25,7 @@ const VoucherPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [favoriteIds, setFavoriteIds] = useState([]); // 🆕 Quản lý yêu thích
   const itemsPerPage = 8;
 
   useEffect(() => {
@@ -46,6 +47,12 @@ const VoucherPage = () => {
         : voucherData.filter((item) => selected.includes(item.category));
     setFilteredVouchers(filtered);
     setCurrentPage(1);
+  };
+
+  const toggleFavorite = (id) => {
+    setFavoriteIds((prev) =>
+      prev.includes(id) ? prev.filter((fid) => fid !== id) : [...prev, id]
+    );
   };
 
   const paginatedVouchers = filteredVouchers.slice(
@@ -77,8 +84,23 @@ const VoucherPage = () => {
         {paginatedVouchers.map((item, index) => (
           <div
             key={index}
-            className="border border-gray-300 rounded-xl p-4 shadow-sm flex flex-col justify-between h-full hover:shadow-md transition-all"
+            className="relative border border-gray-300 rounded-xl p-4 shadow-sm flex flex-col justify-between h-full hover:shadow-md transition-all"
           >
+            {/* ❤️ Trái tim */}
+            <div
+              className="absolute top-2 right-2 cursor-pointer z-10"
+              onClick={() => toggleFavorite(item._id)}
+            >
+              {favoriteIds.includes(item._id) ? (
+                <FaHeart size={18} className="text-red-500" />
+              ) : (
+                <FaRegHeart
+                  size={18}
+                  className="text-gray-400 hover:text-red-400"
+                />
+              )}
+            </div>
+
             {platformImages[item.platform] && (
               <img
                 src={platformImages[item.platform]}
@@ -145,6 +167,7 @@ const VoucherPage = () => {
           showSizeChanger={false}
         />
       </div>
+
       <FilterModal
         openModal={openModal}
         setOpenModal={setOpenModal}

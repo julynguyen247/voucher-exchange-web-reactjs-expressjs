@@ -1,9 +1,8 @@
-import { Avatar, Button, Form, Input, Upload } from "antd";
+import { Avatar, Button, Form, Input, Upload, Card, message } from "antd";
 import React, { useContext, useEffect, useState } from "react";
-import { AntDesignOutlined, UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined } from "@ant-design/icons";
 import { AuthContext } from "../../../components/context/auth.context";
 import { updateUserApi, uploadApi } from "../../../utils/api";
-import { message } from "antd";
 
 const Info = () => {
   const { auth, setAuth } = useContext(AuthContext);
@@ -24,16 +23,20 @@ const Info = () => {
   }, [auth.user]);
 
   const handleUploadFile = async (options) => {
-    const { onSuccess } = options;
-    const file = options.file;
-    const res = await uploadApi(file, "avatar");
-
-    if (res && res.data) {
-      const newAvatar = res.data.name;
-      setUserAvatar(newAvatar);
-      if (onSuccess) onSuccess("ok");
-    } else {
-      message.error(res.message);
+    const { onSuccess, onError, file } = options;
+    try {
+      const res = await uploadApi(file, "avatar");
+      if (res && res.data) {
+        const newAvatar = res.data.name;
+        setUserAvatar(newAvatar);
+        onSuccess?.("ok");
+        message.success("Tải ảnh thành công!");
+      } else {
+        throw new Error(res.message);
+      }
+    } catch (err) {
+      onError?.(err);
+      message.error("Tải ảnh thất bại!");
     }
   };
 
@@ -42,14 +45,8 @@ const Info = () => {
     multiple: false,
     showUploadList: false,
     customRequest: handleUploadFile,
-    onChange(info) {
-      if (info.file.status === "done") {
-        message.success(`Upload file thành công`);
-      } else if (info.file.status === "error") {
-        message.error(`Upload file thất bại`);
-      }
-    },
   };
+
   const onFinish = async (values) => {
     const { name, id, phone, email } = values;
     const res = await updateUserApi(
@@ -72,102 +69,70 @@ const Info = () => {
         },
       }));
     } else {
-      message.error(`Cập nhật thất bại`);
+      message.error("Cập nhật thất bại");
     }
   };
+
   return (
-    <div className="flex justify-center flex-col items-center gap-10">
-      <div className="flex justify-center items-center flex-col gap-4">
-        <Avatar
-          size={120}
-          src={urlAvatar}
-          style={{
-            border: "1px solid black",
-            objectFit: "cover",
-          }}
-        />
-        <Upload {...propsUpload}>
-          <Button icon={<UploadOutlined />}>Upload Avatar</Button>
-        </Upload>
-      </div>
-
-      <Form
-        form={form}
-        labelCol={{
-          span: 8,
-        }}
-        wrapperCol={{
-          span: 16,
-        }}
-        style={{
-          maxWidth: 600,
-        }}
-        initialValues={{
-          remember: true,
-        }}
-        autoComplete="off"
-        onFinish={onFinish}
+    <div className="flex justify-center mt-10 px-4">
+      <Card
+        className="w-full max-w-xl shadow-xl"
+        title="Thông tin cá nhân"
+        bordered={false}
       >
-        <hr />
+        <div className="flex flex-col items-center gap-6 mb-6">
+          <Avatar
+            size={120}
+            src={urlAvatar}
+            style={{
+              border: "2px solid #1677ff",
+              objectFit: "cover",
+            }}
+          />
+          <Upload {...propsUpload}>
+            <Button icon={<UploadOutlined />}>Thay ảnh đại diện</Button>
+          </Upload>
+        </div>
 
-        <Form.Item
-          label="ID"
-          name="id"
-          rules={[
-            {
-              required: true,
-              message: "Please input your id!",
-            },
-          ]}
-          hidden
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          autoComplete="off"
         >
-          <Input disabled />
-        </Form.Item>
+          <Form.Item name="id" hidden>
+            <Input disabled />
+          </Form.Item>
 
-        <Form.Item
-          label="Email"
-          name="email"
-          rules={[
-            {
-              required: false,
-              message: "Please input your email!",
-            },
-          ]}
-        >
-          <Input disabled />
-        </Form.Item>
+          <Form.Item label="Email" name="email">
+            <Input disabled />
+          </Form.Item>
 
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[
-            {
-              required: true,
-              message: "Please input your name!",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Phone"
-          name="phone"
-          rules={[
-            {
-              required: true,
-              message: "Please input your phone!",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
+          <Form.Item
+            label="Họ và tên"
+            name="name"
+            rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item label={null}>
-          <Button type="primary" htmlType="submit">
-            Update
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item
+            label="Số điện thoại"
+            name="phone"
+            rules={[
+              { required: true, message: "Vui lòng nhập số điện thoại!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Cập nhật thông tin
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
     </div>
   );
 };

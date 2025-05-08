@@ -32,7 +32,6 @@ const getTransactionsService = async (userId) => {
     const transactions = await Transaction.find({ userId }).sort({
       createdAt: -1,
     });
-    console.log("Transactions found:", transactions);
 
     return { success: true, transactions };
   } catch (error) {

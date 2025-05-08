@@ -10,15 +10,18 @@ import Layout from "./layout";
 import LoginPage from "../src/pages/client/auth/login";
 import RegisterPage from "../src/pages/client/auth/register";
 import { createRoot } from "react-dom/client";
-import OrderPage from "./pages/client/order";
-import TransactionPage from "./pages/client/transaction";
-import TransactionHistory from "./pages/client/transactionHistory";
 
 import Chatbot from "./components/chatbot";
 import React from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import OrderPage from "./pages/client/transactions/order";
+import TransactionPage from "./pages/client/transactions/transaction";
+import TransactionHistory from "./pages/client/transactions/transactionHistory";
+import Ranking from "./pages/client/ranking";
+import Favorites from "./pages/client/favorites";
 
-const clientId = "672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com";
+const clientId =
+  "672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com";
 
 const router = createBrowserRouter([
   {
@@ -52,6 +55,14 @@ const router = createBrowserRouter([
       {
         path: "/transaction-history",
         element: <TransactionHistory />,
+      },
+      {
+        path: "/ranking",
+        element: <Ranking />,
+      },
+      {
+        path: "/favorites",
+        element: <Favorites />,
       },
     ],
   },

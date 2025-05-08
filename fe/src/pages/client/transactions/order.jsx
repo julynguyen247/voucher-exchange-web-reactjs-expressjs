@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "../../style/orderPage.css"; // Đảm bảo bạn có file CSS riêng để cải thiện giao diện
+import "../../../style/orderPage.css"; // Đảm bảo bạn có file CSS riêng để cải thiện giao diện
 
 const OrderPage = () => {
   const navigate = useNavigate();
