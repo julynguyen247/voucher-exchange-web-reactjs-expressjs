@@ -3,11 +3,17 @@ import axios from "axios";
 import "../style/chatbot.css";
 import robotImg from "../assets/robot.png";
 import userImg from "../assets/user.png";
+import { io } from "socket.io-client";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8081";
 
+const socket = io("http://localhost:8081");
+
 const Chatbot = ({ showChatbot, setShowChatbot }) => {
   const [inputText, setInputText] = useState("");
+
+  const [isBotTyping, setIsBotTyping] = useState(false);
+
   const [chatMessages, setChatMessages] = useState([
     {
       message: "Xin chào! Tôi có thể giúp gì cho bạn?",
@@ -24,61 +30,51 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
     }
   }, [chatMessages]);
 
-  const handleSendMessage = async () => {
-    if (!inputText.trim()) return;
+  //nhận tin nhắn từ RASA qua backend Socket.IO
+  useEffect(() => {
+    socket.on("bot_reply", (msg) => {
+      setIsBotTyping(false);
+
+      const botMessage = {
+        message: msg,
+        sender: "robot",
+        id: crypto.randomUUID(),
+      };
+      setChatMessages((prev) => [...prev, botMessage]);
+    });
+
+    return () => {
+      socket.off("bot_reply"); // Cleanup để tránh đăng ký nhiều lần
+    };
+  }, []);
+
+  const handleSendMessage = () => {
+    // Không cho gửi khi đang gõ hoặc khi input rỗng
+    if (!inputText.trim() || isBotTyping) return;
 
     const userMessage = {
       message: inputText,
       sender: "user",
       id: crypto.randomUUID(),
     };
-    setChatMessages((prevMessages) => [...prevMessages, userMessage]);
+    setChatMessages((prev) => [...prev, userMessage]);
     setInputText("");
-
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      console.error("🚨 Không tìm thấy token, vui lòng đăng nhập lại!");
-      setChatMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          message: "🚨 Bạn chưa đăng nhập! Hãy đăng nhập để tiếp tục.",
-          sender: "robot",
-          id: crypto.randomUUID(),
-        },
-      ]);
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        `${API_URL}/v1/api/chatbot`,
-        { message: inputText },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const botMessage = {
-        message: response.data.reply,
-        sender: "robot",
-        id: crypto.randomUUID(),
-      };
-
-      setChatMessages((prevMessages) => [...prevMessages, botMessage]);
-    } catch (error) {
-      console.error("❌ Lỗi khi gửi tin nhắn:", error);
-      setChatMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          message: "Xin lỗi, tôi đang gặp sự cố!",
-          sender: "robot",
-          id: crypto.randomUUID(),
-        },
-      ]);
-    }
+  
+    // Thêm dòng "Bot đang nhập..."
+    setIsBotTyping(true);
+  
+    socket.emit("user_message", inputText);
   };
+
+  useEffect(() => {
+    const saved = localStorage.getItem("chat_messages");
+    if (saved) setChatMessages(JSON.parse(saved));
+  }, []);
+  
+  useEffect(() => {
+    localStorage.setItem("chat_messages", JSON.stringify(chatMessages));
+  }, [chatMessages]);
+  
 
   return (
     <>
@@ -112,6 +108,19 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
                 )}
               </div>
             ))}
+              
+            {/* Hiển thị "Bot đang nhập..." khi bot đang nhập */}
+            {isBotTyping && (
+              <div className="chat-message-robot">
+                <img src={robotImg} alt="Bot" className="chat-message-profile" />
+                <div className="chat-message-text typing-indicator">
+                  Đang nhập<span className="dot">.</span>
+                  <span className="dot">.</span>
+                  <span className="dot">.</span>
+                </div>
+              </div>
+            )}
+
           </div>
           <div className="chat-input-container">
             <input
