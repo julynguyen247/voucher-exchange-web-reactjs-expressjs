@@ -9,12 +9,12 @@ import {
   SearchOutlined,
   MenuOutlined,
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const AppHeader = () => {
   const { auth, setAuth } = useContext(AuthContext);
   const [drawerVisible, setDrawerVisible] = useState(false);
-
+  const navigate = useNavigate();
   const handleLogout = async () => {
     const res = await logoutApi();
     if (res && res.data) {
@@ -58,7 +58,7 @@ const AppHeader = () => {
             alt="logo"
             className="w-10 h-10 rounded-full object-cover border"
           />
-          <span className="text-xl font-bold text-green-600">VOUCHERS</span>
+          <span className="text-xl font-bold text-blue-400">VOUCHERS</span>
         </Link>
 
         <nav className="hidden md:flex gap-6 text-gray-700 text-sm font-medium">
@@ -70,11 +70,11 @@ const AppHeader = () => {
             Trang chủ
           </Link>
           <Link
-            to="/category"
+            to="/ranking"
             className="hover:text-green-600"
             style={{ textDecoration: "none" }}
           >
-            Ngành hàng
+            Xếp hạng
           </Link>
           <Link
             to="/voucher"
@@ -84,11 +84,11 @@ const AppHeader = () => {
             Mã giảm giá
           </Link>
           <Link
-            to="/review"
+            to="/transaction-history"
             className="hover:text-green-600"
             style={{ textDecoration: "none" }}
           >
-            Đánh giá
+            Lịch sử giao dịch
           </Link>
         </nav>
 
@@ -102,7 +102,10 @@ const AppHeader = () => {
             <StarOutlined className="text-xl hover:text-green-600 cursor-pointer" />
           </Tooltip>
           <Tooltip title="Yêu thích">
-            <HeartOutlined className="text-xl hover:text-green-600 cursor-pointer" />
+            <HeartOutlined
+              className="text-xl hover:text-green-600 cursor-pointer"
+              onClick={() => navigate("/favorites")}
+            />
           </Tooltip>
           {auth.isAuthenticated ? (
             <Dropdown overlay={menu} placement="bottomRight">
