@@ -14,11 +14,16 @@ import { Link, useNavigate } from "react-router-dom";
 const AppHeader = () => {
   const { auth, setAuth } = useContext(AuthContext);
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
+  const userAvatar = `${import.meta.env.VITE_BACKEND_URL}/images/upload/${
+    auth.user.image
+  }`;
+
   const handleLogout = async () => {
     const res = await logoutApi();
     if (res && res.data) {
-      localStorage.clear("access_token");
+      localStorage.removeItem("access_token");
       setAuth({
         isAuthenticated: false,
         user: {
@@ -29,21 +34,32 @@ const AppHeader = () => {
           image: "",
         },
       });
+      navigate("/login");
     }
   };
 
-  const menu = (
-    <Menu>
-      <Menu.Item key="1">
-        <Link to="/account" style={{ textDecoration: "none" }}>
-          Chỉnh sửa thông tin
-        </Link>
-      </Menu.Item>
-      <Menu.Item key="2" onClick={handleLogout}>
-        Đăng xuất
-      </Menu.Item>
-    </Menu>
-  );
+  const handleSearch = () => {
+    if (searchValue.trim()) {
+      navigate(`/voucher?search=${encodeURIComponent(searchValue.trim())}`);
+    }
+  };
+
+  const menu = {
+    items: [
+      {
+        key: "1",
+        label: (
+          <Link to="/account" style={{ textDecoration: "none" }}>
+            Chỉnh sửa thông tin
+          </Link>
+        ),
+      },
+      {
+        key: "2",
+        label: <span onClick={handleLogout}>Đăng xuất</span>,
+      },
+    ],
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -93,14 +109,15 @@ const AppHeader = () => {
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
-          <Input
+          <Input.Search
             placeholder="Tìm kiếm voucher..."
-            suffix={<SearchOutlined />}
+            enterButton
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onSearch={handleSearch}
             className="w-52"
           />
-          <Tooltip title="Đã lưu">
-            <StarOutlined className="text-xl hover:text-green-600 cursor-pointer" />
-          </Tooltip>
+
           <Tooltip title="Yêu thích">
             <HeartOutlined
               className="text-xl hover:text-green-600 cursor-pointer"
@@ -108,11 +125,9 @@ const AppHeader = () => {
             />
           </Tooltip>
           {auth.isAuthenticated ? (
-            <Dropdown overlay={menu} placement="bottomRight">
+            <Dropdown menu={menu} placement="bottomRight">
               <img
-                src={`${import.meta.env.VITE_BACKEND_URL}/images/upload/${
-                  auth.user.image
-                }`}
+                src={userAvatar}
                 alt="avatar"
                 className="w-10 h-10 rounded-full border cursor-pointer object-cover"
               />
@@ -156,27 +171,34 @@ const AppHeader = () => {
             Đánh giá
           </Link>
         </nav>
+
         <div className="mt-6 flex flex-col gap-4">
-          <Input
+          <Input.Search
             placeholder="Tìm kiếm voucher..."
-            suffix={<SearchOutlined />}
+            enterButton
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onSearch={handleSearch}
           />
           <div className="flex gap-4 items-center">
             <Tooltip title="Đã lưu">
               <StarOutlined className="text-xl hover:text-green-600 cursor-pointer" />
             </Tooltip>
             <Tooltip title="Yêu thích">
-              <HeartOutlined className="text-xl hover:text-green-600 cursor-pointer" />
+              <HeartOutlined
+                className="text-xl hover:text-green-600 cursor-pointer"
+                onClick={() => navigate("/favorites")}
+              />
             </Tooltip>
             {auth.isAuthenticated ? (
-              <Dropdown overlay={menu} placement="bottomRight">
-                <img
-                  src={`${import.meta.env.VITE_BACKEND_URL}/images/upload/${
-                    auth.user.image
-                  }`}
-                  alt="avatar"
-                  className="w-8 h-8 rounded-full object-cover border cursor-pointer"
-                />
+              <Dropdown menu={menu} placement="bottomRight">
+                <span>
+                  <img
+                    src={userAvatar}
+                    alt="avatar"
+                    className="w-8 h-8 rounded-full object-cover border cursor-pointer"
+                  />
+                </span>
               </Dropdown>
             ) : (
               <Tooltip title="Đăng nhập">

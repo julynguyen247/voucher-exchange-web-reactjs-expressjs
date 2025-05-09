@@ -106,6 +106,20 @@ const getBank = () => {
   const URL_API = `/v1/api/bank`;
   return axios.get(URL_API);
 };
+const addToFavoriteApi = (userId, voucherId) => {
+  const URL_API = "/v1/api/favorites";
+  const data = { userId, voucherId };
+
+  return axios.post(URL_API, data);
+};
+const getFavoritesApi = (userId) => {
+  return axios.get(`/v1/api/favorites/${userId}`);
+};
+const removeFavoriteApi = (userId, voucherId) => {
+  return axios.delete("/v1/api/favorites", {
+    data: { userId, voucherId },
+  });
+};
 export {
   createUserApi,
   loginApi,
@@ -121,4 +135,7 @@ export {
   getTransactions,
   processTransaction,
   getBank,
+  addToFavoriteApi,
+  getFavoritesApi,
+  removeFavoriteApi,
 };

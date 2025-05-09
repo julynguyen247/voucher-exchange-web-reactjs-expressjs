@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Favorite = require("../models/favorite");
 
 const addFavoriteService = async (userId, voucherId) => {
@@ -8,13 +9,13 @@ const addFavoriteService = async (userId, voucherId) => {
 };
 
 const removeFavoriteService = async (userId, voucherId) => {
-  return await Favorite.delete({ user: userId, voucher: voucherId });
+  return await Favorite.deleteOne({ user: userId, voucher: voucherId });
 };
 
 const getUserFavoritesService = async (userId) => {
-  return await Favorite.find({ user: userId })
-    .populate("voucher")
-    .sort({ createdAt: -1 });
+  return Favorite.find({ user: new mongoose.Types.ObjectId(userId) }).populate(
+    "voucher"
+  );
 };
 
 module.exports = {
