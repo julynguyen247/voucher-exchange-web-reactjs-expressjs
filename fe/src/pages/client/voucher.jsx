@@ -1,13 +1,19 @@
-import { useEffect, useState } from "react";
-import { getVoucher } from "../../utils/api";
+import { useEffect, useState, useContext } from "react";
+import {
+  getVoucher,
+  addToFavoriteApi,
+  getFavoritesApi,
+  removeFavoriteApi,
+} from "../../utils/api";
 import { FaArrowLeft, FaFilter, FaHeart, FaRegHeart } from "react-icons/fa";
 import { RiDiscountPercentLine } from "react-icons/ri";
 import { MdAccessTime, MdAttachMoney } from "react-icons/md";
-import { Input, Button, Pagination, Rate } from "antd";
+import { Input, Button, Pagination, Rate, message } from "antd";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import FilterModal from "../../components/client/voucher/filterModal";
-
+import { AuthContext } from "../../components/context/auth.context";
+import queryString from "query-string";
 const platformImages = {
   Shopee: "src/assets/Shopee.jpg",
   Lazada: "src/assets/Lazada.jpg",
@@ -25,19 +31,48 @@ const VoucherPage = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [favoriteIds, setFavoriteIds] = useState([]); // 🆕 Quản lý yêu thích
+  const [favoriteIds, setFavoriteIds] = useState([]);
+  const { auth } = useContext(AuthContext);
   const itemsPerPage = 8;
+  const { search } = useLocation();
+  const query = queryString.parse(search);
+  const searchTerm = (query.search || "").toLowerCase();
 
   useEffect(() => {
     const fetchVoucher = async () => {
       const res = await getVoucher();
       if (res?.data?.data) {
-        setVoucherData(res.data.data);
-        setFilteredVouchers(res.data.data);
+        const allVouchers = res.data.data;
+        setVoucherData(allVouchers);
+
+        const filtered = searchTerm
+          ? allVouchers.filter(
+              (item) =>
+                item.category.toLowerCase().includes(searchTerm) ||
+                item.platform.toLowerCase().includes(searchTerm) ||
+                item.code?.toLowerCase().includes(searchTerm)
+            )
+          : allVouchers;
+
+        setFilteredVouchers(filtered);
       }
     };
+
+    const fetchFavorites = async () => {
+      const userId = auth?.user?.id;
+      if (!userId) return;
+      try {
+        const res = await getFavoritesApi(userId);
+        const favIds = res.data.data.map((f) => f.voucher._id);
+        setFavoriteIds(favIds);
+      } catch (err) {
+        console.error("Không thể load favorites", err);
+      }
+    };
+
     fetchVoucher();
-  }, []);
+    fetchFavorites();
+  }, [auth, searchTerm]);
 
   const handleFilterChange = (selected) => {
     setSelectedCategories(selected);
@@ -49,10 +84,28 @@ const VoucherPage = () => {
     setCurrentPage(1);
   };
 
-  const toggleFavorite = (id) => {
-    setFavoriteIds((prev) =>
-      prev.includes(id) ? prev.filter((fid) => fid !== id) : [...prev, id]
-    );
+  const toggleFavorite = async (voucherId) => {
+    const userId = auth?.user?.id;
+    if (!userId) {
+      message.error("Bạn cần đăng nhập để yêu thích.");
+      return;
+    }
+
+    const isFavorited = favoriteIds.includes(voucherId);
+
+    try {
+      if (isFavorited) {
+        await removeFavoriteApi(userId, voucherId);
+        setFavoriteIds((prev) => prev.filter((id) => id !== voucherId));
+        message.success("Đã xoá khỏi yêu thích!");
+      } else {
+        await addToFavoriteApi(userId, voucherId);
+        setFavoriteIds((prev) => [...prev, voucherId]);
+        message.success("Đã thêm vào yêu thích!");
+      }
+    } catch (err) {
+      message.error(err.response?.data?.message || "Lỗi khi xử lý yêu thích");
+    }
   };
 
   const paginatedVouchers = filteredVouchers.slice(
@@ -86,7 +139,6 @@ const VoucherPage = () => {
             key={index}
             className="relative border border-gray-300 rounded-xl p-4 shadow-sm flex flex-col justify-between h-full hover:shadow-md transition-all"
           >
-            {/* ❤️ Trái tim */}
             <div
               className="absolute top-2 right-2 cursor-pointer z-10"
               onClick={() => toggleFavorite(item._id)}

@@ -26,6 +26,11 @@ const {
 } = require("../controllers/transactionController");
 
 const transactionController = require("../controllers/transactionController");
+const {
+  addFavorite,
+  getUserFavorites,
+  removeFavorite,
+} = require("../controllers/favoriteController");
 const routerAPI = express.Router();
 routerAPI.all("*", auth);
 routerAPI.get("/", (req, res) => {
@@ -58,5 +63,9 @@ routerAPI.post("/voucher/:id/rate", rateVoucher);
 routerAPI.post("/transaction/process", processTransaction);
 routerAPI.get("/transaction/get", getTransactions);
 
+//favorites
+routerAPI.post("/favorites", addFavorite);
+routerAPI.get("/favorites/:userId", getUserFavorites);
+routerAPI.delete("/favorites", removeFavorite);
 
 module.exports = routerAPI; //export default

@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Button, Rate, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { RiDiscountPercentLine } from "react-icons/ri";
 import { MdAccessTime, MdAttachMoney } from "react-icons/md";
 import dayjs from "dayjs";
+import { getFavoritesApi, removeFavoriteApi } from "../../utils/api";
+import { AuthContext } from "../../components/context/auth.context";
 
 const platformImages = {
   Shopee: "src/assets/Shopee.jpg",
@@ -18,36 +20,35 @@ const platformImages = {
 const Favorites = () => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
+  const { auth } = useContext(AuthContext);
 
-  // Dummy data
   useEffect(() => {
-    setFavorites([
-      {
-        _id: "1",
-        discountValue: 50,
-        minimumOrder: 100000,
-        platform: "Shopee",
-        category: "Thời trang",
-        rating: 4.7,
-        expirationDate: "2025-12-31",
-        price: 0,
-      },
-      {
-        _id: "2",
-        discountValue: 30,
-        minimumOrder: 200000,
-        platform: "Tiki",
-        category: "Sức khỏe",
-        rating: 4.2,
-        expirationDate: "2025-10-15",
-        price: 10000,
-      },
-    ]);
-  }, []);
+    const fetchFavorites = async () => {
+      const userId = auth?.user?.id;
+      if (!userId) return;
+      try {
+        const res = await getFavoritesApi(userId);
+        if (res?.data?.data) {
+          const vouchers = res.data.data.map((fav) => fav.voucher);
+          setFavorites(vouchers);
+        }
+      } catch (err) {
+        console.error("Không thể load danh sách yêu thích", err);
+      }
+    };
 
-  const handleRemove = (id) => {
-    setFavorites((prev) => prev.filter((v) => v._id !== id));
-    message.success("Đã xóa khỏi yêu thích");
+    fetchFavorites();
+  }, [auth]);
+
+  const handleRemove = async (voucherId) => {
+    const userId = auth?.user?.id;
+    try {
+      await removeFavoriteApi(userId, voucherId);
+      setFavorites((prev) => prev.filter((v) => v._id !== voucherId));
+      message.success("Đã xóa khỏi yêu thích");
+    } catch (err) {
+      message.error("Lỗi khi xóa yêu thích");
+    }
   };
 
   return (
@@ -65,11 +66,7 @@ const Favorites = () => {
           {favorites.map((item) => (
             <div
               key={item._id}
-              className={`relative border rounded-xl p-4 shadow-sm flex flex-col justify-between h-full hover:shadow-md transition-all ${
-                item.rating >= 4.5
-                  ? "border-yellow-400 bg-yellow-50"
-                  : "border-gray-300"
-              }`}
+              className="relative border border-gray-300 rounded-xl p-4 shadow-sm flex flex-col justify-between h-full hover:shadow-md transition-all"
             >
               {platformImages[item.platform] && (
                 <img
@@ -77,12 +74,6 @@ const Favorites = () => {
                   alt={item.platform}
                   className="w-full h-24 object-contain rounded-md mb-3"
                 />
-              )}
-
-              {item.rating >= 4.5 && (
-                <span className="text-xs text-yellow-600 font-semibold bg-yellow-100 px-2 py-1 rounded-full absolute top-2 right-2">
-                  ⭐ Hot
-                </span>
               )}
 
               <div className="text-sm flex-1">
@@ -125,7 +116,7 @@ const Favorites = () => {
                 <Button
                   block
                   size="small"
-                  className="bg-[#3685f9] text-white hover:bg-blue-600 border-none text-xs"
+                  style={{ text: "black" }}
                   onClick={() =>
                     navigate("/order", {
                       state: {
