@@ -6,22 +6,23 @@
 
 ## 📚 Mục Lục
 
-* [📌 Tổng Quan Dự Án](#tổng-quan-dự-án)
-* [🧰 Công Nghệ Sử Dụng](#công-nghệ-sử-dụng)
-* [🧱 Kiến trúc hệ thống](#kiến-trúc-hệ-thống)
-* [⚙️ Yêu Cầu Cần Có](#yêu-cầu-cần-có)
-* [🚀 Cài Đặt và Thiết Lập](#cài-đặt-và-thiết-lập)
-  * [🔻 Tải Repository](#tải-repository)
-  * [🔧 Thiết Lập Backend (ExpressJS)](#thiết-lập-backend-expressjs)
-  * [🎨 Thiết Lập Frontend (ReactJS)](#thiết-lập-frontend-reactjs)
-  * [🤖 Thiết Lập Chatbot RASA](#thiết-lập-chatbot-rasa)
-* [▶️ Chạy Dự Án](#chạy-dự-án)
-* [📁 Cấu Trúc Dự Án](#cấu-trúc-dự-án)
-* [💬 Góp Ý & Đóng Góp](#góp-ý--đóng-góp)
+* [Tổng Quan Dự Án](#tổng-quan-dự-án)
+* [Công Nghệ Sử Dụng](#công-nghệ-sử-dụng)
+* [Kiến trúc hệ thống](#kiến-trúc-hệ-thống)
+* [Yêu Cầu Cần Có](#yêu-cầu-cần-có)
+* [Cài Đặt và Thiết Lập](#cài-đặt-và-thiết-lập)
+  * [Tải Repository](#tải-repository)
+  * [Thiết Lập Backend (ExpressJS)](#thiết-lập-backend-expressjs)
+  * [Thiết Lập Frontend (ReactJS)](#thiết-lập-frontend-reactjs)
+  * [Thiết Lập Chatbot RASA](#thiết-lập-chatbot-rasa)
+* [Chạy Dự Án](#chạy-dự-án)
+* [Cấu Trúc Dự Án](#cấu-trúc-dự-án)
+* [Góp Ý & Đóng Góp](#góp-ý--đóng-góp)
+
 
 ---
 
-## 📌 Tổng Quan Dự Án
+## Tổng Quan Dự Án
 
 Nền tảng cho phép người dùng:
 
@@ -32,7 +33,7 @@ Nền tảng cho phép người dùng:
 
 ---
 
-## 🧰 Công Nghệ Sử Dụng
+## Công Nghệ Sử Dụng
 
 | Thành phần          | Công nghệ                   |
 | ------------------- | --------------------------- |
@@ -43,7 +44,7 @@ Nền tảng cho phép người dùng:
 | **Thư viện hỗ trợ** | Axios, JWT, Google OAuth2   |
 
 ---
-## 🧱 Kiến trúc hệ thống
+## Kiến trúc hệ thống
         +----------------------------+
         |        Trình Duyệt         |
         |     (ReactJS Frontend)     |
@@ -72,7 +73,7 @@ Nền tảng cho phép người dùng:
         +-----------------------------+
 ---
 
-## ⚙️ Yêu Cầu Cần Có
+## Yêu Cầu Cần Có
 
 ```bash
 # Kiểm tra các yêu cầu hệ thống
@@ -91,9 +92,9 @@ git --version
 
 ---
 
-## 🚀 Cài Đặt và Thiết Lập
+## Cài Đặt và Thiết Lập
 
-### 🔻 Tải Repository
+### Tải Repository
 
 ```bash
 git clone https://github.com/julynguyen247/voucher-exchange-web-reactjs-expressjs.git
@@ -102,7 +103,7 @@ cd voucher-exchange-web-reactjs-expressjs
 
 ---
 
-### 🔧 Thiết Lập Backend (ExpressJS)
+### Thiết Lập Backend (ExpressJS)
 
 ```bash
 cd be
@@ -133,7 +134,7 @@ npm run dev
 
 ---
 
-### 🎨 Thiết Lập Frontend (ReactJS)
+### Thiết Lập Frontend (ReactJS)
 
 ```bash
 cd ../fe
@@ -156,7 +157,7 @@ Truy cập tại: [http://localhost:5173](http://localhost:5173)
 
 ---
 
-### 🤖 Thiết Lập Chatbot RASA
+### Thiết Lập Chatbot RASA
 
 ```bash
 cd ../chatbot
@@ -203,7 +204,7 @@ rasa run actions
 
 ---
 
-## ▶️ Chạy Dự Án
+## Chạy Dự Án
 
 1. ✅ **Chạy Backend** tại `http://localhost:8081`
 2. ✅ **Chạy Frontend** tại `http://localhost:5173`
@@ -217,7 +218,7 @@ rasa run actions
 
 ---
 
-## 📁 Cấu Trúc Dự Án
+## Cấu Trúc Dự Án
 
 ```text
 voucher-exchange-web-reactjs-expressjs/
@@ -257,9 +258,8 @@ voucher-exchange-web-reactjs-expressjs/
 ```
 
 ---
-## 💬 Góp Ý & Đóng Góp
+## Góp Ý & Đóng Góp
 
-Đóng góp để hoàn thiện nền tảng là luôn được hoan nghênh!
-Hãy tạo pull request hoặc issue nếu bạn có đề xuất, lỗi hoặc tính năng mới.
+Nếu gặp vấn đề trong quá trình cài đặt, vui lòng liên hệ với nhóm phát triển.
 
 
