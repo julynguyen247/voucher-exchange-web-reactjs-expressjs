@@ -1,0 +1,87 @@
+{
+  "type": "IntentMaxHistoryTrackerFeaturizer",
+  "state_featurizer": {
+    "action_texts": [],
+    "entity_tag_specs": [],
+    "feature_states": {
+      "intent": {
+        "affirm": 0,
+        "ask_voucher_by_category": 1,
+        "ask_voucher_by_discount": 2,
+        "ask_voucher_by_expiration": 3,
+        "ask_voucher_by_platform": 4,
+        "ask_voucher_by_price": 5,
+        "back": 6,
+        "bot_challenge": 7,
+        "deny": 8,
+        "goodbye": 9,
+        "greet": 10,
+        "mood_great": 11,
+        "mood_unhappy": 12,
+        "nlu_fallback": 13,
+        "out_of_scope": 14,
+        "recommend_voucher": 15,
+        "restart": 16,
+        "search_voucher": 17,
+        "session_start": 18
+      },
+      "action_name": {
+        "action_listen": 0,
+        "action_restart": 1,
+        "action_session_start": 2,
+        "action_default_fallback": 3,
+        "action_deactivate_loop": 4,
+        "action_revert_fallback_events": 5,
+        "action_default_ask_affirmation": 6,
+        "action_default_ask_rephrase": 7,
+        "action_two_stage_fallback": 8,
+        "action_unlikely_intent": 9,
+        "action_back": 10,
+        "...": 11,
+        "action_extract_slots": 12,
+        "action_get_voucher_by_category": 13,
+        "action_get_voucher_by_platform": 14,
+        "action_get_voucher_by_discount": 15,
+        "action_get_voucher_by_price": 16,
+        "action_get_voucher_by_expiration": 17,
+        "action_search_voucher": 18,
+        "utter_ask_category": 19,
+        "utter_ask_discount": 20,
+        "utter_ask_expiration": 21,
+        "utter_ask_platform": 22,
+        "utter_ask_price": 23,
+        "utter_cheer_up": 24,
+        "utter_did_that_help": 25,
+        "utter_fallback": 26,
+        "utter_goodbye": 27,
+        "utter_greet": 28,
+        "utter_happy": 29,
+        "utter_iamabot": 30,
+        "utter_thank_you": 31,
+        "voucher_search_form": 32
+      },
+      "entities": {
+        "category": 0,
+        "date": 1,
+        "discount": 2,
+        "expiration": 3,
+        "platform": 4,
+        "price": 5
+      },
+      "slots": {
+        "category_0": 0,
+        "discount_0": 1,
+        "price_0": 2,
+        "price_1": 3,
+        "platform_0": 4,
+        "expiration_0": 5,
+        "date_0": 6
+      },
+      "active_loop": {
+        "voucher_search_form": 0
+      }
+    }
+  },
+  "remove_duplicates": true,
+  "max_history": 5
+}

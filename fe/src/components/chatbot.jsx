@@ -98,7 +98,44 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
                     className="chat-message-profile"
                   />
                 )}
-                <div className="chat-message-text">{message}</div>
+                <div className="chat-message-text">
+                  {typeof message === "object" ? (
+                    <pre>{JSON.stringify(message, null, 2)}</pre> // format object dễ nhìn
+                  ) : (
+                    message
+                  )}
+                </div>
+                {/* <div className="chat-message-text">
+                      {typeof message === "object" ? (
+                        <>
+                          {message.text && <div>{message.text}</div>}
+                          {message.image && (
+                            <img
+                              src={message.image}
+                              alt="bot-media"
+                              style={{ maxWidth: "200px", marginTop: "5px", borderRadius: "8px" }}
+                            />
+                          )}
+                          {message.buttons && (
+                            <div className="bot-buttons">
+                              {message.buttons.map((btn, idx) => (
+                                <button
+                                  key={idx}
+                                  onClick={() => socket.emit("user_message", btn.payload)}
+                                  className="bot-button"
+                                >
+                                  {btn.title}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        message
+                      )}
+                    </div>
+                    */}
+
                 {sender === "user" && (
                   <img
                     src={userImg}

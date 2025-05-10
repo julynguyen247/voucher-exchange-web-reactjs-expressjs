@@ -1,0 +1,127 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - mood_great
+  - mood_unhappy
+  - bot_challenge
+  - search_voucher
+  - recommend_voucher
+  - ask_voucher_by_category
+  - ask_voucher_by_platform
+  - ask_voucher_by_discount
+  - ask_voucher_by_price
+  - ask_voucher_by_expiration
+
+entities:
+  - platform
+  - category
+  - discount
+  - price
+  - expiration
+  - date
+
+slots:
+  category:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: category
+
+  discount:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: discount
+
+  price:
+    type: float
+    mappings:
+      - type: from_entity
+        entity: amount
+
+  platform:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: platform
+        
+  expiration: 
+    type: text
+    mappings:
+      - type: from_entity
+        entity: expiration
+
+  date:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: date
+
+responses:
+  utter_greet:
+  - text: "Wassup bro, cần tui giúp gì hem? 😎"
+
+  utter_cheer_up:
+  - text: "Here is something to cheer you up:"
+    image: "https://i.imgur.com/nGF1K8f.jpg"
+
+  utter_did_that_help:
+  - text: "Tui nói mai giờ bro thấy oke ko? 😁"
+
+  utter_happy:
+  - text: "Ngon luôn bro, tui cũng thấy vui khi bro vui 😁"
+
+  utter_goodbye:
+  - text: "Bai bro, mai nhậu"
+
+  utter_iamabot:
+  - text: "Tui là bot, ko phải top."
+
+  utter_ask_category:
+  - text: "Bro muốn xài voucher cho cái chi?"
+
+  utter_ask_platform:
+  - text: "Nền tảng nào, nói?"
+
+  utter_ask_discount:
+  - text: "Bro muốn giảm giá bao nhiêu?"
+
+  utter_ask_price:
+  - text: "Bro muốn voucher giá bao nhiêu?"
+
+  utter_ask_expiration:
+  - text: "Bro muốn voucher có thời hạn bao lâu?"
+
+  utter_thank_you:  
+  - text: "Cảm ơn vì đã xài tui"
+
+  utter_fallback:
+  - text: "Tui chưa hiểu bro, nói lại coi? 😅"
+
+actions:
+  - action_get_voucher_by_category
+  - action_get_voucher_by_platform
+  - action_get_voucher_by_discount
+  - action_get_voucher_by_price
+  - action_get_voucher_by_expiration
+  - action_search_voucher
+
+forms:
+  voucher_search_form:
+    required_slots:
+      - category
+      - platform
+      - discount
+      - price
+      - expiration
+
+
+
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

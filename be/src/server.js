@@ -2,17 +2,64 @@ require("dotenv").config({ path: "../.env" });
 const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
-require("./config/passport"); // <-- Phải có dòng này để khởi tạo chiến lược
+require("./config/passport"); 
 const apiRoutes = require("./routes/api");
-const authRoutes = require("./routes/authRoutes"); // Thêm route xác thực
+const authRoutes = require("./routes/authRoutes"); 
 const connection = require("./config/database");
 const cors = require("cors");
 const path = require("path");
 const fileUpload = require("express-fileupload");
 
+const http = require("http");
+const socketIo = require("socket.io");
+const axios = require("axios");
+
 const app = express();
 const port = process.env.PORT || 8081;
 const hostname = process.env.HOST_NAME || "localhost";
+
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: { origin: "*" },
+});
+
+//cấu hình websocket với rasa
+io.on("connection", (socket) => {
+  console.log("Client connected:", socket.id);
+
+  socket.on("user_message", async (msg) => {
+    console.log("User message:", msg);
+
+    try {
+      console.log("Sending message to RASA:", msg); 
+      const rasaRes = await axios.post(
+        "http://localhost:5005/webhooks/rest/webhook",
+        {
+          sender: socket.id,
+          message: msg,
+        },
+        { timeout: 5000 } // Có thể cấu hình timeout nếu cần
+      );
+
+      console.log("RASA response:", rasaRes.data);
+
+      // Gửi từng phần tử phản hồi về client (nguyên object, không chỉ text)
+      rasaRes.data.forEach((responseObj) => {
+        socket.emit("bot_reply", responseObj);
+      });
+    } catch (err) {
+      console.error("RASA error:", err.message);
+      socket.emit("bot_reply", {
+        text: "Xin lỗi, có lỗi xảy ra ở chatbot.",
+        type: "error",
+      });
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id);
+  });
+});
 
 // Cấu hình middleware
 app.use(
@@ -52,7 +99,7 @@ app.get("/", (req, res) => {
 (async () => {
   try {
     await connection();
-    app.listen(port, hostname, () => {
+    server.listen(port, hostname, () => {
       console.log(`✅ Backend đang chạy ở: http://${hostname}:${port}`);
     });
   } catch (error) {

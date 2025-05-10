@@ -1,0 +1,92 @@
+version: "3.1"
+
+stories:
+
+- story: happy path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_great
+  - action: utter_happy
+
+- story: sad path 1
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_unhappy
+  - action: utter_cheer_up
+  - action: utter_did_that_help
+  - intent: affirm
+  - action: utter_happy
+
+- story: sad path 2
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_unhappy
+  - action: utter_cheer_up
+  - action: utter_did_that_help
+  - intent: deny
+  - action: utter_goodbye
+
+- story: ask voucher by category
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: recommend_voucher
+    - action: voucher_search_form
+    - intent: ask_voucher_by_category
+    - action: action_get_voucher_by_category
+
+- story: ask voucher by platform
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: recommend_voucher
+    - action: voucher_search_form
+    - intent: ask_voucher_by_platform
+    - action: action_get_voucher_by_platform
+
+- story: ask voucher by discount
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: recommend_voucher
+    - action: voucher_search_form
+    - intent: ask_voucher_by_discount
+    - action: action_get_voucher_by_discount
+
+- story: ask voucher by price
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: recommend_voucher
+    - action: voucher_search_form
+    - intent: ask_voucher_by_price
+    - action: action_get_voucher_by_price
+
+- story: ask voucher by expiration
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: recommend_voucher
+    - action: voucher_search_form
+    - intent: ask_voucher_by_expiration
+    - action: action_get_voucher_by_expiration
+
+- story: search voucher with form
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - or:
+    - intent: search_voucher
+    - intent: recommend_voucher
+    - intent: ask_voucher_by_category
+    - intent: ask_voucher_by_platform
+    - intent: ask_voucher_by_discount
+    - intent: ask_voucher_by_price
+    - intent: ask_voucher_by_expiration
+  - action: voucher_search_form
+  - active_loop: voucher_search_form
+  - active_loop: null
+  - action: action_search_voucher
