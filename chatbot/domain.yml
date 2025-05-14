@@ -5,8 +5,6 @@ intents:
   - goodbye
   - affirm
   - deny
-  - mood_great
-  - mood_unhappy
   - bot_challenge
   - search_voucher
   - recommend_voucher
@@ -15,6 +13,7 @@ intents:
   - ask_voucher_by_discount
   - ask_voucher_by_price
   - ask_voucher_by_expiration
+  - out_of_scope
 
 entities:
   - platform
@@ -72,9 +71,6 @@ responses:
   utter_did_that_help:
   - text: "Tui nói mai giờ bro thấy oke ko? 😁"
 
-  utter_happy:
-  - text: "Ngon luôn bro, tui cũng thấy vui khi bro vui 😁"
-
   utter_goodbye:
   - text: "Bai bro, mai nhậu"
 
@@ -100,7 +96,10 @@ responses:
   - text: "Cảm ơn vì đã xài tui"
 
   utter_fallback:
-  - text: "Tui chưa hiểu bro, nói lại coi? 😅"
+  - text: "Tui chưa hiểu lắm ạ, hỏi cái gì về voucher/giftcard đi bro? 😅"
+
+  utter_out_of_scope:
+  - text: "Vui lòng hỏi về voucher, tui chỉ rành cái đó thôi bro 😅"
 
 actions:
   - action_get_voucher_by_category

@@ -18,6 +18,15 @@ rules:
     - action: voucher_search_form
     - active_loop: voucher_search_form
 
+- rule: Submit voucher search form
+  condition:
+    - active_loop: voucher_search_form
+  steps:
+    - action: voucher_search_form
+    - active_loop: null
+    - action: action_search_voucher
+
+
 - rule: Fallback
   steps:
   - intent: nlu_fallback
