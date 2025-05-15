@@ -14,13 +14,18 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
 
   const [isBotTyping, setIsBotTyping] = useState(false);
 
-  const [chatMessages, setChatMessages] = useState([
-    {
-      message: "Xin chào! Tôi có thể giúp gì cho bạn?",
-      sender: "robot",
-      id: "id1",
-    },
-  ]);
+  const [chatMessages, setChatMessages] = useState(() => {
+    const saved = sessionStorage.getItem("chat_messages");
+    return saved
+      ? JSON.parse(saved)
+      : [
+          {
+            message: "Xin chào! Tôi có thể giúp gì cho bạn?",
+            sender: "robot",
+            id: "id1",
+          },
+        ];
+  });
 
   const chatMessagesRef = useRef(null);
 
@@ -29,7 +34,7 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
       chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
     }
   }, [chatMessages]);
-
+  
   //nhận tin nhắn từ RASA qua backend Socket.IO
   useEffect(() => {
     socket.on("bot_reply", (msg) => {
@@ -66,15 +71,10 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
     socket.emit("user_message", inputText);
   };
 
+  // Cập nhật sessionStorage mỗi khi chatMessages thay đổi
   useEffect(() => {
-    const saved = localStorage.getItem("chat_messages");
-    if (saved) setChatMessages(JSON.parse(saved));
-  }, []);
-  
-  useEffect(() => {
-    localStorage.setItem("chat_messages", JSON.stringify(chatMessages));
+    sessionStorage.setItem("chat_messages", JSON.stringify(chatMessages));
   }, [chatMessages]);
-  
 
   return (
     <>

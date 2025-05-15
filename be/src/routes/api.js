@@ -38,7 +38,7 @@ routerAPI.get("/", (req, res) => {
 });
 
 const {rating} = require("../controllers/ratingController");
-routerAPI.post("/user/:id/rating", rating);
+routerAPI.post("/user/:id/rating", auth, rating);
 
 //user
 routerAPI.get("/bank", getBank);
