@@ -103,7 +103,7 @@ const Ranking = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-6 text-center text-indigo-700">
-        🏆 Bảng xếp hạng người dùng theo đánh giá
+        🏆 Đánh giá người dùng 
       </h1>
 
       <Row gutter={16} className="mb-6">
