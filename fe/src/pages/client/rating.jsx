@@ -2,39 +2,61 @@ import React, { useEffect, useState } from "react";
 import { Table, Card, Statistic, Row, Col, Avatar, Tooltip } from "antd";
 import { CrownOutlined, UserOutlined } from "@ant-design/icons";
 import ReactStars from "react-rating-stars-component";
+import axios from "axios";
+import { message } from "antd";
+
 
 const Ranking = () => {
   const [userData, setUserData] = useState([]);
 
+  const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8081";
   useEffect(() => {
-    // Gọi API thật ở đây
-    setUserData([
-      {
-        id: "1",
-        name: "Nguyễn Văn A",
-        email: "a@gmail.com",
-        ratingAvg: 4.8,
-        ratingCount: 12,
-      },
-      {
-        id: "2",
-        name: "Trần Thị B",
-        email: "b@gmail.com",
-        ratingAvg: 4.5,
-        ratingCount: 20,
-      },
-      {
-        id: "3",
-        name: "Lê Văn C",
-        email: "c@gmail.com",
-        ratingAvg: 4.2,
-        ratingCount: 8,
-      },
-    ]);
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/users/ratings`);
+        setUserData(response.data.users); // Cập nhật state
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu người dùng:  ", error);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
+  const handleRatingChange = async (newRating, record) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      message.warning("Bạn cần đăng nhập để đánh giá!");
+      return;
+    }
+
+    try {
+      await axios.post(
+        `${API_URL}/api/user/${record._id}/rating`,
+        { star: newRating },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Load lại danh sách để cập nhật điểm đánh giá mới
+      const response = await axios.get(`${API_URL}/api/users/ratings`);
+      setUserData(response.data.users);
+
+      message.success("Đánh giá thành công!");
+    } catch (err) {
+      console.error(err);
+      message.error(err.response?.data?.msg || "Lỗi khi đánh giá!");
+    }
+  };
+
   // Sắp xếp trước theo ratingAvg
-  const sortedData = [...userData].sort((a, b) => b.ratingAvg - a.ratingAvg);
+  const sortedData = [...userData].sort((a, b) => {
+    if (b.ratingAvg !== a.ratingAvg) {
+      return b.ratingAvg - a.ratingAvg;
+    }
+    return b.ratingCount - a.ratingCount;
+  });
 
   const columns = [
     {
@@ -86,9 +108,10 @@ const Ranking = () => {
             count={5}
             value={ratingAvg}
             size={20}
+            edit={true}
             isHalf={true}
-            edit={false}
             activeColor="#fadb14"
+            onChange={(newRating) => handleRatingChange(newRating, record)}
           />
           <Tooltip title={`${record.ratingCount} lượt đánh giá`}>
             <span className="text-sm text-gray-500">({record.ratingCount})</span>
@@ -137,7 +160,7 @@ const Ranking = () => {
         <Table
           columns={columns}
           dataSource={sortedData}
-          rowKey="id"
+          rowKey="_id"
           pagination={{ pageSize: 5 }}
           rowClassName={(_, index) =>
             index === 0

@@ -16,10 +16,12 @@ const rating = async (req, res) => {
 
     await targetUser.addRating(req.user._id, star);
 
+    const updatedUser = await User.findById(req.params.id);
+
     res.json({
       msg: "Đánh giá thành công",
-      ratingAvg: targetUser.ratingAvg.toFixed(2),
-      ratingCount: targetUser.ratingCount,
+      ratingAvg: updatedUser.ratingAvg.toFixed(2),
+      ratingCount: updatedUser.ratingCount,
     });
   } catch (err) {
     console.error(err);
@@ -27,4 +29,14 @@ const rating = async (req, res) => {
   }
 }
 
-module.exports = {rating};
+const getUsersWithRatings = async (req, res) => {
+  try {
+    const users = await User.find({}, "name email ratingAvg ratingCount").sort({ ratingAvg: -1, ratingCount: -1 });
+    res.json({ users });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Lỗi máy chủ" });
+  }
+};
+
+module.exports = {rating, getUsersWithRatings};
