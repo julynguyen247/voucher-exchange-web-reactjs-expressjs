@@ -93,6 +93,13 @@ const AppHeader = () => {
             Xếp hạng
           </Link>
           <Link
+            to="/rating"
+            className="hover:text-green-600"
+            style={{ textDecoration: "none" }}
+          >
+            Đánh giá
+          </Link>
+          <Link
             to="/voucher"
             className="hover:text-green-600"
             style={{ textDecoration: "none" }}

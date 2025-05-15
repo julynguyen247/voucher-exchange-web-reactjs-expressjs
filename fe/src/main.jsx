@@ -19,6 +19,7 @@ import TransactionPage from "./pages/client/transactions/transaction";
 import TransactionHistory from "./pages/client/transactions/transactionHistory";
 import Ranking from "./pages/client/ranking";
 import Favorites from "./pages/client/favorites";
+import Rating from "./pages/client/rating";
 
 const clientId =
   "672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com";
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
       {
         path: "/ranking",
         element: <Ranking />,
+      },
+      {
+        path: "/rating",
+        element: <Rating />,
       },
       {
         path: "/favorites",
