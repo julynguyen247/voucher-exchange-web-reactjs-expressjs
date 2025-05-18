@@ -22,23 +22,23 @@ const FloatingMetaMask = () => {
         onClick={showModal}
         style={{
           position: "fixed",
-          bottom: "90px",
-          right: "90px",
+          bottom: "20px",
+          right: "80px",
           padding: "10px 12px",
           borderRadius: "50%",
           backgroundColor: "#F6851B", // Màu cam chính thức của MetaMask
           color: "white",
           border: "none",
           cursor: "pointer",
-          fontSize: "20px",
+          fontSize: "18px",
           transition: "all 0.3s ease",
           zIndex: 100,
           boxShadow: "0 4px 12px rgba(246, 133, 27, 0.5)",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          width: "48px",
-          height: "48px",
+          width: "44px",
+          height: "44px",
           transform: "translateY(0)",
         }}
         onMouseEnter={(e) => {
