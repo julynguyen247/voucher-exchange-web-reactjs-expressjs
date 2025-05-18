@@ -26,8 +26,22 @@ rules:
     - active_loop: null
     - action: action_search_voucher
 
-
 - rule: Fallback
   steps:
   - intent: nlu_fallback
   - action: utter_fallback
+
+- rule: Handle out of scope
+  steps:
+    - intent: out_of_scope
+    - action: utter_out_of_scope
+
+- rule: Submit form khi recommend voucher
+  condition:
+    - active_loop: voucher_search_form
+  steps:
+    - action: voucher_search_form
+    - active_loop: null
+    - action: action_search_voucher
+
+

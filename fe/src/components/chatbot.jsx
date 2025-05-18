@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import axios from "axios";
 import "../style/chatbot.css";
 import robotImg from "../assets/robot.png";
 import userImg from "../assets/user.png";

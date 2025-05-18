@@ -21,7 +21,7 @@ const Ranking = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [API_URL]);
 
   const handleRatingChange = async (newRating, record) => {
     const token = localStorage.getItem("token");

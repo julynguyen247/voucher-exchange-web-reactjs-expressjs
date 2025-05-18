@@ -1,3 +1,4 @@
+
 body {
   font-family: Arial;
   margin-top: 0px;
@@ -37,6 +38,7 @@ color:rgb(241, 241, 226);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   transition: all 0.3s ease-in-out;
+  z-index: 1000;
 }
 
 
