@@ -86,7 +86,18 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Cấu hình thư mục tĩnh
-app.use("/images", express.static(path.join(__dirname, "public/images")));
+const staticPath = path.join(__dirname, "public");
+console.log('Serving static files from:', staticPath);
+app.use("/images", express.static(path.join(staticPath, "images")));
+
+// Log static file requests for debugging
+app.use((req, res, next) => {
+  if (req.url.startsWith('/images')) {
+    console.log(`Static file request: ${req.method} ${req.url}`);
+  }
+  next();
+});
+
 app.use("/v1/api", apiRoutes);
 app.use("/api/v1/auth", authRoutes); // Mount route auth
 

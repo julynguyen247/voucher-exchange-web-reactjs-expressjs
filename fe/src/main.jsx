@@ -21,6 +21,15 @@ import Ranking from "./pages/client/ranking";
 import Favorites from "./pages/client/favorites";
 import Rating from "./pages/client/rating";
 
+// Admin imports
+import AdminLayout from "./pages/admin/components/AdminLayout";
+import AdminDashboard from "./pages/admin/dashboard/AdminDashboard";
+import UserManagement from "./pages/admin/users/UserManagement";
+import VoucherManagement from "./pages/admin/vouchers/VoucherManagement";
+import TransactionManagement from "./pages/admin/transactions/TransactionManagement";
+
+import AdminProtectedRoute from "./pages/admin/components/AdminProtectedRoute";
+
 const clientId =
   "672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com";
 
@@ -78,6 +87,33 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <RegisterPage />,
+  },
+  // Admin Routes
+  {
+    path: "/admin",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout />
+      </AdminProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <AdminDashboard />,
+      },
+      {
+        path: "/admin/users",
+        element: <UserManagement />,
+      },
+      {
+        path: "/admin/vouchers",
+        element: <VoucherManagement />,
+      },
+      {
+        path: "/admin/transactions",
+        element: <TransactionManagement />,
+      },
+    ],
   },
 ]);
 

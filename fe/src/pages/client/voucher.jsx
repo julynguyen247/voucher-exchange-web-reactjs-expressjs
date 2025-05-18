@@ -42,14 +42,22 @@ const VoucherPage = () => {
     const fetchVoucher = async () => {
       const res = await getVoucher();
       if (res?.data?.data) {
-        const allVouchers = res.data.data;
+        // Make sure we're getting the vouchers array from the response
+        const allVouchers = Array.isArray(res.data.data.vouchers) 
+          ? res.data.data.vouchers 
+          : Array.isArray(res.data.data) 
+            ? res.data.data 
+            : [];
+        
+        console.log("Fetched vouchers:", allVouchers);
+        
         setVoucherData(allVouchers);
 
         const filtered = searchTerm
           ? allVouchers.filter(
               (item) =>
-                item.category.toLowerCase().includes(searchTerm) ||
-                item.platform.toLowerCase().includes(searchTerm) ||
+                item.category?.toLowerCase().includes(searchTerm) ||
+                item.platform?.toLowerCase().includes(searchTerm) ||
                 item.code?.toLowerCase().includes(searchTerm)
             )
           : allVouchers;
@@ -108,10 +116,13 @@ const VoucherPage = () => {
     }
   };
 
-  const paginatedVouchers = filteredVouchers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  // Ensure filteredVouchers is an array before using slice
+  const paginatedVouchers = Array.isArray(filteredVouchers) 
+    ? filteredVouchers.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      )
+    : [];
 
   return (
     <div className="p-4 max-w-7xl mx-auto">
@@ -214,7 +225,7 @@ const VoucherPage = () => {
         <Pagination
           current={currentPage}
           pageSize={itemsPerPage}
-          total={filteredVouchers.length}
+          total={Array.isArray(filteredVouchers) ? filteredVouchers.length : 0}
           onChange={(page) => setCurrentPage(page)}
           showSizeChanger={false}
         />

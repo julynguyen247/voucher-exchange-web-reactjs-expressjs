@@ -42,6 +42,8 @@ const loginService = async (email, password) => {
         const payload = {
           email: user.email,
           name: user.name,
+          id: user._id,
+          role: user.role
         };
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
           expiresIn: "1d", // Chuỗi hợp lệ
@@ -52,6 +54,10 @@ const loginService = async (email, password) => {
           user: {
             email: user.email,
             name: user.name,
+            id: user._id,
+            role: user.role,
+            phone: user.phone || "",
+            image: user.image || ""
           },
         };
       }

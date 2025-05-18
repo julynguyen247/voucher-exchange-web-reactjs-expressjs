@@ -20,9 +20,13 @@ const LoginPage = () => {
       message.success("Login successfully");
       setAuth({
         isAuthenticated: true,
-        user: {
+        user: res.data.user || {
           email: res.data.user.email ?? "",
           name: res.data.user.name ?? "",
+          role: res.data.user.role ?? "",
+          id: res.data.user.id ?? "",
+          phone: res.data.user.phone ?? "",
+          image: res.data.user.image ?? "",
         },
       });
       navigate("/");

@@ -12,7 +12,14 @@ const uploadImgService = async (image) => {
   }
 
   const path = require("path");
+  const fs = require("fs");
+  
+  // Ensure upload directory exists
   const uploadPath = path.resolve(__dirname, "../public/images/upload");
+  if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+    console.log(`Created directory: ${uploadPath}`);
+  }
 
   const extname = path.extname(image.name);
   const basename = path.basename(image.name, extname);
@@ -20,18 +27,36 @@ const uploadImgService = async (image) => {
   const finalPath = `${uploadPath}/${finalName}`;
 
   try {
+    // Log the path where we're trying to save the file
+    console.log(`Attempting to save image to: ${finalPath}`);
+    
+    // Move the file to the upload directory
     await image.mv(finalPath);
-    return {
-      status: "success",
-      path: `/images/upload/${finalName}`,
-      error: null,
-      name: finalName,
-    };
+    
+    // Check if the file was successfully saved
+    const fs = require('fs');
+    if (fs.existsSync(finalPath)) {
+      console.log(`File successfully saved to: ${finalPath}`);
+      return {
+        status: "success",
+        path: `/images/upload/${finalName}`,
+        error: null,
+        name: finalName,
+      };
+    } else {
+      console.error(`File was not saved to ${finalPath}`);
+      return {
+        status: "failed",
+        path: null,
+        error: "File move operation completed but file does not exist at destination",
+      };
+    }
   } catch (error) {
+    console.error(`Error saving file to ${finalPath}:`, error);
     return {
       status: "failed",
       path: null,
-      error: JSON.stringify(error),
+      error: error.message || JSON.stringify(error),
     };
   }
 };
@@ -50,27 +75,91 @@ const createVoucherService = async (
   bankName
 ) => {
   try {
-    let user = await User.findOne({ email: email });
-    let userId = user._id;
-    let result = await Voucher.create({
-      minimumOrder,
-      platform,
-      category,
-      image,
-      code,
-      discountValue,
-      expirationDate,
-      createdBy: userId,
-      status: "Available",
-      price,
-      bankAccount,
-      bankName,
-      rating: 5,
+    console.log("Creating voucher with params:", {
+      minimumOrder, platform, category, image, code, discountValue, 
+      expirationDate, email, price, bankAccount, bankName
     });
+
+    // Find user by email, or use admin account if specified
+    let userId = null;
+    let user = null;
+    
+    if (email) {
+      user = await User.findOne({ email: email });
+      
+      if (user) {
+        console.log(`Found user with email ${email}:`, user._id);
+        userId = user._id;
+      } else if (email === 'admin@voucher-exchange.com') {
+        // Try to find an admin user
+        const adminUser = await User.findOne({ isAdmin: true });
+        if (adminUser) {
+          console.log("Using admin user:", adminUser._id);
+          userId = adminUser._id;
+        } else {
+          console.log("No admin user found, creating voucher without user association");
+        }
+      } else {
+        console.log(`No user found with email ${email}`);
+      }
+    } else {
+      console.log("No email provided");
+    }
+    
+    // Format the date correctly
+    let formattedDate;
+    try {
+      if (typeof expirationDate === 'string') {
+        formattedDate = new Date(expirationDate);
+      } else {
+        formattedDate = expirationDate;
+      }
+      
+      // Check if date is valid
+      if (isNaN(formattedDate.getTime())) {
+        console.error("Invalid date format:", expirationDate);
+        formattedDate = new Date(); // Default to current date
+        formattedDate.setMonth(formattedDate.getMonth() + 1); // Set to 1 month from now
+      }
+    } catch (dateError) {
+      console.error("Error parsing date:", dateError);
+      formattedDate = new Date();
+      formattedDate.setMonth(formattedDate.getMonth() + 1); // Set to 1 month from now
+    }
+
+    // Prepare voucher data
+    const voucherData = {
+      minimumOrder: Number(minimumOrder) || 0,
+      platform: platform || "Unknown",
+      category: category || "Other",
+      image: image || "",
+      code: code || "",
+      discountValue: Number(discountValue) || 0,
+      expirationDate: formattedDate,
+      status: "Available",
+      price: Number(price) || 0,
+      rating: 5,
+      totalRatings: 1
+    };
+
+    // Only add user-specific fields if a user was found
+    if (userId) {
+      voucherData.createdBy = userId;
+    }
+    
+    if (bankAccount) voucherData.bankAccount = bankAccount;
+    if (bankName) voucherData.bankName = bankName;
+    
+    console.log("Creating voucher with data:", voucherData);
+    
+    // Create the voucher
+    let result = await Voucher.create(voucherData);
+    console.log("Voucher created successfully:", result._id);
+    
     return result;
   } catch (error) {
-    console.log(error);
-    return null;
+    console.error("Error creating voucher:", error);
+    throw error; // Re-throw to handle in the controller
   }
 };
 const getVoucherService = async (limit, page, query) => {
@@ -78,32 +167,61 @@ const getVoucherService = async (limit, page, query) => {
     let result = null;
     if (limit && page) {
       let offset = (page - 1) * limit;
-      const { filter } = aqp(query);
-      const includeLowRating = query.includeLowRating === "true";
-      delete filter.page;
-      delete filter.includeLowRating;
-      if (!includeLowRating) {
-        filter.rating = { ...(filter.rating || {}), $gte: 3 };
+      
+      // Parse query parameters safely
+      const { filter = {} } = query ? aqp(query) : { filter: {} };
+      
+      // Handle special query parameters
+      if (query) {
+        const includeLowRating = query.includeLowRating === "true";
+        
+        // Remove pagination params from filter
+        delete filter.page;
+        delete filter.limit;
+        delete filter.admin;
+        delete filter.includeLowRating;
+        
+        // Apply rating filter unless explicitly including low ratings
+        if (!includeLowRating) {
+          filter.rating = { ...(filter.rating || {}), $gte: 3 };
+        }
+        
+        // Add search query if present
+        if (query.q) {
+          const searchRegex = new RegExp(query.q, 'i');
+          filter.$or = [
+            { code: searchRegex },
+            { platform: searchRegex },
+            { category: searchRegex }
+          ];
+        }
       }
+      
+      console.log("Voucher query filter:", filter);
+      
       result = await Voucher.find(filter)
-        .limit(limit)
+        .sort({ createdAt: -1 }) // Sort by newest first
+        .limit(parseInt(limit))
         .skip(offset)
         .populate("createdBy")
         .exec();
     } else {
-      result = await Voucher.find().populate("createdBy").exec();
+      result = await Voucher.find()
+        .sort({ createdAt: -1 })
+        .populate("createdBy")
+        .exec();
     }
 
     return result;
   } catch (error) {
     console.error("Error in getVoucherService:", error);
-    return null;
+    return [];
   }
 };
 
 const deleteAVoucherService = async (id) => {
   try {
-    let result = await Voucher.deleteById(id);
+    let result = await Voucher.findByIdAndDelete(id);
     return result;
   } catch (error) {
     console.log("error >>>> ", error);
@@ -134,10 +252,6 @@ const rateVoucherService = async (voucherId, rating) => {
     updatedRating: Math.round(newAvg * 2) / 2,
     totalRatings: newTotal,
   };
-};
-
-module.exports = {
-  rateVoucherService,
 };
 
 module.exports = {

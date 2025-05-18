@@ -20,7 +20,7 @@ const auth = (req, res, next) => {
           id: decoded.id,
           email: decoded.email,
           name: decoded.name,
-          role: "USER",
+          role: decoded.role || "user",
         };
         next();
       } catch (error) {

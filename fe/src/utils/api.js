@@ -120,6 +120,53 @@ const removeFavoriteApi = (userId, voucherId) => {
     data: { userId, voucherId },
   });
 };
+
+// ============ ADMIN API ============
+// Admin Users API
+const getAllUsersApi = (limit = 10, page = 1, filters = {}) => {
+  const URL_API = "/v1/api/user";
+  return axios.get(URL_API, {
+    params: { limit, page, ...filters }
+  });
+};
+
+const deleteUserApi = (userId) => {
+  const URL_API = "/v1/api/user";
+  return axios.delete(URL_API, { data: { id: userId } });
+};
+
+const updateAdminUserApi = (userId, userData) => {
+  const URL_API = "/v1/api/user";
+  return axios.put(URL_API, { id: userId, ...userData });
+};
+
+// Admin Vouchers API
+const getAllVouchersApi = (limit = 10, page = 1, filters = {}) => {
+  const URL_API = "/v1/api/voucher";
+  return axios.get(URL_API, {
+    params: { limit, page, ...filters, admin: true }
+  });
+};
+
+const deleteVoucherApi = (voucherId) => {
+  const URL_API = "/v1/api/voucher";
+  return axios.delete(URL_API, { data: { id: voucherId } });
+};
+
+// Admin Transactions API
+const getAllTransactionsApi = (limit = 10, page = 1, filters = {}) => {
+  const URL_API = "/v1/api/transaction/get";
+  return axios.get(URL_API, {
+    params: { limit, page, ...filters, admin: true }
+  });
+};
+
+// Admin Statistics API
+const getDashboardStatsApi = () => {
+  const URL_API = "/v1/api/admin/stats";
+  return axios.get(URL_API);
+};
+
 export {
   createUserApi,
   loginApi,
@@ -138,4 +185,11 @@ export {
   addToFavoriteApi,
   getFavoritesApi,
   removeFavoriteApi,
+  getAllUsersApi,
+  deleteUserApi,
+  updateAdminUserApi,
+  getAllVouchersApi,
+  deleteVoucherApi,
+  getAllTransactionsApi,
+  getDashboardStatsApi
 };

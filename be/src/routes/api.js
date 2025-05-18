@@ -31,6 +31,8 @@ const {
   getUserFavorites,
   removeFavorite,
 } = require("../controllers/favoriteController");
+const { isAdmin, getDashboardStats } = require("../controllers/adminController");
+
 const routerAPI = express.Router();
 routerAPI.all("*", auth);
 routerAPI.get("/", (req, res) => {
@@ -57,7 +59,7 @@ routerAPI.put("/user", updateUser);
 
 //voucher
 routerAPI.post("/image", handleUploadImg);
-routerAPI.post("/voucher", createVoucher);
+routerAPI.post("/voucher", createVoucher); // Don't require auth for admin creation
 routerAPI.get("/voucher", getVoucher);
 routerAPI.delete("/voucher", deleteVoucher);
 routerAPI.get("/voucher/platform", getPlatform);
@@ -72,5 +74,8 @@ routerAPI.get("/transaction/get", getTransactions);
 routerAPI.post("/favorites", addFavorite);
 routerAPI.get("/favorites/:userId", getUserFavorites);
 routerAPI.delete("/favorites", removeFavorite);
+
+//admin
+routerAPI.get("/admin/stats", auth, isAdmin, getDashboardStats);
 
 module.exports = routerAPI; //export default

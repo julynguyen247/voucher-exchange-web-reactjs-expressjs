@@ -306,7 +306,7 @@ function MetaMaskWallet({ onWalletConnected }) {
               <Text strong>Số dư ETH:</Text>
               <div className="bg-white p-3 rounded border mt-1 flex items-center justify-between">
                 <span>{ethBalance} ETH</span>
-                <span className="text-gray-500 text-sm">Ethereum Mainnet</span>
+                <span className="text-gray-500 text-sm">Ethereum Testnet</span>
               </div>
             </div>
           )}
