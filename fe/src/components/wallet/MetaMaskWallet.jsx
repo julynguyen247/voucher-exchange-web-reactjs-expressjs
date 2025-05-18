@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Button, Typography, message } from "antd";
+import { Button, Typography, message, Spin } from "antd";
+import tokenABI from './vou-token-abi.json';
 
 const { Title, Paragraph, Text } = Typography;
+const VOU_CONTRACT_ADDRESS = "0x314cD8EAE63594ac72EEDd627795DB59A783927b";
 
 /**
  * MetaMaskWallet component for connecting to MetaMask wallet
@@ -9,8 +11,12 @@ const { Title, Paragraph, Text } = Typography;
  */
 function MetaMaskWallet({ onWalletConnected }) {
   const [account, setAccount] = useState(null);
-  const [balance, setBalance] = useState(null);
+  const [ethBalance, setEthBalance] = useState(null);
+  const [vouBalance, setVouBalance] = useState(null);
   const [chainId, setChainId] = useState(null);
+  const [loadingVouBalance, setLoadingVouBalance] = useState(false);
+  const [tokenName, setTokenName] = useState("VOU");
+  const [tokenDecimals, setTokenDecimals] = useState(18);
 
   // Effect to check if wallet is already connected
   useEffect(() => {
@@ -34,7 +40,9 @@ function MetaMaskWallet({ onWalletConnected }) {
   // Get account balance when account changes
   useEffect(() => {
     if (account) {
-      getAccountBalance();
+      getEthBalance();
+      getVouTokenInfo();
+      getVouBalance();
     }
   }, [account, chainId]);
 
@@ -58,7 +66,8 @@ function MetaMaskWallet({ onWalletConnected }) {
       setAccount(accounts[0]);
     } else {
       setAccount(null);
-      setBalance(null);
+      setEthBalance(null);
+      setVouBalance(null);
     }
   }
 
@@ -90,12 +99,13 @@ function MetaMaskWallet({ onWalletConnected }) {
   // Disconnect wallet
   function disconnectWallet() {
     setAccount(null);
-    setBalance(null);
+    setEthBalance(null);
+    setVouBalance(null);
     message.info("Đã ngắt kết nối ví MetaMask.");
   }
 
-  // Get wallet balance
-  async function getAccountBalance() {
+  // Get ETH balance
+  async function getEthBalance() {
     if (window.ethereum && account) {
       try {
         const balance = await window.ethereum.request({
@@ -104,11 +114,124 @@ function MetaMaskWallet({ onWalletConnected }) {
         });
         // Convert balance from Wei to ETH (1 ETH = 10^18 Wei)
         const ethBalance = parseInt(balance, 16) / Math.pow(10, 18);
-        setBalance(ethBalance.toFixed(4));
+        setEthBalance(ethBalance.toFixed(4));
       } catch (error) {
-        console.error("Error getting account balance:", error);
+        console.error("Error getting ETH balance:", error);
       }
     }
+  }
+  
+  // Get VOU token information
+  async function getVouTokenInfo() {
+    if (window.ethereum && account) {
+      try {
+        // Create contract instance
+        const params = {
+          to: VOU_CONTRACT_ADDRESS,
+          from: account,
+          data: encodeTokenFunctionCall("decimals", [])
+        };
+        
+        // Get token decimals
+        const decimalsHex = await window.ethereum.request({
+          method: "eth_call",
+          params: [params, "latest"]
+        });
+        const decimals = parseInt(decimalsHex, 16);
+        setTokenDecimals(decimals);
+        
+        // Get token symbol
+        params.data = encodeTokenFunctionCall("symbol", []);
+        const symbolData = await window.ethereum.request({
+          method: "eth_call",
+          params: [params, "latest"]
+        });
+        // Decode token symbol (simplified)
+        const symbolHex = symbolData.slice(130).replace(/^0+|0+$/g, "");
+        const symbol = symbolHex ? hexToString(symbolHex) : "VOU";
+        setTokenName(symbol);
+      } catch (error) {
+        console.error("Error getting token info:", error);
+      }
+    }
+  }
+  
+  // Get VOU token balance
+  async function getVouBalance() {
+    if (window.ethereum && account) {
+      setLoadingVouBalance(true);
+      try {
+        // Create the contract call parameters
+        const params = {
+          to: VOU_CONTRACT_ADDRESS,
+          from: account,
+          data: encodeTokenFunctionCall("balanceOf", [account])
+        };
+        
+        // Call the contract
+        const balanceHex = await window.ethereum.request({
+          method: "eth_call",
+          params: [params, "latest"]
+        });
+        
+        // Convert hex balance to decimal
+        const balance = parseInt(balanceHex, 16) / Math.pow(10, tokenDecimals);
+        setVouBalance(balance.toFixed(2));
+      } catch (error) {
+        console.error("Error getting VOU balance:", error);
+        setVouBalance("0.00");
+      } finally {
+        setLoadingVouBalance(false);
+      }
+    }
+  }
+  
+  // Helper function to encode function calls for the token contract
+  function encodeTokenFunctionCall(functionName, params) {
+    const functionABI = tokenABI.find(item => item.name === functionName);
+    
+    if (!functionABI) {
+      throw new Error(`Function ${functionName} not found in ABI`);
+    }
+    
+    // Create function signature
+    const signature = `${functionName}(${functionABI.inputs.map(input => input.type).join(',')})`;
+    const signatureHash = web3FunctionSignatureToHex(signature);
+    
+    // For simple cases like balanceOf with an address parameter
+    if (functionName === 'balanceOf' && params.length === 1) {
+      // Pad address to 32 bytes (64 characters)
+      return signatureHash + params[0].slice(2).padStart(64, '0');
+    }
+    
+    // For parameter-less functions
+    return signatureHash;
+  }
+  
+  // Helper function to convert function signature to hex
+  function web3FunctionSignatureToHex(signature) {
+    // This is a simplified version - in production use a library like web3.js or ethers.js
+    // We're using a fixed hash here for balanceOf function
+    const knownHashes = {
+      'balanceOf(address)': '0x70a08231',
+      'decimals()': '0x313ce567',
+      'symbol()': '0x95d89b41'
+    };
+    
+    return knownHashes[signature] || '0x00000000';
+  }
+  
+  // Helper function to convert hex to string
+  function hexToString(hex) {
+    let str = '';
+    for (let i = 0; i < hex.length; i += 2) {
+      const hexValue = hex.substr(i, 2);
+      const decimal = parseInt(hexValue, 16);
+      if (decimal) {
+        str += String.fromCharCode(decimal);
+      }
+    }
+    return str;
   }
 
   return (
@@ -150,7 +273,7 @@ function MetaMaskWallet({ onWalletConnected }) {
             </div>
             <div>
               <div className="font-medium text-base">MetaMask Connected</div>
-              <div className="text-sm text-gray-500">Ethereum Wallet</div>
+              <div className="text-sm text-gray-500">VOU Token Wallet</div>
             </div>
           </div>
           
@@ -163,11 +286,26 @@ function MetaMaskWallet({ onWalletConnected }) {
             </div>
           </div>
           
-          {balance && (
+          <div className="mb-4">
+            <Text strong>Số dư VOU:</Text>
+            <div className="bg-white p-3 rounded border mt-1 flex items-center justify-between">
+              {loadingVouBalance ? (
+                <Spin size="small" />
+              ) : (
+                <span>{vouBalance || '0.00'} {tokenName}</span>
+              )}
+              <span className="text-gray-500 text-sm flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                VOU Token
+              </span>
+            </div>
+          </div>
+          
+          {ethBalance && (
             <div className="mb-4">
-              <Text strong>Số dư:</Text>
+              <Text strong>Số dư ETH:</Text>
               <div className="bg-white p-3 rounded border mt-1 flex items-center justify-between">
-                <span>{balance} ETH</span>
+                <span>{ethBalance} ETH</span>
                 <span className="text-gray-500 text-sm">Ethereum Mainnet</span>
               </div>
             </div>
