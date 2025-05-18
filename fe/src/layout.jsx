@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./components/context/auth.context";
 import { fetchAccountApi } from "./utils/api";
 import Chatbot from "./components/chatbot"; // Import Chatbot
+import FloatingMetaMask from "./components/wallet/FloatingMetaMask"; // Import FloatingMetaMask
 
 const Layout = () => {
   const { setAuth, auth } = useContext(AuthContext);
@@ -58,10 +59,9 @@ const Layout = () => {
 
       <button
         onClick={() => setShowChatbot(!showChatbot)}
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
+        style={{        position: "fixed",
+        bottom: "20px",
+        right: "20px",
           padding: "10px 15px",
           borderRadius: "50%",
           backgroundColor: "#007bff",
@@ -80,6 +80,9 @@ const Layout = () => {
       {showChatbot && (
         <Chatbot showChatbot={showChatbot} setShowChatbot={setShowChatbot} />
       )}
+      
+      {/* Nút MetaMask nổi */}
+      <FloatingMetaMask />
     </div>
   );
 };
