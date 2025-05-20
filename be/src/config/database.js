@@ -22,6 +22,9 @@ const dbState = [{
 
 const connection = async () => {
     try {
+        // Log MongoDB connection URL for debugging
+        console.log(`Connecting to MongoDB: ${process.env.MONGO_DB_URL || 'undefined connection string'}`);
+        
         // Thêm timeout và retry options
         await mongoose.connect(process.env.MONGO_DB_URL, {
             serverSelectionTimeoutMS: 5000, // Timeout sau 5 giây

@@ -31,7 +31,7 @@ const {
   getUserFavorites,
   removeFavorite,
 } = require("../controllers/favoriteController");
-const { isAdmin, getDashboardStats } = require("../controllers/adminController");
+const { isAdmin, getDashboardStats, updateUserRole, checkUserRole } = require("../controllers/adminController");
 
 const routerAPI = express.Router();
 routerAPI.all("*", auth);
@@ -77,5 +77,7 @@ routerAPI.delete("/favorites", removeFavorite);
 
 //admin
 routerAPI.get("/admin/stats", auth, isAdmin, getDashboardStats);
+routerAPI.post("/admin/update-role", auth, isAdmin, updateUserRole);
+routerAPI.get("/admin/check-user-role", checkUserRole); // Debug endpoint - no auth required for testing
 
 module.exports = routerAPI; //export default

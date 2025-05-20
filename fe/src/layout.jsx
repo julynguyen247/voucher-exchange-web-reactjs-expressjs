@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import AppHeader from "./components/layout/app.header";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { AuthContext } from "./components/context/auth.context";
 import { fetchAccountApi } from "./utils/api";
 import Chatbot from "./components/chatbot"; // Import Chatbot
@@ -9,48 +9,77 @@ import FloatingMetaMask from "./components/wallet/FloatingMetaMask"; // Import F
 const Layout = () => {
   const { setAuth, auth } = useContext(AuthContext);
   const [showChatbot, setShowChatbot] = useState(false); // Trạng thái bật/tắt Chatbot
-
+  const authCheckRef = useRef(false);
+  
+  // Only execute this once when the component mounts
   useEffect(() => {
-    const fetchAcc = async () => {
+    // Use ref to track if we've already checked auth to prevent duplicate checks
+    // This persists through StrictMode double renders
+    if (authCheckRef.current) {
+      return;
+    }
+    authCheckRef.current = true;
+    
+    const checkAuth = async () => {
       try {
-        const res = await fetchAccountApi();
-        if (res?.data) {
-          setAuth({
-            isAuthenticated: true,
-            user: {
-              email: res.data.data.email ?? "",
-              name: res.data.data.name ?? "",
-              phone: res.data.data.phone ?? "",
-              id: res.data.data._id ?? "",
-              image: res.data.data.image ?? "",
-            },
-          });
-        } else {
-          setAuth({
-            isAuthenticated: false,
-            user: {
-              email: "",
-              name: "",
-              phone: "",
-              id: "",
-              image: "",
-            },
-          });
+        // Check if we already have auth data in localStorage
+        const savedAuth = localStorage.getItem('auth');
+        const parsedAuth = savedAuth ? JSON.parse(savedAuth) : null;
+        const hasValidAuthData = parsedAuth && 
+                               parsedAuth.isAuthenticated && 
+                               parsedAuth.user && 
+                               parsedAuth.user.email;
+        
+        // Only fetch if we don't have valid auth data
+        if (!hasValidAuthData) {
+          console.log("No valid cached auth data found, fetching from API");
+          const res = await fetchAccountApi();
+          
+          if (res?.data?.data) {
+            const userData = {
+              isAuthenticated: true,
+              user: {
+                email: res.data.data.email ?? "",
+                name: res.data.data.name ?? "",
+                phone: res.data.data.phone ?? "",
+                id: res.data.data._id ?? "",
+                image: res.data.data.image ?? "",
+                role: res.data.data.role ?? "",
+              },
+            };
+            setAuth(userData);
+          } else {
+            setAuth({
+              isAuthenticated: false,
+              user: {
+                email: "",
+                name: "",
+                phone: "",
+                id: "",
+                image: "",
+                role: "",
+              },
+            });
+          }
         }
       } catch (error) {
-        console.error("Error fetching account data:", error);
+        console.error("Error during auth check:", error);
         setAuth({
           isAuthenticated: false,
           user: {
             email: "",
             name: "",
+            phone: "",
+            id: "",
+            image: "",
+            role: "",
           },
         });
       }
     };
-
-    fetchAcc();
-  }, [setAuth]);
+    
+    checkAuth();
+  }, []);
 
   return (
     <div>

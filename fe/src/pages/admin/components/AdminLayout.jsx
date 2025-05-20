@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import { Layout, Menu, Avatar, Typography, Dropdown, Button } from 'antd';
 import { Outlet, useNavigate, Link } from 'react-router-dom';
 import {
-  DashboardOutlined,
   UserOutlined,
   TagsOutlined,
   TransactionOutlined,
-  LineChartOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -21,12 +19,6 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   
   const items = [
-    {
-      key: 'dashboard',
-      icon: <DashboardOutlined />,
-      label: 'Dashboard',
-      onClick: () => navigate('/admin'),
-    },
     {
       key: 'users',
       icon: <UserOutlined />,
@@ -92,7 +84,7 @@ const AdminLayout = () => {
         <Menu 
           theme="dark" 
           mode="inline" 
-          defaultSelectedKeys={['dashboard']}
+          defaultSelectedKeys={['users']}
           items={items}
         />
       </Sider>

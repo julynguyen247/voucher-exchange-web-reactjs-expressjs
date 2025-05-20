@@ -9,15 +9,21 @@ const isAdmin = async (req, res, next) => {
     const userId = req.user._id;
     const user = await User.findById(userId);
     
-    // Kiểm tra quyền admin (cần thêm trường isAdmin vào model User)
-    // Hiện tại giả định email admin là admin@voucher-exchange.com
-    if (!user || (user.email !== "admin@voucher-exchange.com" && !user.isAdmin)) {
+    console.log(`Checking admin permissions for user: ${user?.email}, role: ${user?.role}`);
+    
+    // Kiểm tra quyền admin thông qua email hoặc role
+    // 1. Email mặc định admin@voucher-exchange.com
+    // 2. Trường role = "ADMIN" hoặc "admin"
+    if (!user || (user.email !== "admin@voucher-exchange.com" && 
+                 user.role?.toLowerCase() !== "admin")) {
+      console.log(`Access denied. User ${user?.email} has role ${user?.role}`);
       return res.status(403).json({
         EC: 1,
         message: "Không có quyền truy cập. Chỉ admin mới có thể thực hiện chức năng này.",
       });
     }
     
+    console.log(`Admin access granted for user: ${user.email}`);
     next();
   } catch (error) {
     console.error("Lỗi kiểm tra quyền admin:", error);
@@ -31,6 +37,8 @@ const isAdmin = async (req, res, next) => {
 // API thống kê cho Dashboard
 const getDashboardStats = async (req, res) => {
   try {
+    console.log("Dashboard stats API called by:", req.user?.email, req.user?.role);
+    
     // Parse date range if provided in query parameters
     let startDate, endDate;
     if (req.query.startDate && req.query.endDate) {
@@ -243,60 +251,126 @@ const getDashboardStats = async (req, res) => {
       ];
     }
     
+    // Log the stats we're about to return
+    console.log("Returning dashboard stats:", JSON.stringify(stats, null, 2));
+    
     // Return results
     return res.status(200).json({
       EC: 0,
-      data: stats
+      data: stats || {},
     });
   } catch (error) {
-    console.error("Lỗi khi lấy thống kê dashboard:", error);
+    console.error("Dashboard stats error:", error);
     
     // Return dummy data to prevent dashboard errors
     return res.status(200).json({
+      EC: 1,
+      message: "Lỗi khi lấy dữ liệu dashboard: " + error.message,
+      data: {
+        userStats: { total: 0, newUsers: 0, growth: 0 },
+        voucherStats: { total: 0, sold: 0, available: 0 },
+        transactionStats: { total: 0, periodCount: 0, growth: 0 },
+        revenueStats: { total: 0, periodTotal: 0, growth: 0, monthly: [] },
+        platformStats: [],
+        categoryStats: []
+      }
+    });
+  }
+};
+
+// Cập nhật quyền người dùng (đặt người dùng làm admin)
+const updateUserRole = async (req, res) => {
+  try {
+    const { userId, role } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({
+        EC: 1,
+        message: "Thiếu thông tin: userId"
+      });
+    }
+    
+    // Mặc định đặt vai trò là "ADMIN" nếu không được cung cấp
+    const newRole = role || "ADMIN";
+    
+    console.log(`Updating user ${userId} role to ${newRole}`);
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        EC: 1,
+        message: "Không tìm thấy người dùng"
+      });
+    }
+    
+    // Cập nhật vai trò người dùng
+    user.role = newRole;
+    await user.save();
+    
+    console.log(`Successfully updated user ${user.email} to role ${newRole}`);
+    
+    return res.status(200).json({
+      EC: 0,
+      message: `Đã cập nhật vai trò của người dùng thành ${newRole}`,
+      data: {
+        userId: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error("Lỗi khi cập nhật vai trò người dùng:", error);
+    return res.status(500).json({
+      EC: 1,
+      message: "Lỗi server khi cập nhật vai trò người dùng",
+      error: error.message
+    });
+  }
+};
+
+// API kiểm tra vai trò người dùng theo email (debug)
+const checkUserRole = async (req, res) => {
+  try {
+    const { email } = req.query;
+    
+    if (!email) {
+      return res.status(400).json({
+        EC: 1,
+        message: "Thiếu thông tin: email"
+      });
+    }
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        EC: 1,
+        message: "Không tìm thấy người dùng"
+      });
+    }
+    
+    return res.status(200).json({
       EC: 0,
       data: {
-        userStats: {
-          total: 15,
-          newUsers: 3,
-          growth: 5.2
-        },
-        voucherStats: {
-          total: 50,
-          sold: 25,
-          available: 25
-        },
-        transactionStats: {
-          total: 30,
-          periodCount: 8,
-          growth: 8.1
-        },
-        revenueStats: {
-          total: 5000000,
-          periodTotal: 1200000,
-          growth: 12.3,
-          monthly: Array.from({length: 12}, (_, i) => ({
-            month: `Tháng ${i + 1}`,
-            sales: Math.floor(Math.random() * 1000000) + 500000
-          }))
-        },
-        platformStats: [
-          { type: "Shopee", value: 10 },
-          { type: "Lazada", value: 8 },
-          { type: "Tiki", value: 12 },
-          { type: "Sendo", value: 5 }
-        ],
-        categoryStats: [
-          { type: "Điện tử", value: 15 },
-          { type: "Thời trang", value: 20 },
-          { type: "Ăn uống", value: 10 },
-          { type: "Du lịch", value: 5 }
-        ]
+        userId: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role
       }
+    });
+  } catch (error) {
+    console.error("Lỗi khi kiểm tra vai trò người dùng:", error);
+    return res.status(500).json({
+      EC: 1,
+      message: "Lỗi server khi kiểm tra vai trò người dùng",
+      error: error.message
     });
   }
 };
 
 module.exports = {
   isAdmin,
-  getDashboardStats
+  getDashboardStats,
+  updateUserRole,
+  checkUserRole
 };

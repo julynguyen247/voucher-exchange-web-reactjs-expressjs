@@ -23,7 +23,6 @@ import Rating from "./pages/client/rating";
 
 // Admin imports
 import AdminLayout from "./pages/admin/components/AdminLayout";
-import AdminDashboard from "./pages/admin/dashboard/AdminDashboard";
 import UserManagement from "./pages/admin/users/UserManagement";
 import VoucherManagement from "./pages/admin/vouchers/VoucherManagement";
 import TransactionManagement from "./pages/admin/transactions/TransactionManagement";
@@ -99,7 +98,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <AdminDashboard />,
+        element: <UserManagement />, // Trang mặc định khi vào /admin là Quản lý người dùng
       },
       {
         path: "/admin/users",

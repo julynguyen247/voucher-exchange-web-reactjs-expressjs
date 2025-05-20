@@ -6,7 +6,36 @@ import { io } from "socket.io-client";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8081";
 
-const socket = io("http://localhost:8081");
+// Create a singleton socket instance to prevent multiple connections
+let socketInstance = null;
+const getSocket = () => {
+  if (!socketInstance) {
+    console.log("Creating new socket connection");
+    socketInstance = io(API_URL, {
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      autoConnect: true,
+      transports: ["websocket"]
+    });
+  }
+  return socketInstance;
+};
+
+// Get the singleton socket instance
+const socket = getSocket();
+
+// Add connection monitoring
+socket.on('connect', () => {
+  console.log('Socket connected with ID:', socket.id);
+});
+
+socket.on('disconnect', () => {
+  console.log('Socket disconnected');
+});
+
+socket.on('connect_error', (error) => {
+  console.error('Socket connection error:', error);
+});
 
 const Chatbot = ({ showChatbot, setShowChatbot }) => {
   const [inputText, setInputText] = useState("");
@@ -36,6 +65,10 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
   
   //nhận tin nhắn từ RASA qua backend Socket.IO
   useEffect(() => {
+    // Log when component mounts
+    console.log("Chatbot component mounted, setting up socket listeners");
+    
+    // Setup socket event listener
     socket.on("bot_reply", (msg) => {
       setIsBotTyping(false);
 
@@ -48,6 +81,8 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
     });
 
     return () => {
+      // Clean up event listener when component unmounts
+      console.log("Chatbot component unmounted, cleaning up socket listeners");
       socket.off("bot_reply"); // Cleanup để tránh đăng ký nhiều lần
     };
   }, []);

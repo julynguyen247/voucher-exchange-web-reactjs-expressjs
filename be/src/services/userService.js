@@ -7,25 +7,43 @@ const aqp = require("api-query-params");
 
 const createUserService = async (name, email, password, phone, image) => {
   try {
+    console.log(`Creating user with email: ${email}`);
+    
     const user = await User.findOne({ email });
     if (user) {
-      console.log(`chon email khac ${email}`);
-      return null;
+      console.log(`Email ${email} already exists, please choose another email`);
+      return {
+        success: false,
+        message: "Email already exists"
+      };
     } else {
       const hashPassword = await bcrypt.hash(password, saltRounds);
-      let result = await User.create({
+      
+      const userData = {
         name,
         email,
         password: hashPassword,
         phone,
         image,
         role: "USER",
-      });
-      return result;
+      };
+      
+      console.log("Creating user with data:", JSON.stringify(userData, null, 2));
+      
+      let result = await User.create(userData);
+      console.log("User created successfully with ID:", result._id);
+      
+      return {
+        success: true,
+        data: result
+      };
     }
   } catch (error) {
-    console.log(error);
-    return null;
+    console.error("Error creating user:", error);
+    return {
+      success: false,
+      message: error.message
+    };
   }
 };
 const loginService = async (email, password) => {
@@ -126,10 +144,35 @@ const updateAUserService = async (
     }
   }
 };
-const fetchAccountService = async (user) => {
-  const data = await User.findOne({ email: user.email }).lean();
+// Track fetched accounts to avoid repetitive logging
+const recentlyFetchedAccounts = new Set();
+setInterval(() => recentlyFetchedAccounts.clear(), 60000); // Clear every minute
 
-  return data;
+const fetchAccountService = async (user) => {
+  try {
+    const userEmail = user.email;
+    
+    // Only log if we haven't recently seen this account
+    if (!recentlyFetchedAccounts.has(userEmail)) {
+      console.log("Fetching account for:", userEmail);
+      recentlyFetchedAccounts.add(userEmail);
+    }
+    
+    const data = await User.findOne({ email: userEmail }).lean();
+    
+    if (data && !recentlyFetchedAccounts.has(userEmail + "-found")) {
+      console.log("User account found with role:", data.role || "No role");
+      recentlyFetchedAccounts.add(userEmail + "-found");
+    } else if (!data && !recentlyFetchedAccounts.has(userEmail + "-notfound")) {
+      console.log("No user account found for email:", userEmail);
+      recentlyFetchedAccounts.add(userEmail + "-notfound");
+    }
+    
+    return data;
+  } catch (error) {
+    console.error("Error in fetchAccountService:", error);
+    return null;
+  }
 };
 module.exports = {
   createUserService,

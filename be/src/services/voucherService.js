@@ -85,6 +85,7 @@ const createVoucherService = async (
     let user = null;
     
     if (email) {
+      console.log(`Looking for user with email: ${email}`);
       user = await User.findOne({ email: email });
       
       if (user) {
@@ -92,7 +93,8 @@ const createVoucherService = async (
         userId = user._id;
       } else if (email === 'admin@voucher-exchange.com') {
         // Try to find an admin user
-        const adminUser = await User.findOne({ isAdmin: true });
+        console.log("Looking for admin user");
+        const adminUser = await User.findOne({ role: "ADMIN" });
         if (adminUser) {
           console.log("Using admin user:", adminUser._id);
           userId = adminUser._id;
@@ -152,11 +154,26 @@ const createVoucherService = async (
     
     console.log("Creating voucher with data:", voucherData);
     
-    // Create the voucher
-    let result = await Voucher.create(voucherData);
-    console.log("Voucher created successfully:", result._id);
-    
-    return result;
+    // Wrap the creation in a try-catch block to provide detailed error info
+    try {
+      // Create the voucher with strict validation
+      console.log("Creating voucher with final data:", JSON.stringify(voucherData, null, 2));
+      let result = await Voucher.create(voucherData);
+      console.log("Voucher created successfully with ID:", result._id);
+      
+      // Verify the voucher was created by retrieving it
+      const verified = await Voucher.findById(result._id);
+      if (!verified) {
+        console.error("Failed to verify voucher creation, voucher not found after creation");
+      } else {
+        console.log("Voucher creation verified successfully");
+      }
+      
+      return result;
+    } catch (dbError) {
+      console.error("Database error creating voucher:", dbError);
+      throw new Error(`Database error: ${dbError.message}`);
+    }
   } catch (error) {
     console.error("Error creating voucher:", error);
     throw error; // Re-throw to handle in the controller

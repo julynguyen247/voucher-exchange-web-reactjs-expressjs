@@ -27,9 +27,79 @@ const registerApi = (name, email, password, phone, image) => {
   };
   return axios.post(URL_API, data);
 };
+// Cache the account API fetch to prevent excessive calls
+let accountApiCache = null;
+let accountApiLastFetch = 0;
+let pendingFetchPromise = null;
+const ACCOUNT_API_CACHE_DURATION = 300000; // 5 minutes - increased from 60 seconds
+
+// Track API call counts to detect potential issues
+const apiCallCounts = {
+  total: 0,
+  byHour: {},
+  lastHourFlushed: 0
+};
+
+// Function to update API call statistics
+const trackApiCall = () => {
+  apiCallCounts.total++;
+  
+  // Track by hour for debugging
+  const now = new Date();
+  const hourKey = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}-${now.getHours()}`;
+  
+  apiCallCounts.byHour[hourKey] = (apiCallCounts.byHour[hourKey] || 0) + 1;
+  
+  // Flush old hour data occasionally to prevent memory bloat
+  if (now.getTime() - apiCallCounts.lastHourFlushed > 3600000) { // 1 hour
+    const keysToKeep = Object.keys(apiCallCounts.byHour).sort().slice(-24); // Keep last 24 hours
+    const newByHour = {};
+    keysToKeep.forEach(k => newByHour[k] = apiCallCounts.byHour[k]);
+    apiCallCounts.byHour = newByHour;
+    apiCallCounts.lastHourFlushed = now.getTime();
+  }
+};
+
 const fetchAccountApi = () => {
   const URL_API = "/v1/api/account";
-  return axios.get(URL_API);
+  
+  // Return a promise that resolves with cached data if available and recent
+  return new Promise((resolve, reject) => {
+    const now = Date.now();
+    
+    // Use cached data if it exists and is recent
+    if (accountApiCache && now - accountApiLastFetch < ACCOUNT_API_CACHE_DURATION) {
+      resolve(accountApiCache);
+      return;
+    }
+    
+    // If there's already a pending request, return that promise
+    // This prevents multiple simultaneous API calls
+    if (pendingFetchPromise) {
+      return pendingFetchPromise;
+    }
+    
+    // Otherwise, make the API call
+    console.log("Making fresh account API call");
+    trackApiCall();
+    
+    pendingFetchPromise = axios.get(URL_API)
+      .then(response => {
+        // Update cache
+        accountApiCache = response;
+        accountApiLastFetch = now;
+        pendingFetchPromise = null; // Clear the pending promise
+        resolve(response);
+        return response; // Important for the returned promise chain
+      })
+      .catch(error => {
+        pendingFetchPromise = null; // Clear the pending promise on error
+        reject(error);
+        throw error; // Re-throw for the promise chain
+      });
+    
+    return pendingFetchPromise;
+  });
 };
 const getVoucherCategory = () => {
   const URL_API = "/v1/api/voucher/category";

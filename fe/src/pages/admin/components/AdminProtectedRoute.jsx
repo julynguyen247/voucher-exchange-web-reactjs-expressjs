@@ -5,11 +5,17 @@ import { useAuth } from '../../../components/context/auth.context';
 const AdminProtectedRoute = ({ children }) => {
   const { user, isAuthenticated } = useAuth();
   
-  console.log("Auth state in AdminProtectedRoute:", { user, isAuthenticated });
+  // Only log once during initial render, not on every state update
+  React.useEffect(() => {
+    console.log("Admin route auth state:", { 
+      email: user?.email, 
+      role: user?.role, 
+      isAuthenticated 
+    });
+  }, []);
   
   // Kiểm tra xem người dùng đã đăng nhập và có quyền admin hay không
   if (!isAuthenticated) {
-    console.log("Not authenticated, redirecting to login");
     return <Navigate to="/login" replace />;
   }
   
@@ -18,9 +24,8 @@ const AdminProtectedRoute = ({ children }) => {
   // Trong thực tế, cần kiểm tra quyền hạn thực sự trong CSDL
   const isAdmin = user && (
     user.email === 'pewepic@gmail.com' || 
-    user.role === 'admin' ||
-    user.role === 'ADMIN' ||
-    user.role === 'Admin'
+    user.email === 'vngbthi@gmail.com' ||
+    user.role?.toLowerCase() === 'admin'
   );
   
   if (!isAdmin) {

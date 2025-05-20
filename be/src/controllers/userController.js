@@ -14,11 +14,39 @@ const { createJWT } = require("../utils/jwt"); // Đảm bảo bạn có hàm t�
 const User = require("../models/user"); // Import trực tiếp model User
 
 const createUser = async (req, res) => {
-  const { name, email, password, phone, image } = req.body;
-  const data = await createUserService(name, email, password, phone, image);
-  return res.status(200).json({
-    result: data,
-  });
+  try {
+    const { name, email, password, phone, image } = req.body;
+    
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        EC: 1,
+        message: "Missing required fields: name, email, or password"
+      });
+    }
+    
+    console.log(`Creating user: ${name}, ${email}`);
+    const result = await createUserService(name, email, password, phone, image);
+    
+    if (!result.success) {
+      return res.status(400).json({
+        EC: 1,
+        message: result.message || "Failed to create user"
+      });
+    }
+    
+    return res.status(200).json({
+      EC: 0,
+      message: "User created successfully",
+      result: result.data
+    });
+  } catch (error) {
+    console.error("Error in createUser controller:", error);
+    return res.status(500).json({
+      EC: 1,
+      message: "Server error while creating user",
+      error: error.message
+    });
+  }
 };
 
 const handleLogin = async (req, res) => {
@@ -138,8 +166,68 @@ const updateUser = async (req, res) => {
     data: result,
   });
 };
+// Cache storage for user account data
+const userCache = new Map();
+const USER_CACHE_TTL = 15 * 60 * 1000; // 15 minutes cache TTL (increased from 5 minutes)
+const userCacheAccessLog = new Map(); // Track logging to prevent spam
+const userCacheHits = new Map(); // Track cache hits per user
+
+// Track API call metrics
+const apiMetrics = {
+  totalCalls: 0,
+  cacheMisses: 0,
+  cacheHits: 0,
+  lastReported: Date.now()
+};
+
 const handleFetchAccount = async (req, res) => {
+  const userId = req.user.id || req.user._id;
+  const userEmail = req.user.email;
+  const currentTime = Date.now();
+  
+  // Update API metrics
+  apiMetrics.totalCalls++;
+  
+  // Report metrics every hour
+  if (currentTime - apiMetrics.lastReported > 3600000) {
+    console.log(`API Metrics Report: ${apiMetrics.totalCalls} total calls, ${apiMetrics.cacheHits} cache hits (${Math.round(apiMetrics.cacheHits/apiMetrics.totalCalls*100)}%), ${apiMetrics.cacheMisses} cache misses (${Math.round(apiMetrics.cacheMisses/apiMetrics.totalCalls*100)}%)`);
+    apiMetrics.lastReported = currentTime;
+  }
+  
+  // Use the cached data if available and not expired
+  const cachedData = userCache.get(userId);
+  if (cachedData && cachedData.timestamp > currentTime - USER_CACHE_TTL) {
+    // Update cache hit metrics
+    apiMetrics.cacheHits++;
+    userCacheHits.set(userId, (userCacheHits.get(userId) || 0) + 1);
+    
+    // Only log once every 5 minutes per user to prevent log spam
+    const lastLogTime = userCacheAccessLog.get(userId) || 0;
+    if (currentTime - lastLogTime > 300000) { // Once per 5 minutes at most (increased from 1 minute)
+      const hits = userCacheHits.get(userId) || 0;
+      console.log(`Using cached user data for ${userEmail} (${hits} cache hits since last log)`);
+      userCacheAccessLog.set(userId, currentTime);
+      userCacheHits.set(userId, 0); // Reset hit counter
+    }
+    
+    return res.status(200).json({
+      EC: 0,
+      data: cachedData.data,
+      cached: true
+    });
+  }
+  
+  // If not cached or cache expired, fetch from database
+  apiMetrics.cacheMisses++;
+  console.log(`Cache miss for ${userEmail}, fetching from database`);
   let result = await fetchAccountService(req.user);
+  
+  // Cache the result
+  userCache.set(userId, {
+    data: result,
+    timestamp: currentTime
+  });
+  
   return res.status(200).json({
     EC: 0,
     data: result,

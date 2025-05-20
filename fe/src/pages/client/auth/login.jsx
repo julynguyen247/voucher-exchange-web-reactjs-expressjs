@@ -47,9 +47,17 @@ const LoginPage = () => {
 
       if (res.data && res.data.EC === 0) {
         localStorage.setItem("access_token", res.data.access_token);
+        // Ensure we explicitly set all user fields including role
         setAuth({
           isAuthenticated: true,
-          user: res.data.user,
+          user: {
+            email: res.data.user.email || '',
+            name: res.data.user.name || '',
+            id: res.data.user._id || '',
+            phone: res.data.user.phone || '',
+            image: res.data.user.image || '',
+            role: res.data.user.role || '',
+          },
         });
         message.success("Đăng nhập bằng Google thành công");
         navigate("/");

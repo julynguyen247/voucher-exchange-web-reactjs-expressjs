@@ -41,11 +41,30 @@ export const AuthWrapper = (props) => {
   };
   
   const [auth, setAuthState] = useState(initialAuth);
+  const [fetchCount, setFetchCount] = useState(0);
   
   // Custom setAuth that also saves to localStorage
   const setAuth = (newAuth) => {
-    localStorage.setItem('auth', JSON.stringify(newAuth));
-    setAuthState(newAuth);
+    // Prevent unnecessary rerenders by doing deep comparison
+    const isSameAuth = 
+      newAuth.isAuthenticated === auth.isAuthenticated &&
+      newAuth.user.email === auth.user.email &&
+      newAuth.user.name === auth.user.name &&
+      newAuth.user.id === auth.user.id &&
+      newAuth.user.role === auth.user.role;
+      
+    // Only update if something actually changed
+    if (!isSameAuth) {
+      console.log("Auth state updated:", {
+        isAuthenticated: newAuth.isAuthenticated,
+        email: newAuth.user.email,
+        role: newAuth.user.role
+      });
+      
+      localStorage.setItem('auth', JSON.stringify(newAuth));
+      setAuthState(newAuth);
+      setFetchCount(prev => prev + 1);
+    }
   };
 
   return (
