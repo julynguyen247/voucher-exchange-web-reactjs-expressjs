@@ -1,12 +1,14 @@
 const mongoose = require("mongoose");
 const Transaction = require("../models/transaction");
+const User = require("../models/user");
 
 const createTransactionService = async (
   userId,
   voucherId,
   voucherName,
   price,
-  paymentMethod
+  paymentMethod,
+  uploaderId
 ) => {
   try {
     const transaction = new Transaction({
@@ -15,6 +17,7 @@ const createTransactionService = async (
       voucherName,
       price,
       paymentMethod,
+      uploaderId,
       status: "Completed",
       createdAt: new Date(),
     });
@@ -41,7 +44,21 @@ const getTransactionsService = async (userId) => {
   }
 };
 
+const getSellerInfo = async (uploaderId) => {
+  try {
+    const seller = await User.findById(uploaderId);
+    if (!seller) {
+      throw new Error("Seller not found");
+    }
+    return seller;
+  } catch (error) {
+    console.error("Error fetching seller info:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   createTransactionService,
   getTransactionsService,
+  getSellerInfo,
 };

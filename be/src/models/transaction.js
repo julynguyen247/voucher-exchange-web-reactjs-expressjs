@@ -12,7 +12,7 @@ const transactionSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   paymentMethod: {
     type: String,
-    enum: ["cash", "bank_transfer"],
+    enum: ["bank_transfer"],
     required: true,
   },
   status: {

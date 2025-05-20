@@ -91,15 +91,6 @@ const TransactionPage = () => {
           <label className="radio-label">
             <input
               type="radio"
-              value="cash"
-              checked={paymentMethod === "cash"}
-              onChange={handlePaymentMethodChange}
-            />
-            <span>Tiền Mặt</span>
-          </label>
-          <label className="radio-label">
-            <input
-              type="radio"
               value="bank_transfer"
               checked={paymentMethod === "bank_transfer"}
               onChange={handlePaymentMethodChange}
@@ -121,7 +112,6 @@ const TransactionPage = () => {
           </div>
         )}
 
-        {/* Hiển thị thông tin thanh toán tương ứng với ngân hàng được chọn */}
         {paymentMethod === "bank_transfer" && selectedBank && (
           <div className="payment-instruction">
             {selectedBank === "momo" && (
