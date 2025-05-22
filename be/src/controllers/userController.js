@@ -12,39 +12,39 @@ const client = new OAuth2Client(
 );
 const { createJWT } = require("../utils/jwt"); // Đảm bảo bạn có hàm tạo JWT
 const User = require("../models/user"); // Import trực tiếp model User
-
+const Voucher = require("../models/voucher");
 const createUser = async (req, res) => {
   try {
     const { name, email, password, phone, image } = req.body;
-    
+
     if (!name || !email || !password) {
       return res.status(400).json({
         EC: 1,
-        message: "Missing required fields: name, email, or password"
+        message: "Missing required fields: name, email, or password",
       });
     }
-    
+
     console.log(`Creating user: ${name}, ${email}`);
     const result = await createUserService(name, email, password, phone, image);
-    
+
     if (!result.success) {
       return res.status(400).json({
         EC: 1,
-        message: result.message || "Failed to create user"
+        message: result.message || "Failed to create user",
       });
     }
-    
+
     return res.status(200).json({
       EC: 0,
       message: "User created successfully",
-      result: result.data
+      result: result.data,
     });
   } catch (error) {
     console.error("Error in createUser controller:", error);
     return res.status(500).json({
       EC: 1,
       message: "Server error while creating user",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -65,7 +65,6 @@ const getUser = async (req, res) => {
     let limit = req.query.limit;
     let page = req.query.page;
     let result = null;
-    
     if (limit && page) {
       result = await getUserService(limit, page, req.query);
     } else {
@@ -78,11 +77,11 @@ const getUser = async (req, res) => {
         EC: 0,
         data: {
           users: result,
-          total: result.length
-        }
+          total: result.length,
+        },
       });
     }
-    
+
     // Nếu không có dữ liệu, tạo dữ liệu mẫu
     const sampleUsers = [
       {
@@ -92,7 +91,7 @@ const getUser = async (req, res) => {
         phone: "0901234567",
         image: "",
         accountType: "Local",
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       },
       {
         _id: "sample-2",
@@ -101,7 +100,7 @@ const getUser = async (req, res) => {
         phone: "0901234568",
         image: "",
         accountType: "Google",
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       },
       {
         _id: "sample-3",
@@ -110,16 +109,16 @@ const getUser = async (req, res) => {
         phone: "0901234569",
         image: "",
         accountType: "Local",
-        createdAt: new Date().toISOString()
-      }
+        createdAt: new Date().toISOString(),
+      },
     ];
-    
+
     return res.status(200).json({
       EC: 0,
       data: {
         users: sampleUsers,
-        total: sampleUsers.length
-      }
+        total: sampleUsers.length,
+      },
     });
   } catch (error) {
     console.error("Lỗi khi lấy danh sách người dùng:", error);
@@ -127,16 +126,18 @@ const getUser = async (req, res) => {
     return res.status(200).json({
       EC: 0,
       data: {
-        users: Array(3).fill().map((_, i) => ({
-          _id: `error-${i}`,
-          name: `Người dùng mẫu ${i+1}`,
-          email: `user${i+1}@example.com`,
-          phone: `090${i}123456`,
-          image: "",
-          createdAt: new Date().toISOString()
-        })),
-        total: 3
-      }
+        users: Array(3)
+          .fill()
+          .map((_, i) => ({
+            _id: `error-${i}`,
+            name: `Người dùng mẫu ${i + 1}`,
+            email: `user${i + 1}@example.com`,
+            phone: `090${i}123456`,
+            image: "",
+            createdAt: new Date().toISOString(),
+          })),
+        total: 3,
+      },
     });
   }
 };
@@ -166,6 +167,86 @@ const updateUser = async (req, res) => {
     data: result,
   });
 };
+const getSellerPaymentDetails = async (req, res) => {
+  try {
+    const { voucherId, bank } = req.query;
+
+    if (!voucherId || !bank) {
+      return res.status(400).json({
+        EC: 1,
+        message: "Voucher ID và loại ngân hàng là bắt buộc.",
+      });
+    }
+
+    const voucher = await Voucher.findById(voucherId).populate("createdBy");
+
+    if (!voucher) {
+      return res
+        .status(404)
+        .json({ EC: 1, message: "Không tìm thấy voucher." });
+    }
+
+    if (!voucher.createdBy) {
+      return res.status(404).json({
+        EC: 1,
+        message: "Không tìm thấy thông tin người bán cho voucher này.",
+      });
+    }
+
+    const seller = voucher.createdBy;
+
+    let paymentDetails = {};
+
+    if (bank.toLowerCase() === "momo" || bank.toLowerCase() === "zalo_pay") {
+      if (seller.phone) {
+        paymentDetails.sellerPhone = seller.phone;
+      } else {
+        return res.status(404).json({
+          EC: 1,
+          message: "Người bán chưa cập nhật số điện thoại cho ví điện tử.",
+        });
+      }
+    } else if (
+      bank.toLowerCase() === "vietcombank" ||
+      bank.toLowerCase() === "techcombank"
+    ) {
+      if (seller.bankAccount && seller.bankName) {
+        paymentDetails.sellerBankAccount = seller.bankAccount;
+        paymentDetails.sellerBankName = seller.bankName;
+      } else if (voucher.bankAccount && voucher.bankName) {
+        paymentDetails.sellerBankAccount = voucher.bankAccount;
+        paymentDetails.sellerBankName = voucher.bankName;
+      } else {
+        return res.status(404).json({
+          EC: 1,
+          message: "Người bán chưa cập nhật thông tin tài khoản ngân hàng.",
+        });
+      }
+    } else {
+      return res.status(400).json({
+        EC: 1,
+        message:
+          "Loại ngân hàng không được hỗ trợ hoặc không tìm thấy thông tin.",
+      });
+    }
+
+    if (Object.keys(paymentDetails).length === 0) {
+      return res.status(404).json({
+        EC: 1,
+        message: `Không tìm thấy thông tin thanh toán cho ngân hàng ${bank}.`,
+      });
+    }
+
+    return res.status(200).json({ EC: 0, data: paymentDetails });
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin thanh toán của người bán:", error);
+    return res.status(500).json({
+      EC: 1,
+      message: "Lỗi máy chủ nội bộ khi lấy thông tin người bán.",
+    });
+  }
+};
+
 // Cache storage for user account data
 const userCache = new Map();
 const USER_CACHE_TTL = 15 * 60 * 1000; // 15 minutes cache TTL (increased from 5 minutes)
@@ -177,57 +258,68 @@ const apiMetrics = {
   totalCalls: 0,
   cacheMisses: 0,
   cacheHits: 0,
-  lastReported: Date.now()
+  lastReported: Date.now(),
 };
 
 const handleFetchAccount = async (req, res) => {
   const userId = req.user.id || req.user._id;
   const userEmail = req.user.email;
   const currentTime = Date.now();
-  
+
   // Update API metrics
   apiMetrics.totalCalls++;
-  
+
   // Report metrics every hour
   if (currentTime - apiMetrics.lastReported > 3600000) {
-    console.log(`API Metrics Report: ${apiMetrics.totalCalls} total calls, ${apiMetrics.cacheHits} cache hits (${Math.round(apiMetrics.cacheHits/apiMetrics.totalCalls*100)}%), ${apiMetrics.cacheMisses} cache misses (${Math.round(apiMetrics.cacheMisses/apiMetrics.totalCalls*100)}%)`);
+    console.log(
+      `API Metrics Report: ${apiMetrics.totalCalls} total calls, ${
+        apiMetrics.cacheHits
+      } cache hits (${Math.round(
+        (apiMetrics.cacheHits / apiMetrics.totalCalls) * 100
+      )}%), ${apiMetrics.cacheMisses} cache misses (${Math.round(
+        (apiMetrics.cacheMisses / apiMetrics.totalCalls) * 100
+      )}%)`
+    );
     apiMetrics.lastReported = currentTime;
   }
-  
+
   // Use the cached data if available and not expired
   const cachedData = userCache.get(userId);
   if (cachedData && cachedData.timestamp > currentTime - USER_CACHE_TTL) {
     // Update cache hit metrics
     apiMetrics.cacheHits++;
     userCacheHits.set(userId, (userCacheHits.get(userId) || 0) + 1);
-    
+
     // Only log once every 5 minutes per user to prevent log spam
     const lastLogTime = userCacheAccessLog.get(userId) || 0;
-    if (currentTime - lastLogTime > 300000) { // Once per 5 minutes at most (increased from 1 minute)
+    if (currentTime - lastLogTime > 300000) {
+      // Once per 5 minutes at most (increased from 1 minute)
       const hits = userCacheHits.get(userId) || 0;
-      console.log(`Using cached user data for ${userEmail} (${hits} cache hits since last log)`);
+      console.log(
+        `Using cached user data for ${userEmail} (${hits} cache hits since last log)`
+      );
       userCacheAccessLog.set(userId, currentTime);
       userCacheHits.set(userId, 0); // Reset hit counter
     }
-    
+
     return res.status(200).json({
       EC: 0,
       data: cachedData.data,
-      cached: true
+      cached: true,
     });
   }
-  
+
   // If not cached or cache expired, fetch from database
   apiMetrics.cacheMisses++;
   console.log(`Cache miss for ${userEmail}, fetching from database`);
   let result = await fetchAccountService(req.user);
-  
+
   // Cache the result
   userCache.set(userId, {
     data: result,
-    timestamp: currentTime
+    timestamp: currentTime,
   });
-  
+
   return res.status(200).json({
     EC: 0,
     data: result,
@@ -316,6 +408,7 @@ module.exports = {
   handleLogout,
   handleFetchAccount,
   getAccount,
+  getSellerPaymentDetails,
   handleGoogleLogin,
   getBank,
 };

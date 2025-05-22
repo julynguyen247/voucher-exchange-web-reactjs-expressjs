@@ -8,6 +8,7 @@ const {
   handleLogout,
   handleFetchAccount,
   getAccount,
+  getSellerPaymentDetails,
   getBank,
 } = require("../controllers/userController");
 const auth = require("../middleware/auth");
@@ -31,7 +32,12 @@ const {
   getUserFavorites,
   removeFavorite,
 } = require("../controllers/favoriteController");
-const { isAdmin, getDashboardStats, updateUserRole, checkUserRole } = require("../controllers/adminController");
+const {
+  isAdmin,
+  getDashboardStats,
+  updateUserRole,
+  checkUserRole,
+} = require("../controllers/adminController");
 
 const routerAPI = express.Router();
 routerAPI.all("*", auth);
@@ -39,7 +45,11 @@ routerAPI.get("/", (req, res) => {
   return res.status(200).json("Hello world");
 });
 
-const {rating, getUsersWithRatings} = require("../controllers/ratingController");
+const {
+  rating,
+  getUsersWithRatings,
+} = require("../controllers/ratingController");
+
 routerAPI.post("/user/:id/rating", auth, rating);
 routerAPI.get("/user/ratings", getUsersWithRatings);
 
@@ -50,6 +60,7 @@ routerAPI.post("/login", handleLogin);
 routerAPI.post("/logout", handleLogout);
 routerAPI.get("/account", handleFetchAccount);
 routerAPI.get("/account-fetch", getAccount);
+routerAPI.get("/seller-payment-details", getSellerPaymentDetails);
 
 //admin
 routerAPI.post("/user", createUser);
