@@ -3,7 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import "../../../style/transactionPage.css";
 import { QRCode } from "antd";
-import { processTransaction } from "../../../utils/api";
+import {
+  processTransaction,
+  getSellerPaymentDetails,
+} from "../../../utils/api";
 import { AuthContext } from "../../../components/context/auth.context";
 
 const TransactionPage = () => {
@@ -21,16 +24,101 @@ const TransactionPage = () => {
   const handlePaymentMethodChange = (event) => {
     setPaymentMethod(event.target.value);
     setSelectedBank("");
+    setSellerPhone("");
+    setSellerBankAccount("");
+    setSellerBankName("");
+    setMessage("");
   };
 
-  const handleBankChange = (event) => {
-    setSelectedBank(event.target.value);
+  const handleBankChange = async (event) => {
+    const newSelectedBank = event.target.value;
+    setSelectedBank(newSelectedBank);
+    setMessage("");
+
+    if (paymentMethod === "bank_transfer" && newSelectedBank) {
+      setSellerPhone("");
+      setSellerBankAccount("");
+      setSellerBankName("");
+      try {
+        const response = await getSellerPaymentDetails(
+          voucherId,
+          newSelectedBank
+        );
+
+        if (response.data && response.data.EC === 0) {
+          const details = response.data.data;
+          setSellerPhone(details.sellerPhone || "");
+          setSellerBankAccount(details.sellerBankAccount || "");
+          setSellerBankName(details.sellerBankName || "");
+
+          if (
+            (newSelectedBank === "momo" || newSelectedBank === "zalo_pay") &&
+            !details.sellerPhone
+          ) {
+            setMessage(`Không tìm thấy SĐT người bán cho ${newSelectedBank}.`);
+          } else if (
+            (newSelectedBank === "vietcombank" ||
+              newSelectedBank === "techcombank") &&
+            (!details.sellerBankAccount || !details.sellerBankName)
+          ) {
+            setMessage(
+              `Không tìm thấy thông tin tài khoản cho ${newSelectedBank}.`
+            );
+          }
+        } else {
+          const errorMessage =
+            response.data?.message ||
+            "Không thể lấy thông tin người bán cho ngân hàng này.";
+          setMessage(errorMessage);
+        }
+      } catch (error) {
+        console.error(
+          "Lỗi khi lấy thông tin người bán:",
+          error.response?.data || error.message
+        );
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          "Lỗi kết nối hoặc máy chủ khi lấy thông tin người bán. Vui lòng thử lại.";
+        setMessage(errorMessage);
+      }
+    } else {
+      // Nếu không chọn bank_transfer hoặc không chọn ngân hàng cụ thể, xóa thông tin
+      setSellerPhone("");
+      setSellerBankAccount("");
+      setSellerBankName("");
+    }
   };
 
   const handleTransaction = async () => {
+    setMessage(""); // Xóa message cũ trước khi thực hiện giao dịch mới
+    if (!auth?.user?.id) {
+      setMessage("Người dùng chưa được xác thực. Vui lòng đăng nhập lại.");
+      return;
+    }
+
+    if (paymentMethod === "bank_transfer") {
+      if (
+        (selectedBank === "momo" || selectedBank === "zalo_pay") &&
+        !sellerPhone
+      ) {
+        setMessage(
+          `Thông tin SĐT cho ${selectedBank} chưa được tải. Vui lòng chọn lại ngân hàng hoặc thử lại.`
+        );
+        return;
+      }
+      if (
+        (selectedBank === "vietcombank" || selectedBank === "techcombank") &&
+        (!sellerBankAccount || !sellerBankName)
+      ) {
+        setMessage(
+          `Thông tin tài khoản cho ${selectedBank} chưa được tải. Vui lòng chọn lại ngân hàng hoặc thử lại.`
+        );
+        return;
+      }
+    }
     try {
       const userId = auth?.user?.id;
-
       if (!userId) {
         setMessage("Người dùng chưa được xác thực.");
         return;
@@ -49,15 +137,10 @@ const TransactionPage = () => {
       const response = await processTransaction(transactionData);
 
       setMessage(response.data.message);
-      if (response.data.sellerPhone) {
-        setSellerPhone(response.data.sellerPhone);
-      }
-      if (response.data.sellerBankAccount) {
-        setSellerBankAccount(response.data.sellerBankAccount);
-      }
-      if (response.data.sellerBankName) {
-        setSellerBankName(response.data.sellerBankName);
-      }
+      const details = response.data.data;
+      setSellerPhone(details.sellerPhone || "");
+      setSellerBankAccount(details.sellerBankAccount || "");
+      setSellerBankName(details.sellerBankName || "");
     } catch (error) {
       console.error(
         "Giao dịch thất bại:",
@@ -89,15 +172,6 @@ const TransactionPage = () => {
       <div className="payment-options">
         <h2>Chọn Phương Thức Thanh Toán</h2>
         <div className="payment-method">
-          <label className="radio-label">
-            <input
-              type="radio"
-              value="cash"
-              checked={paymentMethod === "cash"}
-              onChange={handlePaymentMethodChange}
-            />
-            <span>Tiền Mặt</span>
-          </label>
           <label className="radio-label">
             <input
               type="radio"

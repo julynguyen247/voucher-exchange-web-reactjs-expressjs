@@ -5,10 +5,13 @@ import "../../../style/orderPage.css"; // Đảm bảo bạn có file CSS riêng
 const OrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { voucherId, voucherName, price } = location.state || {};
+
+  const { voucherId, voucherName, price, userId } = location.state || {};
 
   const handlePayment = () => {
-    navigate("/transaction", { state: { voucherId, voucherName, price } });
+    navigate("/transaction", {
+      state: { voucherId, voucherName, price, userId },
+    });
   };
 
   return (
