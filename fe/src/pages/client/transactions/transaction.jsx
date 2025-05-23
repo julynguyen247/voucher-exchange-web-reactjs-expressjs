@@ -1,6 +1,5 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-
 import "../../../style/transactionPage.css";
 import { QRCode } from "antd";
 import {
@@ -12,292 +11,394 @@ import { AuthContext } from "../../../components/context/auth.context";
 const TransactionPage = () => {
   const location = useLocation();
   const { voucherId, voucherName, price } = location.state || {};
-  const [paymentMethod, setPaymentMethod] = useState("cash");
-  const [selectedBank, setSelectedBank] = useState("");
+
+  const [selectedPaymentOption, setSelectedPaymentOption] = useState("");
   const [message, setMessage] = useState("");
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
+
   const [sellerPhone, setSellerPhone] = useState("");
   const [sellerBankAccount, setSellerBankAccount] = useState("");
   const [sellerBankName, setSellerBankName] = useState("");
+  const [sellerAccountHolderName, setSellerAccountHolderName] = useState("");
 
-  const handlePaymentMethodChange = (event) => {
-    setPaymentMethod(event.target.value);
-    setSelectedBank("");
+  const [isLoadingSellerInfo, setIsLoadingSellerInfo] = useState(false);
+
+  useEffect(() => {
+    if (!voucherId || !voucherName || typeof price !== "number") {
+      setMessage("Thông tin voucher không hợp lệ. Vui lòng thử lại.");
+    }
+  }, [voucherId, voucherName, price]);
+
+  const handlePaymentOptionChange = async (event) => {
+    const newPaymentOption = event.target.value;
+    setSelectedPaymentOption(newPaymentOption);
+    setMessage("");
     setSellerPhone("");
     setSellerBankAccount("");
     setSellerBankName("");
-    setMessage("");
-  };
+    setSellerAccountHolderName("");
 
-  const handleBankChange = async (event) => {
-    const newSelectedBank = event.target.value;
-    setSelectedBank(newSelectedBank);
-    setMessage("");
-
-    if (paymentMethod === "bank_transfer" && newSelectedBank) {
-      setSellerPhone("");
-      setSellerBankAccount("");
-      setSellerBankName("");
+    if (newPaymentOption) {
+      setIsLoadingSellerInfo(true);
       try {
         const response = await getSellerPaymentDetails(
           voucherId,
-          newSelectedBank
+          newPaymentOption
         );
 
         if (response.data && response.data.EC === 0) {
           const details = response.data.data;
-          setSellerPhone(details.sellerPhone || "");
-          setSellerBankAccount(details.sellerBankAccount || "");
-          setSellerBankName(details.sellerBankName || "");
-
-          if (
-            (newSelectedBank === "momo" || newSelectedBank === "zalo_pay") &&
-            !details.sellerPhone
-          ) {
-            setMessage(`Không tìm thấy SĐT người bán cho ${newSelectedBank}.`);
-          } else if (
-            (newSelectedBank === "vietcombank" ||
-              newSelectedBank === "techcombank") &&
-            (!details.sellerBankAccount || !details.sellerBankName)
-          ) {
-            setMessage(
-              `Không tìm thấy thông tin tài khoản cho ${newSelectedBank}.`
-            );
+          if (newPaymentOption === "momo" || newPaymentOption === "zalo_pay") {
+            setSellerPhone(details.sellerPhone || "");
+            if (!details.sellerPhone) {
+              setMessage(
+                `Không tìm thấy SĐT người bán cho ${newPaymentOption}.`
+              );
+            }
+          } else if (newPaymentOption === "vietqr_bank_transfer") {
+            setSellerBankName(details.sellerBankName || "");
+            setSellerBankAccount(details.sellerBankAccount || "");
+            setSellerAccountHolderName(details.sellerAccountHolderName || "");
+            if (
+              !details.sellerBankName ||
+              !details.sellerBankAccount ||
+              !details.sellerAccountHolderName
+            ) {
+              setMessage(
+                "Người bán chưa cập nhật đủ thông tin tài khoản ngân hàng (ngân hàng, STK, tên chủ TK)."
+              );
+            }
           }
         } else {
-          const errorMessage =
+          setMessage(
             response.data?.message ||
-            "Không thể lấy thông tin người bán cho ngân hàng này.";
-          setMessage(errorMessage);
+              `Không thể lấy thông tin cho ${newPaymentOption}.`
+          );
         }
       } catch (error) {
-        console.error(
-          "Lỗi khi lấy thông tin người bán:",
-          error.response?.data || error.message
-        );
-        const errorMessage =
+        console.error("Lỗi khi lấy thông tin thanh toán:", error);
+        setMessage(
           error.response?.data?.message ||
-          error.message ||
-          "Lỗi kết nối hoặc máy chủ khi lấy thông tin người bán. Vui lòng thử lại.";
-        setMessage(errorMessage);
+            "Lỗi kết nối khi lấy thông tin thanh toán."
+        );
+      } finally {
+        setIsLoadingSellerInfo(false);
       }
-    } else {
-      // Nếu không chọn bank_transfer hoặc không chọn ngân hàng cụ thể, xóa thông tin
-      setSellerPhone("");
-      setSellerBankAccount("");
-      setSellerBankName("");
     }
   };
 
   const handleTransaction = async () => {
-    setMessage(""); // Xóa message cũ trước khi thực hiện giao dịch mới
+    setMessage("");
     if (!auth?.user?.id) {
-      setMessage("Người dùng chưa được xác thực. Vui lòng đăng nhập lại.");
+      setMessage("Người dùng chưa được xác thực.");
+      return;
+    }
+    if (!selectedPaymentOption) {
+      setMessage("Vui lòng chọn một phương thức thanh toán.");
+      return;
+    }
+    if (isLoadingSellerInfo) {
+      setMessage("Đang tải thông tin, vui lòng đợi.");
+      return;
+    }
+    if (
+      (selectedPaymentOption === "momo" ||
+        selectedPaymentOption === "zalo_pay") &&
+      !sellerPhone
+    ) {
+      setMessage(`Thông tin SĐT cho ${selectedPaymentOption} chưa sẵn sàng.`);
+      return;
+    }
+    if (
+      selectedPaymentOption === "vietqr_bank_transfer" &&
+      (!sellerBankAccount || !sellerBankName || !sellerAccountHolderName)
+    ) {
+      setMessage("Thông tin tài khoản ngân hàng của người bán chưa sẵn sàng.");
       return;
     }
 
-    if (paymentMethod === "bank_transfer") {
-      if (
-        (selectedBank === "momo" || selectedBank === "zalo_pay") &&
-        !sellerPhone
-      ) {
-        setMessage(
-          `Thông tin SĐT cho ${selectedBank} chưa được tải. Vui lòng chọn lại ngân hàng hoặc thử lại.`
-        );
-        return;
-      }
-      if (
-        (selectedBank === "vietcombank" || selectedBank === "techcombank") &&
-        (!sellerBankAccount || !sellerBankName)
-      ) {
-        setMessage(
-          `Thông tin tài khoản cho ${selectedBank} chưa được tải. Vui lòng chọn lại ngân hàng hoặc thử lại.`
-        );
-        return;
-      }
-    }
     try {
-      const userId = auth?.user?.id;
-      if (!userId) {
-        setMessage("Người dùng chưa được xác thực.");
-        return;
-      }
-
       const transactionData = {
-        userId,
+        userId: auth.user.id,
         voucherId,
         voucherName,
         price,
-        paymentMethod,
-        ...(paymentMethod === "bank_transfer" &&
-          selectedBank && { bank: selectedBank }),
+        paymentMethod: selectedPaymentOption,
       };
-
       const response = await processTransaction(transactionData);
-
-      setMessage(response.data.message);
-      const details = response.data.data;
-      setSellerPhone(details.sellerPhone || "");
-      setSellerBankAccount(details.sellerBankAccount || "");
-      setSellerBankName(details.sellerBankName || "");
+      if (response.data && response.data.EC === 0) {
+        setMessage(response.data.message || "Giao dịch thành công!");
+      } else {
+        setMessage(response.data?.message || "Giao dịch thất bại.");
+      }
     } catch (error) {
-      console.error(
-        "Giao dịch thất bại:",
-        error.response?.data || error.message
-      );
-      const errorMessage =
-        error.response?.data?.message || error.message || "Giao dịch thất bại";
-      setMessage(errorMessage);
+      setMessage(error.response?.data?.message || "Lỗi khi xử lý giao dịch.");
     }
   };
 
-  const getBankBin = (bankKey) => {
+  const getBankBin = (bankNameKey) => {
     const bankBins = {
       vietcombank: "970436",
       techcombank: "970407",
-      // Thêm các ngân hàng khác nếu cần
-      // mb_bank: "970422",
-      // acb: "970416",
+      acb: "970416",
+      mbbank: "970422",
+      vpbank: "970432",
+      bidv: "970418",
+      viettinbank: "970415",
+      agribank: "970405",
+      sacombank: "970403",
+      dongabank: "970406",
     };
-    return bankBins[bankKey.toLowerCase()];
+    const normalizedKey = bankNameKey
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "");
+    return bankBins[normalizedKey];
   };
 
-  const generateVietQRString = (
-    bankKey,
+  const generateVietQRImageUrl = (
+    sellerBank,
     accountNo,
-    accountName,
+    accountHolder,
     amount,
     description
   ) => {
-    const bankBin = getBankBin(bankKey);
-    if (!bankBin || !accountNo || !amount) return null;
-
-    // VietQR string format for URL generation (e.g., via vietqr.io)
-    // You can adjust the template (compact, compact2, print, qr_only, etc.)
+    const bankBin = getBankBin(sellerBank);
+    if (!bankBin || !accountNo || typeof amount !== "number" || amount <= 0)
+      return null;
     const template = "compact2";
-    let qrString = `https://img.vietqr.io/image/${bankBin}-${accountNo}-${template}.png?amount=${amount}&addInfo=${encodeURIComponent(
+    let qrImageUrl = `https://img.vietqr.io/image/${bankBin}-${accountNo}-${template}.png?amount=${amount}&addInfo=${encodeURIComponent(
       description
     )}`;
-    if (accountName) {
-      qrString += `&accountName=${encodeURIComponent(accountName)}`;
+    if (accountHolder) {
+      qrImageUrl += `&accountName=${encodeURIComponent(
+        accountHolder.toUpperCase()
+      )}`;
     }
-    return qrString;
+    return qrImageUrl;
   };
+
+  const generateZaloPayQRString = (phone, amount, desc) => {
+    if (!phone || typeof amount !== "number" || amount <= 0) return null;
+    return `https://qr.zalopay.vn/p?s=0&a=${phone}&m=${encodeURIComponent(
+      desc
+    )}&am=${amount}`;
+  };
+
+  if (!voucherId || typeof price !== "number") {
+    return (
+      <div className="transaction-container">
+        <h1>Lỗi</h1>
+        <p>{message || "Thông tin voucher không hợp lệ."}</p>
+        <button onClick={() => navigate(-1)} className="confirm-button">
+          Quay Lại
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="transaction-container">
-      <h1 className="transaction-title">Xác Nhận Thanh Toán</h1>
+      <h1>Xác Nhận Thanh Toán</h1>
       <div className="transaction-details">
         <p>
           <strong>Voucher:</strong> {voucherName}
         </p>
         <p>
           <strong>Giá:</strong>{" "}
-          {price
-            ? price.toLocaleString("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              })
-            : "N/A"}
+          {price.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+          })}
         </p>
       </div>
 
       <div className="payment-options">
         <h2>Chọn Phương Thức Thanh Toán</h2>
-        <div className="payment-method">
-          <label className="radio-label">
+        <div className="payment-method-option">
+          <label>
             <input
               type="radio"
-              value="bank_transfer"
-              checked={paymentMethod === "bank_transfer"}
-              onChange={handlePaymentMethodChange}
-            />
-            <span>Chuyển Khoản Ngân Hàng</span>
+              value="momo"
+              name="paymentOption"
+              checked={selectedPaymentOption === "momo"}
+              onChange={handlePaymentOptionChange}
+            />{" "}
+            Momo
           </label>
         </div>
+        <div className="payment-method-option">
+          <label>
+            <input
+              type="radio"
+              value="zalo_pay"
+              name="paymentOption"
+              checked={selectedPaymentOption === "zalo_pay"}
+              onChange={handlePaymentOptionChange}
+            />{" "}
+            ZaloPay
+          </label>
+        </div>
+        <div className="payment-method-option">
+          <label>
+            <input
+              type="radio"
+              value="vietqr_bank_transfer"
+              name="paymentOption"
+              checked={selectedPaymentOption === "vietqr_bank_transfer"}
+              onChange={handlePaymentOptionChange}
+            />{" "}
+            Chuyển khoản ngân hàng (VietQR)
+          </label>
+        </div>
+      </div>
 
-        {paymentMethod === "bank_transfer" && (
-          <div className="bank-selection">
-            <p>Chọn Ngân Hàng:</p>
-            <select value={selectedBank} onChange={handleBankChange}>
-              <option value="">-- Chọn Ngân Hàng --</option>
-              <option value="momo">Momo</option>
-              <option value="zalo_pay">Zalo Pay</option>
-              <option value="bank">Ngân hàng</option>
-            </select>
-          </div>
-        )}
+      {selectedPaymentOption && (
+        <div className="payment-instruction">
+          {isLoadingSellerInfo && <p>Đang tải thông tin thanh toán...</p>}
 
-        {/* Hiển thị thông tin thanh toán tương ứng với ngân hàng được chọn */}
-        {paymentMethod === "bank_transfer" && selectedBank && (
-          <div className="payment-instruction">
-            {selectedBank === "momo" && (
+          {!isLoadingSellerInfo &&
+            selectedPaymentOption === "momo" &&
+            sellerPhone && (
               <div>
                 <h3>Quét mã QR để thanh toán bằng Momo</h3>
                 <QRCode
-                  value={`2|99|${sellerPhone}||0|0|${
-                    price * 1000
-                  }|Thanh toan voucher ${voucherName}`}
+                  value={`2|99|${sellerPhone}|||${price}|${encodeURIComponent(
+                    `TT Voucher ${voucherName.substring(0, 10)}`
+                  )}|0|0`}
                   size={256}
                 />
                 <p>
                   <strong>SĐT người nhận:</strong> {sellerPhone}
                 </p>
                 <p>
-                  <strong>Nội dung:</strong> Thanh toan voucher {voucherName}
+                  <strong>Số tiền:</strong> {price.toLocaleString("vi-VN")} VND
+                </p>
+                <p>
+                  <strong>Nội dung:</strong> TT Voucher{" "}
+                  {voucherName.substring(0, 10)}
                 </p>
               </div>
             )}
 
-            {selectedBank === "zalo_pay" && (
+          {!isLoadingSellerInfo &&
+            selectedPaymentOption === "zalo_pay" &&
+            sellerPhone && (
               <div>
-                <h3>Quét mã QR để thanh toán bằng Zalo Pay</h3>
+                <h3>Quét mã QR để thanh toán bằng ZaloPay</h3>
                 <QRCode
-                  value={`https://pay.zalopay.vn/qr-code?vnp_Amount=${
-                    price * 100000
-                  }&vnp_OrderInfo=Thanh toan voucher ${voucherName}`}
+                  value={generateZaloPayQRString(
+                    sellerPhone,
+                    price,
+                    `TT Voucher ${voucherName.substring(0, 10)}`
+                  )}
                   size={256}
                 />
                 <p>
                   <strong>SĐT người nhận:</strong> {sellerPhone}
                 </p>
                 <p>
-                  <strong>Nội dung:</strong> Thanh toan voucher {voucherName}
+                  <strong>Số tiền:</strong> {price.toLocaleString("vi-VN")} VND
+                </p>
+                <p>
+                  <strong>Nội dung:</strong> TT Voucher{" "}
+                  {voucherName.substring(0, 10)}
                 </p>
               </div>
             )}
 
-            {selectedBank === "bank" && (
+          {!isLoadingSellerInfo &&
+            selectedPaymentOption === "vietqr_bank_transfer" &&
+            sellerBankAccount &&
+            sellerBankName &&
+            sellerAccountHolderName && (
               <div>
-                <h3>Thông tin chuyển khoản</h3>
+                <h3>Quét mã QR hoặc chuyển khoản thủ công</h3>
+                <img
+                  src={generateVietQRImageUrl(
+                    sellerBankName,
+                    sellerBankAccount,
+                    sellerAccountHolderName,
+                    price,
+                    `TT VCR ${voucherName.substring(0, 10)} ${
+                      auth.user?.id?.slice(-4) || ""
+                    }`
+                  )}
+                  alt={`VietQR cho ${sellerBankName}`}
+                  style={{
+                    width: 256,
+                    height: "auto",
+                    display: "block",
+                    margin: "10px auto",
+                    border: "1px solid #eee",
+                  }}
+                />
                 <p>
-                  <strong>Ngân hàng:</strong> {sellerBankName}
+                  <strong>Ngân hàng người bán:</strong>{" "}
+                  {sellerBankName.toUpperCase()}
                 </p>
                 <p>
-                  <strong>Chủ tài khoản:</strong>{" "}
-                  {auth?.user?.name || "Người bán"}
+                  <strong>Chủ tài khoản:</strong> {sellerAccountHolderName}
                 </p>
                 <p>
                   <strong>Số tài khoản:</strong> {sellerBankAccount}
                 </p>
                 <p>
-                  <strong>Nội dung:</strong> Thanh toan voucher {voucherName}
+                  <strong>Số tiền:</strong> {price.toLocaleString("vi-VN")} VND
+                </p>
+                <p>
+                  <strong>Nội dung khuyến nghị:</strong>{" "}
+                  {`TT VCR ${voucherName.substring(0, 10)} ${
+                    auth.user?.id?.slice(-4) || ""
+                  }`}
                 </p>
               </div>
             )}
-          </div>
-        )}
-      </div>
 
-      <button onClick={handleTransaction} className="confirm-button">
-        Xác Nhận Thanh Toán
+          {!isLoadingSellerInfo &&
+            !message /* Thông báo lỗi chung nếu không có thông tin */ && (
+              <>
+                {(selectedPaymentOption === "momo" ||
+                  selectedPaymentOption === "zalo_pay") &&
+                  !sellerPhone && (
+                    <p>
+                      Không thể tải thông tin SĐT cho {selectedPaymentOption}.
+                      Vui lòng thử lại.
+                    </p>
+                  )}
+                {selectedPaymentOption === "vietqr_bank_transfer" &&
+                  (!sellerBankAccount ||
+                    !sellerBankName ||
+                    !sellerAccountHolderName) && (
+                    <p>
+                      Không thể tải thông tin tài khoản ngân hàng. Vui lòng thử
+                      lại.
+                    </p>
+                  )}
+              </>
+            )}
+        </div>
+      )}
+
+      <button
+        onClick={handleTransaction}
+        className="confirm-button"
+        disabled={
+          isLoadingSellerInfo ||
+          !selectedPaymentOption ||
+          !voucherId ||
+          typeof price !== "number"
+        }
+      >
+        Xác Nhận Đã Thanh Toán
       </button>
 
       {message && (
         <div
           className={`message ${
-            message.includes("Transaction successful") ? "success" : "error"
+            message.toLowerCase().includes("thành công") ? "success" : "error"
           }`}
         >
           {message}

@@ -168,17 +168,22 @@ const updateUser = async (req, res) => {
   });
 };
 const getSellerPaymentDetails = async (req, res) => {
+  //console.log(">>> Request received at getSellerPaymentDetails controller");
+  //console.log("Query params:", req.query);
   try {
-    const { voucherId, bank } = req.query;
+    const { voucherId, bank: paymentType } = req.query;
 
-    if (!voucherId || !bank) {
+    if (!voucherId || !paymentType) {
       return res.status(400).json({
         EC: 1,
-        message: "Voucher ID và loại ngân hàng là bắt buộc.",
+        message: "Voucher ID và loại thanh toán là bắt buộc.",
       });
     }
 
-    const voucher = await Voucher.findById(voucherId).populate("createdBy");
+    const voucher = await Voucher.findById(voucherId).populate({
+      path: "createdBy",
+      select: "name phone bank accountNumber",
+    });
 
     if (!voucher) {
       return res
@@ -194,46 +199,42 @@ const getSellerPaymentDetails = async (req, res) => {
     }
 
     const seller = voucher.createdBy;
-
     let paymentDetails = {};
 
-    if (bank.toLowerCase() === "momo" || bank.toLowerCase() === "zalo_pay") {
+    if (
+      paymentType.toLowerCase() === "momo" ||
+      paymentType.toLowerCase() === "zalo_pay"
+    ) {
       if (seller.phone) {
         paymentDetails.sellerPhone = seller.phone;
       } else {
         return res.status(404).json({
           EC: 1,
-          message: "Người bán chưa cập nhật số điện thoại cho ví điện tử.",
+          message: `Người bán chưa cập nhật SĐT cho ${paymentType}.`,
         });
       }
-    } else if (
-      bank.toLowerCase() === "vietcombank" ||
-      bank.toLowerCase() === "techcombank"
-    ) {
-      if (seller.bankAccount && seller.bankName) {
-        paymentDetails.sellerBankAccount = seller.bankAccount;
-        paymentDetails.sellerBankName = seller.bankName;
-      } else if (voucher.bankAccount && voucher.bankName) {
-        paymentDetails.sellerBankAccount = voucher.bankAccount;
-        paymentDetails.sellerBankName = voucher.bankName;
+    } else if (paymentType.toLowerCase() === "vietqr_bank_transfer") {
+      if (seller.bank && seller.accountNumber && seller.name) {
+        paymentDetails.sellerBankName = seller.bank;
+        paymentDetails.sellerBankAccount = seller.accountNumber;
+        paymentDetails.sellerAccountHolderName = seller.name;
       } else {
         return res.status(404).json({
           EC: 1,
-          message: "Người bán chưa cập nhật thông tin tài khoản ngân hàng.",
+          message:
+            "Người bán chưa cập nhật đủ thông tin tài khoản ngân hàng (tên ngân hàng, STK, tên chủ TK).",
         });
       }
     } else {
-      return res.status(400).json({
-        EC: 1,
-        message:
-          "Loại ngân hàng không được hỗ trợ hoặc không tìm thấy thông tin.",
-      });
+      return res
+        .status(400)
+        .json({ EC: 1, message: "Loại thanh toán không được hỗ trợ." });
     }
 
     if (Object.keys(paymentDetails).length === 0) {
       return res.status(404).json({
         EC: 1,
-        message: `Không tìm thấy thông tin thanh toán cho ngân hàng ${bank}.`,
+        message: `Không tìm thấy thông tin thanh toán cho ${paymentType}.`,
       });
     }
 
