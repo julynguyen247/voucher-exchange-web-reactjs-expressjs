@@ -151,6 +151,40 @@ const TransactionPage = () => {
       setMessage(errorMessage);
     }
   };
+
+  const getBankBin = (bankKey) => {
+    const bankBins = {
+      vietcombank: "970436",
+      techcombank: "970407",
+      // Thêm các ngân hàng khác nếu cần
+      // mb_bank: "970422",
+      // acb: "970416",
+    };
+    return bankBins[bankKey.toLowerCase()];
+  };
+
+  const generateVietQRString = (
+    bankKey,
+    accountNo,
+    accountName,
+    amount,
+    description
+  ) => {
+    const bankBin = getBankBin(bankKey);
+    if (!bankBin || !accountNo || !amount) return null;
+
+    // VietQR string format for URL generation (e.g., via vietqr.io)
+    // You can adjust the template (compact, compact2, print, qr_only, etc.)
+    const template = "compact2";
+    let qrString = `https://img.vietqr.io/image/${bankBin}-${accountNo}-${template}.png?amount=${amount}&addInfo=${encodeURIComponent(
+      description
+    )}`;
+    if (accountName) {
+      qrString += `&accountName=${encodeURIComponent(accountName)}`;
+    }
+    return qrString;
+  };
+
   return (
     <div className="transaction-container">
       <h1 className="transaction-title">Xác Nhận Thanh Toán</h1>
@@ -190,8 +224,7 @@ const TransactionPage = () => {
               <option value="">-- Chọn Ngân Hàng --</option>
               <option value="momo">Momo</option>
               <option value="zalo_pay">Zalo Pay</option>
-              <option value="vietcombank">Vietcombank</option>
-              <option value="techcombank">Techcombank</option>
+              <option value="bank">Ngân hàng</option>
             </select>
           </div>
         )}
@@ -235,8 +268,7 @@ const TransactionPage = () => {
               </div>
             )}
 
-            {(selectedBank === "vietcombank" ||
-              selectedBank === "techcombank") && (
+            {selectedBank === "bank" && (
               <div>
                 <h3>Thông tin chuyển khoản</h3>
                 <p>

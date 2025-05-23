@@ -37,30 +37,12 @@ const ACCOUNT_API_CACHE_DURATION = 300000; // 5 minutes - increased from 60 seco
 const apiCallCounts = {
   total: 0,
   byHour: {},
-<<<<<<< HEAD
-  lastHourFlushed: 0
-=======
   lastHourFlushed: 0,
->>>>>>> bf83d4b (update momo qr code for transaction)
 };
 
 // Function to update API call statistics
 const trackApiCall = () => {
   apiCallCounts.total++;
-<<<<<<< HEAD
-  
-  // Track by hour for debugging
-  const now = new Date();
-  const hourKey = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}-${now.getHours()}`;
-  
-  apiCallCounts.byHour[hourKey] = (apiCallCounts.byHour[hourKey] || 0) + 1;
-  
-  // Flush old hour data occasionally to prevent memory bloat
-  if (now.getTime() - apiCallCounts.lastHourFlushed > 3600000) { // 1 hour
-    const keysToKeep = Object.keys(apiCallCounts.byHour).sort().slice(-24); // Keep last 24 hours
-    const newByHour = {};
-    keysToKeep.forEach(k => newByHour[k] = apiCallCounts.byHour[k]);
-=======
 
   // Track by hour for debugging
   const now = new Date();
@@ -76,7 +58,6 @@ const trackApiCall = () => {
     const keysToKeep = Object.keys(apiCallCounts.byHour).sort().slice(-24); // Keep last 24 hours
     const newByHour = {};
     keysToKeep.forEach((k) => (newByHour[k] = apiCallCounts.byHour[k]));
->>>>>>> bf83d4b (update momo qr code for transaction)
     apiCallCounts.byHour = newByHour;
     apiCallCounts.lastHourFlushed = now.getTime();
   }
@@ -84,19 +65,6 @@ const trackApiCall = () => {
 
 const fetchAccountApi = () => {
   const URL_API = "/v1/api/account";
-<<<<<<< HEAD
-  
-  // Return a promise that resolves with cached data if available and recent
-  return new Promise((resolve, reject) => {
-    const now = Date.now();
-    
-    // Use cached data if it exists and is recent
-    if (accountApiCache && now - accountApiLastFetch < ACCOUNT_API_CACHE_DURATION) {
-      resolve(accountApiCache);
-      return;
-    }
-    
-=======
 
   // Return a promise that resolves with cached data if available and recent
   return new Promise((resolve, reject) => {
@@ -110,22 +78,11 @@ const fetchAccountApi = () => {
       resolve(accountApiCache);
       return;
     }
-
->>>>>>> bf83d4b (update momo qr code for transaction)
     // If there's already a pending request, return that promise
     // This prevents multiple simultaneous API calls
     if (pendingFetchPromise) {
       return pendingFetchPromise;
     }
-<<<<<<< HEAD
-    
-    // Otherwise, make the API call
-    console.log("Making fresh account API call");
-    trackApiCall();
-    
-    pendingFetchPromise = axios.get(URL_API)
-      .then(response => {
-=======
 
     // Otherwise, make the API call
     console.log("Making fresh account API call");
@@ -134,7 +91,6 @@ const fetchAccountApi = () => {
     pendingFetchPromise = axios
       .get(URL_API)
       .then((response) => {
->>>>>>> bf83d4b (update momo qr code for transaction)
         // Update cache
         accountApiCache = response;
         accountApiLastFetch = now;
@@ -142,20 +98,11 @@ const fetchAccountApi = () => {
         resolve(response);
         return response; // Important for the returned promise chain
       })
-<<<<<<< HEAD
-      .catch(error => {
-=======
       .catch((error) => {
->>>>>>> bf83d4b (update momo qr code for transaction)
         pendingFetchPromise = null; // Clear the pending promise on error
         reject(error);
         throw error; // Re-throw for the promise chain
       });
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> bf83d4b (update momo qr code for transaction)
     return pendingFetchPromise;
   });
 };
@@ -230,8 +177,6 @@ const processTransaction = (transactionData) => {
     },
   });
 };
-<<<<<<< HEAD
-=======
 const getSellerPaymentDetails = (voucherId, bank) => {
   const URL_API = `/v1/api/seller-payment-details`;
   return axios.get(URL_API, {
@@ -241,7 +186,6 @@ const getSellerPaymentDetails = (voucherId, bank) => {
     },
   });
 };
->>>>>>> bf83d4b (update momo qr code for transaction)
 const getBank = () => {
   const URL_API = `/v1/api/bank`;
   return axios.get(URL_API);
@@ -266,11 +210,7 @@ const removeFavoriteApi = (userId, voucherId) => {
 const getAllUsersApi = (limit = 10, page = 1, filters = {}) => {
   const URL_API = "/v1/api/user";
   return axios.get(URL_API, {
-<<<<<<< HEAD
-    params: { limit, page, ...filters }
-=======
     params: { limit, page, ...filters },
->>>>>>> bf83d4b (update momo qr code for transaction)
   });
 };
 
@@ -288,11 +228,7 @@ const updateAdminUserApi = (userId, userData) => {
 const getAllVouchersApi = (limit = 10, page = 1, filters = {}) => {
   const URL_API = "/v1/api/voucher";
   return axios.get(URL_API, {
-<<<<<<< HEAD
-    params: { limit, page, ...filters, admin: true }
-=======
     params: { limit, page, ...filters, admin: true },
->>>>>>> bf83d4b (update momo qr code for transaction)
   });
 };
 
@@ -305,11 +241,7 @@ const deleteVoucherApi = (voucherId) => {
 const getAllTransactionsApi = (limit = 10, page = 1, filters = {}) => {
   const URL_API = "/v1/api/transaction/get";
   return axios.get(URL_API, {
-<<<<<<< HEAD
-    params: { limit, page, ...filters, admin: true }
-=======
     params: { limit, page, ...filters, admin: true },
->>>>>>> bf83d4b (update momo qr code for transaction)
   });
 };
 
@@ -333,10 +265,7 @@ export {
   updateUserApi,
   getTransactions,
   processTransaction,
-<<<<<<< HEAD
-=======
   getSellerPaymentDetails,
->>>>>>> bf83d4b (update momo qr code for transaction)
   getBank,
   addToFavoriteApi,
   getFavoritesApi,
@@ -347,9 +276,5 @@ export {
   getAllVouchersApi,
   deleteVoucherApi,
   getAllTransactionsApi,
-<<<<<<< HEAD
-  getDashboardStatsApi
-=======
   getDashboardStatsApi,
->>>>>>> bf83d4b (update momo qr code for transaction)
 };
