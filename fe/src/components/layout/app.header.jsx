@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../context/auth.context";
 import { logoutApi } from "../../utils/api";
-import { Input, Tooltip, Drawer, Button, Dropdown, Menu } from "antd";
+import { Input, Tooltip, Drawer, Button, Dropdown } from "antd";
 import {
   HeartOutlined,
   StarOutlined,
@@ -56,6 +56,14 @@ const AppHeader = () => {
       },
       {
         key: "2",
+        label: (
+          <Link to="/create-voucher" style={{ textDecoration: "none" }}>
+            Tạo voucher
+          </Link>
+        ),
+      },
+      {
+        key: "3",
         label: <span onClick={handleLogout}>Đăng xuất</span>,
       },
     ],
@@ -131,6 +139,7 @@ const AppHeader = () => {
               onClick={() => navigate("/favorites")}
             />
           </Tooltip>
+
           {auth.isAuthenticated ? (
             <Dropdown menu={menu} placement="bottomRight">
               <img
@@ -194,7 +203,10 @@ const AppHeader = () => {
             <Tooltip title="Yêu thích">
               <HeartOutlined
                 className="text-xl hover:text-green-600 cursor-pointer"
-                onClick={() => navigate("/favorites")}
+                onClick={() => {
+                  setDrawerVisible(false);
+                  navigate("/favorites");
+                }}
               />
             </Tooltip>
             {auth.isAuthenticated ? (
