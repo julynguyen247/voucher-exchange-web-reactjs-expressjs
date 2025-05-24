@@ -19,7 +19,7 @@ const CreateVoucherPage = () => {
   useEffect(() => {
     const fetchPlatform = async () => {
       const res = await getVoucherPlatform();
-      if (res && res.data) {
+      if (res?.data) {
         setVoucherPlatform(
           res.data.data.map((item) => ({ value: item, label: item }))
         );
@@ -28,7 +28,7 @@ const CreateVoucherPage = () => {
 
     const fetchCategory = async () => {
       const res = await getVoucherCategory();
-      if (res && res.data) {
+      if (res?.data) {
         setVoucherCategory(
           res.data.data.map((item) => ({ value: item, label: item }))
         );
@@ -42,10 +42,10 @@ const CreateVoucherPage = () => {
   const handleUploadFile = async (options) => {
     const { onSuccess, file } = options;
     const res = await uploadApi(file, "voucher");
-    if (res && res.data) {
+    if (res?.data) {
       setImageUrl(res.data.name);
       setFileList([file]);
-      if (onSuccess) onSuccess("ok");
+      onSuccess?.("ok");
       message.success("Upload thành công!");
     } else {
       message.error("Upload thất bại!");
@@ -70,6 +70,7 @@ const CreateVoucherPage = () => {
       expirationDate,
       price,
     } = values;
+
     const res = await createVoucher(
       minimumOrder,
       platform,
@@ -80,7 +81,8 @@ const CreateVoucherPage = () => {
       expirationDate,
       price
     );
-    if (res && res.data) {
+
+    if (res?.data) {
       message.success("Thêm voucher thành công!");
       navigate("/voucher");
     } else {
@@ -89,54 +91,51 @@ const CreateVoucherPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center bg-cyan-600 h-[1050px]">
-      <div className="w-[80vw] sm:w-1/2 md:w-1/2 lg:w-2/4 xl:w-1/3 bg-white p-2 rounded-lg shadow-xl">
-        <div className="font-bold text-4xl mb-6 text-[#198754] text-center">
-          Add New Voucher
-        </div>
-        
-        <Form
-          name="add-voucher"
-          onFinish={onFinish}
-          autoComplete="off"
-          layout="vertical"
-        >
+    <div className="flex justify-center items-center bg-gradient-to-br from-green-100 to-cyan-100 min-h-screen py-10">
+      <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-8">
+        <h1 className="text-3xl font-bold text-center text-green-600 mb-6">
+          Thêm Voucher Mới
+        </h1>
+
+        <Form layout="vertical" name="create-voucher" onFinish={onFinish}>
           <Form.Item
-            label="Minimum Order"
+            label="Giá trị đơn tối thiểu"
             name="minimumOrder"
             rules={[
-              { required: true, message: "Please enter a minimum order!" },
+              { required: true, message: "Vui lòng nhập giá trị tối thiểu!" },
             ]}
           >
-            <Input />
+            <Input placeholder="VD: 500000" />
           </Form.Item>
+
           <Form.Item
-            label="Platform"
+            label="Nền tảng"
             name="platform"
-            rules={[{ required: true, message: "Please select platform!" }]}
+            rules={[{ required: true, message: "Chọn nền tảng!" }]}
           >
-            <Select options={voucherPlatform} />
+            <Select options={voucherPlatform} placeholder="Chọn nền tảng" />
           </Form.Item>
+
           <Form.Item
-            label="Category"
+            label="Ngành hàng"
             name="category"
-            rules={[{ required: true, message: "Please select category!" }]}
+            rules={[{ required: true, message: "Chọn ngành hàng!" }]}
           >
-            <Select options={voucherCategory} />
+            <Select options={voucherCategory} placeholder="Chọn ngành hàng" />
           </Form.Item>
+
           <Form.Item
-            label="Code"
+            label="Mã giảm giá"
             name="code"
-            rules={[
-              { required: true, message: "Please enter the voucher code!" },
-            ]}
+            rules={[{ required: true, message: "Nhập mã giảm giá!" }]}
           >
-            <Input />
+            <Input placeholder="VD: GIAM50K" />
           </Form.Item>
+
           <Form.Item
-            label="Image"
+            label="Ảnh đại diện"
             name="image"
-            rules={[{ required: true, message: "Please upload an image!" }]}
+            rules={[{ required: true, message: "Hãy tải ảnh!" }]}
           >
             <Upload {...propsUpload}>
               {imageUrl ? (
@@ -144,47 +143,52 @@ const CreateVoucherPage = () => {
                   src={`${
                     import.meta.env.VITE_BACKEND_URL
                   }/images/upload/${imageUrl}`}
-                  alt="voucher"
-                  style={{ width: "30%", borderRadius: "5px" }}
+                  alt="preview"
+                  style={{
+                    width: "100%",
+                    maxHeight: "200px",
+                    objectFit: "contain",
+                    borderRadius: "8px",
+                    marginBottom: "8px",
+                  }}
                 />
               ) : (
-                <Button icon={<PlusOutlined />}>Upload</Button>
+                <Button icon={<PlusOutlined />}>Tải ảnh</Button>
               )}
             </Upload>
           </Form.Item>
 
           <Form.Item
-            label="Discount Value"
+            label="Giá trị giảm"
             name="discountValue"
-            rules={[
-              { required: true, message: "Please enter the discount value!" },
-            ]}
+            rules={[{ required: true, message: "Nhập số tiền giảm!" }]}
           >
-            <Input type="number" />
+            <Input type="number" placeholder="VD: 50000" />
           </Form.Item>
+
           <Form.Item
-            label="Expiration Date"
+            label="Ngày hết hạn"
             name="expirationDate"
-            rules={[
-              { required: true, message: "Please select expiration date!" },
-            ]}
+            rules={[{ required: true, message: "Chọn ngày hết hạn!" }]}
           >
-            <DatePicker />
+            <DatePicker className="w-full" />
           </Form.Item>
+
           <Form.Item
-            label="Price"
+            label="Giá trị voucher"
             name="price"
-            rules={[{ required: true, message: "Please enter the price!" }]}
+            rules={[{ required: true, message: "Nhập giá voucher!" }]}
           >
-            <Input type="number" />
+            <Input type="number" placeholder="VD: 10000" />
           </Form.Item>
+
           <Form.Item>
             <Button
               type="primary"
               htmlType="submit"
-              className="w-full mt-4 bg-[#198754]"
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
             >
-              Add Voucher
+              Tạo Voucher
             </Button>
           </Form.Item>
         </Form>

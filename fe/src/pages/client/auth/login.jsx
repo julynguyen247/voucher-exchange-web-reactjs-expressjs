@@ -17,7 +17,7 @@ const LoginPage = () => {
     const res = await loginApi(email, password);
     if (res && res.data.EC === 0) {
       localStorage.setItem("access_token", res.data.access_token);
-      message.success("Login successfully");
+      message.success("Đăng nhập thành công");
       setAuth({
         isAuthenticated: true,
         user: res.data.user || {
@@ -31,14 +31,13 @@ const LoginPage = () => {
       });
       navigate("/");
     } else {
-      message.error("Error email/password");
+      message.error("Email hoặc mật khẩu không chính xác");
     }
     setIsSubmit(false);
   };
 
   const handleGoogleSuccess = async (response) => {
     const credential = response.credential;
-
     try {
       const res = await axios.post(
         "http://localhost:8081/api/v1/auth/google-login",
@@ -47,16 +46,15 @@ const LoginPage = () => {
 
       if (res.data && res.data.EC === 0) {
         localStorage.setItem("access_token", res.data.access_token);
-        // Ensure we explicitly set all user fields including role
         setAuth({
           isAuthenticated: true,
           user: {
-            email: res.data.user.email || '',
-            name: res.data.user.name || '',
-            id: res.data.user._id || '',
-            phone: res.data.user.phone || '',
-            image: res.data.user.image || '',
-            role: res.data.user.role || '',
+            email: res.data.user.email || "",
+            name: res.data.user.name || "",
+            id: res.data.user._id || "",
+            phone: res.data.user.phone || "",
+            image: res.data.user.image || "",
+            role: res.data.user.role || "",
           },
         });
         message.success("Đăng nhập bằng Google thành công");
@@ -66,84 +64,74 @@ const LoginPage = () => {
       }
     } catch (err) {
       console.error("Google login error:", err);
-      message.error("Lỗi hệ thống khi login Google");
+      message.error("Lỗi hệ thống khi đăng nhập Google");
     }
   };
 
   return (
-    <div className="flex justify-center items-center w-full px-4 flex-col h-[70vh]">
-      <div className="font-bold text-4xl mb-6 text-[##3685f9] text-center">
-        Đăng nhập
-      </div>
-      <br />
-      <div className="bg-gray-300 p-8 sm:p-10 w-[70vw] rounded-lg shadow-lg sm:w-[40vw] md:w-[25vw] lg:w-[400px] h-auto sm:h-[60vh] flex justify-center items-center">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-200 px-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
+        <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">
+          Đăng nhập
+        </h1>
+
         <Form
-          name="basic"
+          name="login-form"
+          layout="vertical"
           onFinish={onFinish}
           autoComplete="off"
-          layout="vertical"
-          className="w-3xs mt-4"
         >
           <Form.Item
             label="Email"
             name="email"
-            labelCol={{
-              span: 24,
-            }}
             rules={[
               {
                 type: "email",
                 required: true,
-                message: "Vui lòng nhập email!",
+                message: "Vui lòng nhập email hợp lệ!",
               },
             ]}
           >
-            <Input />
+            <Input placeholder="Nhập email của bạn" />
           </Form.Item>
+
           <Form.Item
             label="Mật khẩu"
             name="password"
-            labelCol={{
-              span: 24,
-            }}
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng nhập mật khẩu!",
-              },
-            ]}
+            rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
           >
-            <Input.Password />
+            <Input.Password placeholder="Nhập mật khẩu" />
           </Form.Item>
+
           <Form.Item>
             <Button
               type="primary"
               htmlType="submit"
-              className="w-full mt-4 bg-[##3685f9]"
-              style={{ backgroundColor: "##3685f9" }}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              loading={isSubmit}
             >
               Đăng nhập
             </Button>
           </Form.Item>
-          <Divider>Or</Divider>
-          <div style={{ display: "flex", justifyContent: "center", marginTop: "16px" }}>
+
+          <Divider>Hoặc</Divider>
+
+          <div className="flex justify-center mb-4">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
-              onError={() => {
-                message.error("Đăng nhập bằng Google thất bại");
-              }}
+              onError={() => message.error("Đăng nhập bằng Google thất bại")}
             />
           </div>
-          <p className="text text-normal" style={{ textAlign: "center" }}>
-            Chưa có tài khoản?
-            <span>
-              <Link to="/register" style={{ textDecoration: "none" }}>
-                {" "}
-                Đăng Ký{" "}
-              </Link>
-            </span>
+
+          <p className="text-center text-sm">
+            Chưa có tài khoản?{" "}
+            <Link
+              to="/register"
+              className="text-blue-600 font-medium hover:underline"
+            >
+              Đăng ký ngay
+            </Link>
           </p>
-          <br />
         </Form>
       </div>
     </div>

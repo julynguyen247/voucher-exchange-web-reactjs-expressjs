@@ -12,16 +12,14 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   const handleUploadFile = async (options) => {
-    const { onSuccess } = options;
-    const file = options.file;
+    const { onSuccess, file } = options;
     const res = await uploadApi(file, "avatar");
 
-    if (res && res.data) {
-      const newAvatar = res.data.name;
-      setUserAvatar(newAvatar);
-      if (onSuccess) onSuccess("ok");
+    if (res?.data) {
+      setUserAvatar(res.data.name);
+      onSuccess?.("ok");
     } else {
-      message.error(res.message);
+      message.error(res.message || "Lỗi khi upload!");
     }
   };
 
@@ -32,9 +30,9 @@ const RegisterPage = () => {
     customRequest: handleUploadFile,
     onChange(info) {
       if (info.file.status === "done") {
-        message.success(`Upload file thành công`);
+        message.success("Upload ảnh thành công");
       } else if (info.file.status === "error") {
-        message.error(`Upload file thất bại`);
+        message.error("Upload ảnh thất bại");
       }
     },
   };
@@ -48,7 +46,7 @@ const RegisterPage = () => {
     }
 
     const res = await registerApi(name, email, password, phone, userAvatar);
-    if (res && res.data) {
+    if (res?.data) {
       if (res.data.result === null) {
         message.error("Email đã tồn tại!");
       } else {
@@ -61,89 +59,79 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-[100vh] w-full flex-col">
-      <div className="font-bold text-4xl mb-6 text-[##3685f9] text-center">
-        Đăng ký
-      </div>
-      <div className="bg-gray-300 p-8 sm:p-10 w-[70vw] rounded-lg shadow-lg sm:w-[30vw] md:w-[25vw] lg:w-[400px] h-auto sm:h-[60vh] flex justify-center items-center flex-col">
-        <div className="flex justify-center items-center flex-col mt-3 gap-2">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-200 px-4">
+      <div className="w-full max-w-md bg-white p-4 rounded-2xl shadow-lg mt-8">
+        <h1 className="text-3xl font-bold text-center text-blue-600 mb-4">
+          Đăng ký
+        </h1>
+
+        <div className="flex justify-center flex-col items-center mb-4">
           <Avatar
             size={100}
-            src={urlAvatar}
-            style={{
-              border: "1px solid black",
-              objectFit: "cover",
-            }}
+            src={userAvatar ? urlAvatar : undefined}
+            style={{ border: "1px solid #ccc", objectFit: "cover" }}
           />
           <Upload {...propsUpload}>
-            <Button icon={<UploadOutlined />}>Upload Avatar</Button>
+            <Button icon={<UploadOutlined />} className="mt-2" type="default">
+              Tải ảnh đại diện
+            </Button>
           </Upload>
         </div>
+
         <Form
-          name="basic"
+          layout="vertical"
+          name="register-form"
           onFinish={onFinish}
           autoComplete="off"
-          layout="vertical"
-          className="w-3xs mt-4"
         >
-          <Form.Item
-            label="Email"
-            name="email"
-            labelCol={{ span: 24 }}
-            rules={[
-              {
-                type: "email",
-                required: true,
-                message: "Vui lòng nhập email!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-
           <Form.Item
             label="Họ và Tên"
             name="name"
-            labelCol={{ span: 24 }}
-            rules={[{ required: true, message: "Vui lòng nhập họ và tên!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập họ tên!" }]}
           >
-            <Input />
+            <Input placeholder="Nguyễn Văn A" />
+          </Form.Item>
+
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              { type: "email", required: true, message: "Email không hợp lệ!" },
+            ]}
+          >
+            <Input placeholder="email@example.com" />
           </Form.Item>
 
           <Form.Item
             label="Số điện thoại"
             name="phone"
-            labelCol={{ span: 24 }}
             rules={[
               { required: true, message: "Vui lòng nhập số điện thoại!" },
             ]}
           >
-            <Input />
+            <Input placeholder="0123456789" />
           </Form.Item>
 
           <Form.Item
             label="Mật khẩu"
             name="password"
-            labelCol={{ span: 24 }}
             rules={[
               { required: true, message: "Vui lòng nhập mật khẩu!" },
-              { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự!" },
+              { min: 6, message: "Mật khẩu ít nhất 6 ký tự!" },
               {
                 pattern:
                   /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-                message:
-                  "Mật khẩu phải chứa ít nhất một chữ hoa, một số và một ký tự đặc biệt!",
+                message: "Phải có chữ in hoa, số và ký tự đặc biệt!",
               },
             ]}
           >
-            <Input.Password />
+            <Input.Password placeholder="••••••••" />
           </Form.Item>
 
           <Form.Item
             label="Xác nhận mật khẩu"
             name="confirmPassword"
             dependencies={["password"]}
-            labelCol={{ span: 24 }}
             rules={[
               { required: true, message: "Vui lòng nhập lại mật khẩu!" },
               ({ getFieldValue }) => ({
@@ -156,23 +144,27 @@ const RegisterPage = () => {
               }),
             ]}
           >
-            <Input.Password />
+            <Input.Password placeholder="••••••••" />
           </Form.Item>
 
           <Form.Item>
             <Button
               type="primary"
               htmlType="submit"
-              className="w-full mt-4 bg-[##3685f9]"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
             >
               Đăng ký
             </Button>
           </Form.Item>
 
           <Divider>Hoặc</Divider>
-          <p className="text-center">
-            Đã có tài khoản?
-            <Link to="/login" style={{ textDecoration: "none", marginLeft: 5 }}>
+
+          <p className="text-center text-sm">
+            Đã có tài khoản?{" "}
+            <Link
+              to="/login"
+              className="text-blue-600 font-medium hover:underline"
+            >
               Đăng nhập
             </Link>
           </p>

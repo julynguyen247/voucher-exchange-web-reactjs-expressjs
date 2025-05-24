@@ -1,6 +1,7 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Typography, Carousel, Card } from "antd";
 import { useNavigate } from "react-router-dom";
+import { getVoucher } from "../../utils/api";
 import shopeeImg from "../../assets/Shopee.jpg";
 import tikiImg from "../../assets/Tiki.jpg";
 import lazadaImg from "../../assets/Lazada.jpg";
@@ -13,6 +14,7 @@ import starbucksImg from "../../assets/Starbucks.jpg";
 import phelaImg from "../../assets/Phela.jpg";
 import katinatImg from "../../assets/Katinat.jpg";
 import phuclongImg from "../../assets/PhucLong.jpg";
+
 const { Title, Paragraph } = Typography;
 
 const BANNERS = [
@@ -35,36 +37,43 @@ const BRANDS = [
   { name: "Katinat", src: katinatImg },
   { name: "Phúc Long", src: phuclongImg },
 ];
-
-const HOT_VOUCHERS = [
-  {
-    brand: "Shopee",
-    title: "Giảm 50K cho đơn từ 250K",
-    description: "Áp dụng cho khách hàng mới, số lượng có hạn",
-  },
-  {
-    brand: "Tiki",
-    title: "Mã giảm 100K cho sách ngoại văn",
-    description: "Chỉ áp dụng trong hôm nay",
-  },
-  {
-    brand: "Lazada",
-    title: "Freeship toàn quốc đơn từ 99K",
-    description: "Không giới hạn số lần sử dụng",
-  },
-  {
-    brand: "Highlands",
-    title: "Tặng 1 ly khi mua combo 2 ly",
-    description: "Áp dụng khung giờ 14h - 17h hàng ngày",
-  },
-];
+const PLATFORM_IMAGES = {
+  Shopee: shopeeImg,
+  Tiki: tikiImg,
+  Lazada: lazadaImg,
+  Ebay: ebayImg,
+  Sendo: sendoImg,
+  TikTok: tiktokshopImg,
+  Amazon: amazonImg,
+  Highlands: highlandsImg,
+  Starbucks: starbucksImg,
+  Phela: phelaImg,
+  Katinat: katinatImg,
+  "Phúc Long": phuclongImg,
+};
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const [vouchers, setVouchers] = useState([]);
+
+  useEffect(() => {
+    const fetchVouchers = async () => {
+      try {
+        const res = await getVoucher();
+        if (res?.data?.data.vouchers) {
+          setVouchers(res.data.data.vouchers.slice(0, 4));
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách voucher:", error);
+      }
+    };
+
+    fetchVouchers();
+  }, []);
 
   return (
-    <div className="bg-white min-h-screen py-6 px-6 sm:px-8 md:px-12 ">
-      <div className=" max-w-xl lg:max-w-7xl mx-auto">
+    <div className="bg-white min-h-screen py-6 px-6 sm:px-8 md:px-12">
+      <div className="max-w-xl lg:max-w-7xl mx-auto">
         <Carousel
           autoplay
           autoplaySpeed={4000}
@@ -76,7 +85,7 @@ const HomePage = () => {
               <img
                 src={src}
                 alt={`banner-${index}`}
-                className="w-full lg:h-[700px] object-fit"
+                className="w-full max-h-[400px] object-cover"
               />
             </div>
           ))}
@@ -88,9 +97,8 @@ const HomePage = () => {
           Chào mừng đến với Vouchers & Mã giảm giá!
         </Title>
         <Paragraph className="text-gray-600 max-w-2xl mx-auto text-base leading-relaxed">
-          Tại đây bạn có thể khám phá hàng loạt mã khuyến mãi và ưu đãi độc
-          quyền từ các nền tảng thương mại điện tử, cửa hàng cà phê và thương
-          hiệu yêu thích.
+          Khám phá hàng ngàn ưu đãi đặc biệt từ các nền tảng thương mại và
+          thương hiệu nổi tiếng mỗi ngày.
         </Paragraph>
       </div>
 
@@ -108,7 +116,7 @@ const HomePage = () => {
               <img
                 src={brand.src}
                 alt={brand.name}
-                className="w-full h-[60px]  rounded-xl border border-gray-200 object-cover"
+                className="w-full h-[60px] rounded-xl border border-gray-200 object-cover"
               />
               <p className="text-center text-sm text-gray-700 mt-3 font-medium">
                 {brand.name}
@@ -118,17 +126,26 @@ const HomePage = () => {
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-xl shadow-md py-24 px-10">
+      <div className="bg-gray-50 rounded-xl shadow-md py-24 px-10 mt-16">
         <div className="max-w-7xl mx-auto">
           <Title level={4} className="text-center text-gray-800 mb-16">
             Voucher nổi bật hôm nay
           </Title>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {HOT_VOUCHERS.map((voucher, index) => (
+            {vouchers.map((voucher) => (
               <Card
-                key={index}
-                title={voucher.brand}
+                key={voucher.id}
+                title={voucher.platform}
                 className="rounded-xl shadow hover:shadow-lg transition"
+                cover={
+                  PLATFORM_IMAGES[voucher.platform] ? (
+                    <img
+                      alt={voucher.platform}
+                      src={PLATFORM_IMAGES[voucher.platform]}
+                      className="h-[160px] object-contain p-4"
+                    />
+                  ) : null
+                }
                 actions={[
                   <button
                     key="action"
@@ -139,9 +156,9 @@ const HomePage = () => {
                   </button>,
                 ]}
               >
-                <p className="font-medium text-gray-800">{voucher.title}</p>
                 <p className="text-sm text-gray-500 mt-1">
-                  {voucher.description}
+                  Giảm {voucher.discountValue?.toLocaleString("vi-VN")}₫ cho đơn
+                  từ {voucher.minimumOrder?.toLocaleString("vi-VN")}₫
                 </p>
               </Card>
             ))}
@@ -149,41 +166,42 @@ const HomePage = () => {
         </div>
       </div>
 
-      <div className="relative overflow-hidden py-16 px-6 sm:px-12 rounded-xl shadow-xl max-w-5xl mx-auto  from-green-50 to-white mt-8">
+      <div className="relative overflow-hidden py-20 px-6 sm:px-12 rounded-xl shadow-xl max-w-6xl mx-auto bg-gradient-to-r from-green-50 to-white mt-16">
         <div className="relative z-10 text-center">
           <Title level={3} className="text-green-700 mb-4">
-            Sẵn sàng săn deal cực hot?
+            Săn deal cực hot mỗi ngày!
           </Title>
-          <Paragraph className="text-gray-600 text-base max-w-xl mx-auto mb-6">
-            Hàng trăm ưu đãi độc quyền từ Shopee, Tiki, Lazada và hơn thế nữa
-            đang chờ bạn.
+          <Paragraph className="text-gray-600 text-base max-w-2xl mx-auto mb-6">
+            Cập nhật hàng trăm voucher từ các thương hiệu nổi bật như Shopee,
+            Tiki, Lazada, Highlands... và tận hưởng ưu đãi mỗi ngày.
           </Paragraph>
           <button
-            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-sm font-semibold rounded-full shadow-md transition"
+            className="bg-green-600 hover:bg-green-700 text-white px-10 py-3 text-base font-semibold rounded-full shadow-md transition"
             onClick={() => navigate("/voucher")}
           >
             Khám phá ngay
           </button>
         </div>
-
         <div className="absolute -bottom-4 -right-4 opacity-10 w-52 h-52 bg-[url('/assets/deal-icon.png')] bg-no-repeat bg-contain"></div>
       </div>
 
-      <footer className="bg-gray-100 text-center py-6 text-sm text-gray-700 rounded-xl shadow-inner mt-8">
-        <p className="font-semibold mb-1">📞 Liên hệ với chúng tôi</p>
-        <p>Email: contact@voucher.com</p>
-        <p>Hotline: 0123 456 789</p>
-        <p>
-          Facebook:{" "}
-          <a
-            href="https://facebook.com/voucher"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-green-600 hover:underline"
-          >
-            fb.com/voucher
-          </a>
-        </p>
+      <footer className="bg-gray-50 text-center py-10 text-sm text-gray-700 mt-16 border-t border-gray-200">
+        <div className="max-w-5xl mx-auto space-y-3">
+          <p className="font-semibold text-lg">Liên hệ với chúng tôi</p>
+          <p>Email: contact@voucher.com</p>
+          <p>Hotline: 0123 456 789</p>
+          <p>
+            Facebook:{" "}
+            <a
+              href="https://facebook.com/voucher"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:underline"
+            >
+              fb.com/voucher
+            </a>
+          </p>
+        </div>
       </footer>
     </div>
   );
