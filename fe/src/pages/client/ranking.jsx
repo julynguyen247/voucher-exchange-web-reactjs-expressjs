@@ -1,58 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { Table, Card, Statistic, Row, Col, Avatar } from "antd";
+import {
+  Table,
+  Card,
+  Statistic,
+  Row,
+  Col,
+  Avatar,
+  Modal,
+  Descriptions,
+} from "antd";
 import { CrownOutlined, UserOutlined } from "@ant-design/icons";
 
 const Ranking = () => {
   const [userData, setUserData] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Fake data, có thể thay bằng dữ liệu API
   useEffect(() => {
     setUserData([
-      {
-        id: "1",
-        name: "Nguyễn Văn A",
-        email: "a@gmail.com",
-        score: 98,
-      },
-      {
-        id: "2",
-        name: "Trần Thị B",
-        email: "b@gmail.com",
-        score: 90,
-      },
-      {
-        id: "3",
-        name: "Lê Văn C",
-        email: "c@gmail.com",
-        score: 85,
-      },
-      {
-        id: "4",
-        name: "Phạm Thị D",
-        email: "d@gmail.com",
-        score: 80,
-      },
+      { id: "1", name: "Nguyễn Văn A", email: "a@gmail.com", score: 98 },
+      { id: "2", name: "Trần Thị B", email: "b@gmail.com", score: 90 },
+      { id: "3", name: "Lê Văn C", email: "c@gmail.com", score: 85 },
+      { id: "4", name: "Phạm Thị D", email: "d@gmail.com", score: 80 },
     ]);
   }, []);
 
   const columns = [
     {
-      title: "Hạng",
-      dataIndex: "rank",
-      key: "rank",
-      render: (_, __, index) => {
-        const rank = index + 1;
-        const color =
-          rank === 1
-            ? "text-yellow-500"
-            : rank === 2
-            ? "text-gray-500"
-            : rank === 3
-            ? "text-orange-400"
-            : "text-blue-600";
-        return <span className={`font-bold ${color}`}>{rank}</span>;
-      },
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      render: (_, record) => <ModalUser user={record} />,
     },
+
     {
       title: "Tên người dùng",
       dataIndex: "name",
@@ -103,10 +83,7 @@ const Ranking = () => {
 
       <Row gutter={16} className="mb-6">
         <Col span={12}>
-          <Card
-            style={{ borderColor: "#91d5ff", backgroundColor: "#e6f7ff" }}
-            headStyle={{ color: "#1890ff" }}
-          >
+          <Card style={{ borderColor: "#91d5ff", backgroundColor: "#e6f7ff" }}>
             <Statistic
               title="Tổng số người dùng"
               value={userData.length}
@@ -115,10 +92,7 @@ const Ranking = () => {
           </Card>
         </Col>
         <Col span={12}>
-          <Card
-            style={{ borderColor: "#ffe58f", backgroundColor: "#fffbe6" }}
-            headStyle={{ color: "#faad14" }}
-          >
+          <Card style={{ borderColor: "#ffe58f", backgroundColor: "#fffbe6" }}>
             <Statistic
               title="Top 1"
               value={topUser?.name || "Chưa có"}
@@ -145,6 +119,28 @@ const Ranking = () => {
           }
         />
       </Card>
+
+      <Modal
+        open={isModalVisible}
+        title="Thông tin người dùng"
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+      >
+        {selectedUser && (
+          <Descriptions bordered column={1}>
+            <Descriptions.Item label="ID">{selectedUser.id}</Descriptions.Item>
+            <Descriptions.Item label="Tên">
+              {selectedUser.name}
+            </Descriptions.Item>
+            <Descriptions.Item label="Email">
+              {selectedUser.email}
+            </Descriptions.Item>
+            <Descriptions.Item label="Điểm">
+              {selectedUser.score}
+            </Descriptions.Item>
+          </Descriptions>
+        )}
+      </Modal>
     </div>
   );
 };

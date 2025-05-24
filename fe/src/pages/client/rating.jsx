@@ -1,20 +1,32 @@
 import React, { useEffect, useState } from "react";
-import { Table, Card, Statistic, Row, Col, Avatar, Tooltip } from "antd";
+import {
+  Table,
+  Card,
+  Statistic,
+  Row,
+  Col,
+  Avatar,
+  Tooltip,
+  Drawer,
+  Descriptions,
+  Button,
+} from "antd";
 import { CrownOutlined, UserOutlined } from "@ant-design/icons";
 import ReactStars from "react-rating-stars-component";
 import axios from "axios";
 import { message } from "antd";
 
-
 const Ranking = () => {
   const [userData, setUserData] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [open, setOpen] = useState(false);
 
   const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8081";
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/users/ratings`);
-        setUserData(response.data.users); // Cập nhật state
+        setUserData(response.data.users);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu người dùng:  ", error);
       }
@@ -39,10 +51,8 @@ const Ranking = () => {
         }
       );
 
-      // Load lại danh sách để cập nhật điểm đánh giá mới
       const response = await axios.get(`${API_URL}/api/users/ratings`);
       setUserData(response.data.users);
-
       message.success("Đánh giá thành công!");
     } catch (err) {
       console.error(err);
@@ -50,7 +60,6 @@ const Ranking = () => {
     }
   };
 
-  // Sắp xếp trước theo ratingAvg
   const sortedData = [...userData].sort((a, b) => {
     if (b.ratingAvg !== a.ratingAvg) {
       return b.ratingAvg - a.ratingAvg;
@@ -80,15 +89,21 @@ const Ranking = () => {
       title: "Tên người dùng",
       dataIndex: "name",
       key: "name",
-      render: (text, _, index) => (
+      render: (text, record, index) => (
         <div className="flex items-center gap-2">
           <Avatar icon={<UserOutlined />} />
-          <span className="font-medium">
+          <Button
+            type="link"
+            onClick={() => {
+              setSelectedUser(record);
+              setOpen(true);
+            }}
+          >
             {text}
             {index === 0 && (
               <span className="ml-1 text-yellow-500 font-bold">👑</span>
             )}
-          </span>
+          </Button>
         </div>
       ),
     },
@@ -114,7 +129,9 @@ const Ranking = () => {
             onChange={(newRating) => handleRatingChange(newRating, record)}
           />
           <Tooltip title={`${record.ratingCount} lượt đánh giá`}>
-            <span className="text-sm text-gray-500">({record.ratingCount})</span>
+            <span className="text-sm text-gray-500">
+              ({record.ratingCount})
+            </span>
           </Tooltip>
         </div>
       ),
@@ -126,7 +143,7 @@ const Ranking = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-6 text-center text-indigo-700">
-        🏆 Đánh giá người dùng 
+        🏆 Đánh giá người dùng
       </h1>
 
       <Row gutter={16} className="mb-6">
@@ -173,6 +190,32 @@ const Ranking = () => {
           }
         />
       </Card>
+
+      <Drawer
+        title="Thông tin người dùng"
+        placement="right"
+        width={360}
+        onClose={() => setOpen(false)}
+        open={open}
+      >
+        {selectedUser && (
+          <Descriptions column={1} bordered size="small">
+            <Descriptions.Item label="Họ tên">
+              {selectedUser.name}
+            </Descriptions.Item>
+            <Descriptions.Item label="Email">
+              {selectedUser.email}
+            </Descriptions.Item>
+            <Descriptions.Item label="ID">{selectedUser._id}</Descriptions.Item>
+            <Descriptions.Item label="Số lượt đánh giá">
+              {selectedUser.ratingCount}
+            </Descriptions.Item>
+            <Descriptions.Item label="Điểm trung bình">
+              {selectedUser.ratingAvg}
+            </Descriptions.Item>
+          </Descriptions>
+        )}
+      </Drawer>
     </div>
   );
 };
