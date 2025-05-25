@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import ModalUser from "../../components/client/modalUser"; 
+
 import {
   Table,
   Card,
