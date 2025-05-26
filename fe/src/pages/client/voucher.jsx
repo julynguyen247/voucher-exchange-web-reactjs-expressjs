@@ -8,12 +8,14 @@ import {
 import { FaArrowLeft, FaFilter, FaHeart, FaRegHeart } from "react-icons/fa";
 import { RiDiscountPercentLine } from "react-icons/ri";
 import { MdAccessTime, MdAttachMoney } from "react-icons/md";
-import { Input, Button, Pagination, Rate, message } from "antd";
+import { Button, Pagination, Rate, message } from "antd";
 import dayjs from "dayjs";
 import { useNavigate, useLocation } from "react-router-dom";
 import FilterModal from "../../components/client/voucher/filterModal";
 import { AuthContext } from "../../components/context/auth.context";
 import queryString from "query-string";
+import { Helmet } from "react-helmet-async";
+
 const platformImages = {
   Shopee: "src/assets/Shopee.jpg",
   Lazada: "src/assets/Lazada.jpg",
@@ -42,15 +44,12 @@ const VoucherPage = () => {
     const fetchVoucher = async () => {
       const res = await getVoucher();
       if (res?.data?.data) {
-        // Make sure we're getting the vouchers array from the response
-        const allVouchers = Array.isArray(res.data.data.vouchers) 
-          ? res.data.data.vouchers 
-          : Array.isArray(res.data.data) 
-            ? res.data.data 
-            : [];
-        
-        console.log("Fetched vouchers:", allVouchers);
-        
+        const allVouchers = Array.isArray(res.data.data.vouchers)
+          ? res.data.data.vouchers
+          : Array.isArray(res.data.data)
+          ? res.data.data
+          : [];
+
         setVoucherData(allVouchers);
 
         const filtered = searchTerm
@@ -116,26 +115,59 @@ const VoucherPage = () => {
     }
   };
 
-  // Ensure filteredVouchers is an array before using slice
-  const paginatedVouchers = Array.isArray(filteredVouchers) 
+  const paginatedVouchers = Array.isArray(filteredVouchers)
     ? filteredVouchers.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
       )
     : [];
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Mua Bán Voucher Trực Tuyến",
+    itemListElement: paginatedVouchers.map((v, index) => ({
+      "@type": "Offer",
+      position: index + 1,
+      itemOffered: {
+        "@type": "Product",
+        name: `Voucher ${v.platform}`,
+        category: v.category,
+      },
+      price: v.price,
+      priceCurrency: "VND",
+      availability: "https://schema.org/InStock",
+      validThrough: v.expirationDate,
+    })),
+  };
+
   return (
     <div className="p-4 max-w-7xl mx-auto">
+      <Helmet>
+        <title>Mua Bán Voucher Uy Tín - Giảm Giá Cực Sốc</title>
+        <meta
+          name="description"
+          content="Mua bán voucher giảm giá trực tuyến: Shopee, Tiki, Lazada, Amazon... Cam kết uy tín, mã giảm giá đa dạng, tiết kiệm chi phí!"
+        />
+        <meta
+          name="keywords"
+          content="mua bán voucher, mã giảm giá, voucher Shopee, bán voucher Tiki, sàn thương mại điện tử, khuyến mãi"
+        />
+        <link rel="canonical" href="https://yourdomain.com/voucher" />
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
+
       <div className="flex flex-wrap gap-3 items-center justify-between mb-4">
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <FaArrowLeft
-            color="#3685f9"
-            size={24}
-            onClick={() => navigate("/")}
-            className="cursor-pointer"
-          />
-          <Input placeholder="Tìm kiếm..." className="flex-1" size="large" />
+        <div
+          className="flex items-center gap-2 cursor-pointer text-blue-600"
+          onClick={() => navigate("/")}
+        >
+          <FaArrowLeft size={20} />
+          <span className="font-medium">Quay lại Trang chủ</span>
         </div>
+
         <FaFilter
           color="#3685f9"
           size={22}
@@ -167,8 +199,9 @@ const VoucherPage = () => {
             {platformImages[item.platform] && (
               <img
                 src={platformImages[item.platform]}
-                alt={item.platform}
+                alt={`Voucher ${item.platform}`}
                 className="w-full h-24 object-contain rounded-md mb-3"
+                loading="lazy"
               />
             )}
 
@@ -215,7 +248,7 @@ const VoucherPage = () => {
                 })
               }
             >
-              Buy now
+              Mua voucher
             </Button>
           </div>
         ))}
@@ -230,6 +263,18 @@ const VoucherPage = () => {
           showSizeChanger={false}
         />
       </div>
+
+      <footer className="mt-12 bg-blue-50 rounded-2xl p-6 shadow-inner text-center">
+        <h2 className="text-xl font-semibold text-blue-700 mb-2">
+          Mua Bán Voucher - Tiết Kiệm Mỗi Ngày
+        </h2>
+        <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+          Nền tảng <strong>mua bán voucher</strong> uy tín với hàng ngàn{" "}
+          <strong>mã giảm giá</strong> hấp dẫn từ Shopee, Lazada, Tiki,
+          Amazon,... Cập nhật mỗi ngày, giúp bạn{" "}
+          <strong>tiết kiệm chi phí</strong> và mua sắm thông minh hơn.
+        </p>
+      </footer>
 
       <FilterModal
         openModal={openModal}

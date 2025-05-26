@@ -28,6 +28,7 @@ import VoucherManagement from "./pages/admin/vouchers/VoucherManagement";
 import TransactionManagement from "./pages/admin/transactions/TransactionManagement";
 
 import AdminProtectedRoute from "./pages/admin/components/AdminProtectedRoute";
+import { HelmetProvider } from "react-helmet-async";
 
 const clientId =
   "672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com";
@@ -119,11 +120,13 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId="672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com">
-      <App>
-        <AuthWrapper>
-          <RouterProvider router={router} />
-        </AuthWrapper>
-      </App>
+      <HelmetProvider>
+        <App>
+          <AuthWrapper>
+            <RouterProvider router={router} />
+          </AuthWrapper>
+        </App>
+      </HelmetProvider>
     </GoogleOAuthProvider>
   </React.StrictMode>
 );
