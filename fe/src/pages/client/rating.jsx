@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import ratingApi from "../../utils/api.js";
+
 import {
   Table,
   Card,
@@ -10,53 +12,59 @@ import {
   Drawer,
   Descriptions,
   Button,
+  message,
 } from "antd";
 import { CrownOutlined, UserOutlined } from "@ant-design/icons";
 import ReactStars from "react-rating-stars-component";
-import axios from "axios";
-import { message } from "antd";
 
-const Ranking = () => {
+const Rating = () => {
   const [userData, setUserData] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [open, setOpen] = useState(false);
 
-  const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8081";
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/users/ratings`);
-        setUserData(response.data.users);
-      } catch (error) {
-        console.error("Lỗi khi tải dữ liệu người dùng:  ", error);
-      }
-    };
+  // rating ẩn danh
+  const [allowAnonymous, setAllowAnonymous] = useState(true);
 
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 20,
+    total: 0
+  });
+
+  const fetchUsers = useCallback(async (page = 1, pageSize = 20) => {
+    try {
+      const res = await ratingApi.getUsers(page, pageSize);
+      setUserData(res.data.users);
+      setPagination({
+        current: res.data.pagination.page,
+        pageSize: res.data.pagination.limit,
+        total: res.data.pagination.total
+      });
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu người dùng: ", error);
+      message.error("Không thể tải danh sách người dùng!");
+    }
+  }, []);
+
+  useEffect(() => {
     fetchUsers();
-  }, [API_URL]);
+  }, [fetchUsers]);
 
   const handleRatingChange = async (newRating, record) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const token = localStorage.getItem("access_token");
+    
+    if (!token && !allowAnonymous) {
       message.warning("Bạn cần đăng nhập để đánh giá!");
       return;
     }
 
     try {
-      await axios.post(
-        `${API_URL}/api/user/${record._id}/rating`,
-        { star: newRating },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      const response = await axios.get(`${API_URL}/api/users/ratings`);
-      setUserData(response.data.users);
+      await ratingApi.rateUser(record._id, newRating);
+      await fetchUsers();
       message.success("Đánh giá thành công!");
     } catch (err) {
       console.error(err);
-      message.error(err.response?.data?.msg || "Lỗi khi đánh giá!");
+      message.error(err.response?.data?.message || "Lỗi khi đánh giá!");
     }
   };
 
@@ -70,10 +78,9 @@ const Ranking = () => {
   const columns = [
     {
       title: "Hạng",
-      dataIndex: "rank",
       key: "rank",
-      render: (_, __, index) => {
-        const rank = index + 1;
+      render: (_, record) => {
+        const rank = sortedData.findIndex(u => u._id === record._id) + 1;
         const color =
           rank === 1
             ? "text-yellow-500"
@@ -178,7 +185,12 @@ const Ranking = () => {
           columns={columns}
           dataSource={sortedData}
           rowKey="_id"
-          pagination={{ pageSize: 5 }}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            onChange: (page, pageSize) => fetchUsers(page, pageSize)
+          }}
           rowClassName={(_, index) =>
             index === 0
               ? "bg-yellow-50"
@@ -220,4 +232,4 @@ const Ranking = () => {
   );
 };
 
-export default Ranking;
+export default Rating;

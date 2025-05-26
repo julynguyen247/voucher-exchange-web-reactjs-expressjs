@@ -251,6 +251,24 @@ const getDashboardStatsApi = () => {
   return axios.get(URL_API);
 };
 
+//rating API
+const ratingApi = {
+  getUsers: async (page = 1, limit = 20) => {
+    const API_URL = "/v1/api/user/ratings";
+    const response = await axios.get(API_URL, {
+      params: { page, limit }
+    });
+    return response.data;
+  },
+  
+  rateUser: async (userId, star) => {
+    const API_URL = `/v1/api/user/${userId}/rating`;
+    const response = await axios.post(API_URL, { star });
+    return response.data;
+  }
+};
+
+
 export {
   createUserApi,
   loginApi,
@@ -277,4 +295,5 @@ export {
   deleteVoucherApi,
   getAllTransactionsApi,
   getDashboardStatsApi,
+  ratingApi,
 };

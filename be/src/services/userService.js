@@ -174,6 +174,73 @@ const fetchAccountService = async (user) => {
     return null;
   }
 };
+
+const rateUserService = async ({ userId, raterId = null, star, ipAddress }) => {
+  try {
+    if (!star || star < 1 || star > 5) {
+      return { success: false, message: "Số sao phải từ 1 đến 5" };
+    }
+
+    if (!userId) {
+      return { success: false, message: "Thiếu userId cần được đánh giá" };
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return { success: false, message: "Người dùng không tồn tại" };
+    }
+
+    // Không cho tự đánh giá chính mình nếu có raterId
+    if (raterId && userId === raterId.toString()) {
+      return { success: false, message: "Không thể tự đánh giá chính mình" };
+    }
+
+    // Tìm đánh giá đã có (theo raterId hoặc ipAddress nếu ẩn danh)
+    let existingRating;
+    if (raterId) {
+      existingRating = user.ratings.find(r => r.rater && r.rater.equals(raterId));
+    } else if (ipAddress) {
+      existingRating = user.ratings.find(r => r.ipAddress === ipAddress);
+    }
+
+    if (existingRating) {
+      // Update rating
+      existingRating.star = star;
+      existingRating.createdAt = Date.now();
+    } else {
+      // Thêm mới
+      user.ratings.push({
+        rater: raterId || undefined,
+        ipAddress: ipAddress || undefined,
+        star
+      });
+    }
+
+    // Cập nhật count + average
+    user.ratingCount = user.ratings.length;
+    const total = user.ratings.reduce((sum, r) => sum + r.star, 0);
+    user.ratingAvg = total / user.ratings.length;
+
+    await user.save();
+
+    return {
+      success: true,
+      message: "Đánh giá thành công",
+      data: {
+        ratingAvg: user.ratingAvg,
+        ratingCount: user.ratingCount
+      }
+    };
+  } catch (error) {
+    console.error("Rating error:", error);
+    return {
+      success: false,
+      message: "Lỗi hệ thống",
+    };
+  }
+};
+
+
 module.exports = {
   createUserService,
   loginService,
@@ -181,4 +248,5 @@ module.exports = {
   deleteAUserService,
   updateAUserService,
   fetchAccountService,
+  rateUserService,
 };

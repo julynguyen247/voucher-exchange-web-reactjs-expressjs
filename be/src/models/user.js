@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 const mongoose_delete = require("mongoose-delete");
 
 const ratingSchema = new mongoose.Schema({
-  rater: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
+  rater: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: false },
+  ipAddress: { type: String }, // Hoặc email ẩn danh
   star: { type: Number, required: true, min: 1, max: 5 },
   createdAt: { type: Date, default: Date.now },
 });
@@ -28,19 +29,28 @@ const userSchema = new mongoose.Schema(
 userSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
 // Method: Add or update rating
-userSchema.methods.addRating = async function (raterId, star) {
+userSchema.methods.addRating = async function (raterId, star, ipAddress) {
   if (!star || star < 1 || star > 5) {
     throw new Error("Star must be between 1 and 5");
   }
 
-  const existingRating = this.ratings.find(r => r.rater.equals(raterId));
+  let existingRating;
+
+  if (raterId) {
+    existingRating = this.ratings.find(r => r.rater && r.rater.equals(raterId));
+  } else if (ipAddress) {
+    existingRating = this.ratings.find(r => r.ipAddress === ipAddress);
+  }
 
   if (existingRating) {
     existingRating.star = star;
     existingRating.createdAt = Date.now();
   } else {
-    this.ratings.push({ rater: raterId, star });
-    this.ratingCount = this.ratings.length;
+    this.ratings.push({ 
+      rater: raterId || undefined, 
+      ipAddress: ipAddress || undefined, 
+      star 
+    });
   }
 
   // Recalculate average

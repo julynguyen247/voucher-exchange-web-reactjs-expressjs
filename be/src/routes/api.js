@@ -50,6 +50,7 @@ const {
   getUsersWithRatings,
 } = require("../controllers/ratingController");
 
+//rating
 routerAPI.post("/user/:id/rating", auth, rating);
 routerAPI.get("/user/ratings", getUsersWithRatings);
 

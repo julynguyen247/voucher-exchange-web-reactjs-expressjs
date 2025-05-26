@@ -1,42 +1,60 @@
 const mongoose = require("mongoose");
 const User = require("../models/user");
+const { rateUserService } = require("../services/userService");
 
 const rating = async (req, res) => {
   try {
-    const targetUser = await User.findById(req.params.id);
-    if (!targetUser) return res.status(404).json({ msg: "Người dùng không tồn tại" });
-
+    const userId = req.params.id;
+    const raterId = req.user ? req.user._id : null;
     const { star } = req.body;
-    if (!star || star < 1 || star > 5)
-      return res.status(400).json({ msg: "Số sao phải từ 1 đến 5" });
+    const ipAddress = req.ip;
 
-    if (targetUser._id.equals(req.user._id)) {
-      return res.status(403).json({ msg: "Bạn không thể đánh giá chính mình" });
+    const result = await rateUserService({ userId, raterId, star, ipAddress });
+    
+    if (!result.success) {
+      return res.status(400).json({ msg: result.message });
     }
-
-    await targetUser.addRating(req.user._id, star);
-
-    const updatedUser = await User.findById(req.params.id);
-
-    res.json({
-      msg: "Đánh giá thành công",
-      ratingAvg: updatedUser.ratingAvg.toFixed(2),
-      ratingCount: updatedUser.ratingCount,
-    });
+    
+    res.json(successResponse("Đánh giá thành công", result.data));
   } catch (err) {
     console.error(err);
-    res.status(500).send("Lỗi máy chủ");
-  }
-}
-
-const getUsersWithRatings = async (req, res) => {
-  try {
-    const users = await User.find({}, "name email ratingAvg ratingCount").sort({ ratingAvg: -1, ratingCount: -1 });
-    res.json({ users });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Lỗi máy chủ" });
+    res.status(500).json(errorResponse("Lỗi máy chủ", "SERVER_ERROR"));
   }
 };
 
-module.exports = {rating, getUsersWithRatings};
+const getUsersWithRatings = async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    
+    const options = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      sort: { ratingAvg: -1, ratingCount: -1 }
+    };
+    
+    const users = await User.find(
+      {},
+      "name email ratingAvg ratingCount"
+    )
+    .skip((options.page - 1) * options.limit)
+    .limit(options.limit)
+    .sort(options.sort);
+    
+    const total = await User.countDocuments({});
+    
+    res.json(successResponse("Danh sách người dùng theo đánh giá", { 
+      users,
+      pagination: {
+        total,
+        page: options.page,
+        limit: options.limit,
+        pages: Math.ceil(total / options.limit)
+      }
+    }));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(errorResponse("Lỗi máy chủ", "SERVER_ERROR"));
+  }
+};
+
+module.exports = { rating, getUsersWithRatings };
