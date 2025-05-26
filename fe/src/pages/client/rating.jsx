@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import ratingApi from "../../utils/api.js";
+import { ratingApi } from "../../utils/api.js";
 
 import {
   Table,
