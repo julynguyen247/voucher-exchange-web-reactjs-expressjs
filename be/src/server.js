@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
+const mongoose = require("mongoose");
 
 require("./config/passport");
 const apiRoutes = require("./routes/api");
@@ -228,7 +229,6 @@ if (process.env.NODE_ENV === 'production') {
     await connection();
 
     // Test database connection by inserting and retrieving a test document
-    const mongoose = require("mongoose");
     const TestModel = mongoose.model(
       "ConnectionTest",
       new mongoose.Schema({
