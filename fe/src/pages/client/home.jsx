@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Typography, Carousel, Card } from "antd";
 import { useNavigate } from "react-router-dom";
-import { getVoucher } from "@/utils/api";
-import { PLATFORM_IMAGES, BANNERS, BRANDS } from "@/utils/imageImports.js";
+import { getVoucher } from "../../utils/api.js";
+import { PLATFORM_IMAGES, BANNERS, BRANDS } from "../../utils/imageImports.js";
 
 const { Title, Paragraph } = Typography;
 

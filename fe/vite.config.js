@@ -8,9 +8,6 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: process.env.VITE_BASE_PATH || "/",
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
     extensions: ['.js', '.jsx', '.json', '.css'],
   },
   build: {
@@ -21,5 +18,13 @@ export default defineConfig({
         drop_debugger: true,
       },
     },
+    // Add this to ensure paths are properly resolved
+    outDir: 'dist',
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
   }
 });
