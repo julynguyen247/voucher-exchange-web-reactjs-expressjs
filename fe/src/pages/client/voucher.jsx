@@ -15,16 +15,7 @@ import FilterModal from "../../components/client/voucher/filterModal";
 import { AuthContext } from "../../components/context/auth.context";
 import queryString from "query-string";
 import { Helmet } from "react-helmet-async";
-
-const platformImages = {
-  Shopee: "src/assets/Shopee.jpg",
-  Lazada: "src/assets/Lazada.jpg",
-  Tiki: "src/assets/Tiki.jpg",
-  Sendo: "src/assets/Sendo.jpg",
-  Ebay: "src/assets/Ebay.jpg",
-  Amazon: "src/assets/Amazon.jpg",
-  Tiktok: "src/assets/Tiktok.jpg",
-};
+import { PLATFORM_IMAGES } from "../../utils/imageImports";
 
 const VoucherPage = () => {
   const navigate = useNavigate();
@@ -196,9 +187,9 @@ const VoucherPage = () => {
               )}
             </div>
 
-            {platformImages[item.platform] && (
+            {PLATFORM_IMAGES[item.platform] && (
               <img
-                src={platformImages[item.platform]}
+                src={PLATFORM_IMAGES[item.platform]}
                 alt={`Voucher ${item.platform}`}
                 className="w-full h-24 object-contain rounded-md mb-3"
                 loading="lazy"
