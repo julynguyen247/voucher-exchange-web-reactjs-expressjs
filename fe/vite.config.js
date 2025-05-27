@@ -18,12 +18,18 @@ export default defineConfig({
         drop_debugger: true,
       },
     },
-    // Add this to ensure paths are properly resolved
     outDir: 'dist',
     assetsDir: 'assets',
+    emptyOutDir: true,
+    // Cấu hình cho assets tĩnh
     rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+      },
       output: {
-        manualChunks: undefined
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
       }
     }
   }
