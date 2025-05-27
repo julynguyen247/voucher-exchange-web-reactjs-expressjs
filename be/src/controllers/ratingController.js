@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/user");
 const { rateUserService } = require("../services/userService");
+const { successResponse, errorResponse } = require("../utils/responseFomatter");
 
 const rating = async (req, res) => {
   try {
@@ -8,6 +9,13 @@ const rating = async (req, res) => {
     const raterId = req.user ? req.user._id : null;
     const { star } = req.body;
     const ipAddress = req.ip;
+
+    // Thêm kiểm tra để đảm bảo ít nhất một định danh được cung cấp
+    if (!raterId && !ipAddress) {
+      return res.status(400).json({ 
+        msg: "Không thể đánh giá khi không đăng nhập hoặc thiếu thông tin IP" 
+      });
+    }
 
     const result = await rateUserService({ userId, raterId, star, ipAddress });
     

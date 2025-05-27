@@ -175,6 +175,46 @@ const fetchAccountService = async (user) => {
   }
 };
 
+// rank user
+const getUsersWithRankService = async (page = 1, pageSize = 20) => {
+  // Lấy toàn bộ user với trường cần thiết, chuyển thành object thuần
+  const allUsers = await User.find({}, 'name email ratingCount ratingAvg').lean();
+
+  // Tính tổng ratingCount và tổng điểm để tính trung bình cộng C
+  const totalRatings = allUsers.reduce((acc, u) => acc + u.ratingCount, 0);
+  const totalScore = allUsers.reduce((acc, u) => acc + (u.ratingAvg * u.ratingCount), 0);
+  const C = totalRatings ? totalScore / totalRatings : 0;
+
+  // Tính weightedScore cho từng user
+  allUsers.forEach(user => {
+    const v = user.ratingCount;
+    const R = user.ratingAvg;
+    user.weightedScore = (v / (v + m)) * R + (m / (v + m)) * C;
+  });
+
+  // Sắp xếp giảm dần theo weightedScore
+  allUsers.sort((a, b) => b.weightedScore - a.weightedScore);
+
+  // Gán rank theo thứ tự sắp xếp
+  allUsers.forEach((user, index) => {
+    user.rank = index + 1;
+  });
+
+  // Phân trang
+  const skip = (page - 1) * pageSize;
+  const pagedUsers = allUsers.slice(skip, skip + pageSize);
+
+  return {
+    users: pagedUsers,
+    pagination: {
+      page,
+      limit: pageSize,
+      total: allUsers.length,
+    },
+  };
+};
+
+
 const rateUserService = async ({ userId, raterId = null, star, ipAddress }) => {
   try {
     if (!star || star < 1 || star > 5) {
@@ -183,6 +223,11 @@ const rateUserService = async ({ userId, raterId = null, star, ipAddress }) => {
 
     if (!userId) {
       return { success: false, message: "Thiếu userId cần được đánh giá" };
+    }
+
+    // Kiểm tra xem có ít nhất một định danh
+    if (!raterId && !ipAddress) {
+      return { success: false, message: "Thiếu thông tin người đánh giá hoặc IP" };
     }
 
     const user = await User.findById(userId);
@@ -195,33 +240,8 @@ const rateUserService = async ({ userId, raterId = null, star, ipAddress }) => {
       return { success: false, message: "Không thể tự đánh giá chính mình" };
     }
 
-    // Tìm đánh giá đã có (theo raterId hoặc ipAddress nếu ẩn danh)
-    let existingRating;
-    if (raterId) {
-      existingRating = user.ratings.find(r => r.rater && r.rater.equals(raterId));
-    } else if (ipAddress) {
-      existingRating = user.ratings.find(r => r.ipAddress === ipAddress);
-    }
-
-    if (existingRating) {
-      // Update rating
-      existingRating.star = star;
-      existingRating.createdAt = Date.now();
-    } else {
-      // Thêm mới
-      user.ratings.push({
-        rater: raterId || undefined,
-        ipAddress: ipAddress || undefined,
-        star
-      });
-    }
-
-    // Cập nhật count + average
-    user.ratingCount = user.ratings.length;
-    const total = user.ratings.reduce((sum, r) => sum + r.star, 0);
-    user.ratingAvg = total / user.ratings.length;
-
-    await user.save();
+    // Use the model's method
+    await user.addRating(raterId, star, ipAddress);
 
     return {
       success: true,
@@ -248,5 +268,6 @@ module.exports = {
   deleteAUserService,
   updateAUserService,
   fetchAccountService,
+  getUsersWithRankService,
   rateUserService,
 };
