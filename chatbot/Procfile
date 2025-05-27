@@ -1,0 +1,2 @@
+# filepath: /home/vngbthang/Documents/deploying/voucher-exchange-web-reactjs-expressjs/chatbot/Procfile
+web: rasa run --enable-api --port $PORT --cors "*"

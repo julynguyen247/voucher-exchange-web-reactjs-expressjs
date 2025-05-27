@@ -27,3 +27,7 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
+      - key: RASA_URL
+        value: https://voucher-exchange-chatbot.onrender.com # URL của chatbot khi được triển khai
+      - key: FRONTEND_URL
+        value: https://your-frontend-domain.vercel.app # Cập nhật thành domain thực tế của frontend

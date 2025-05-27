@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: voucher-exchange-chatbot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: rasa run --enable-api --port $PORT --cors "*"
+    plan: standard # Rasa cần nhiều tài nguyên hơn dịch vụ web thông thường
+    pythonVersion: 3.10.12 # Chọn phiên bản Python phù hợp cho Rasa
+    envVars:
+      - key: PATH
+        value: /opt/render/project/python/bin:/opt/render/project/.venv/bin:/opt/render/project/.local/bin:${PATH}
+      - key: PYTHONUNBUFFERED
+        value: true
+      - key: PYTHONPATH
+        value: ${PYTHONPATH}:/opt/render/project
+      - key: RASA_TELEMETRY_ENABLED
+        value: false
