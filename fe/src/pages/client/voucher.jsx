@@ -4,18 +4,18 @@ import {
   addToFavoriteApi,
   getFavoritesApi,
   removeFavoriteApi,
-} from "../../utils/api";
+} from "@/utils/api";
 import { FaArrowLeft, FaFilter, FaHeart, FaRegHeart } from "react-icons/fa";
 import { RiDiscountPercentLine } from "react-icons/ri";
 import { MdAccessTime, MdAttachMoney } from "react-icons/md";
 import { Button, Pagination, Rate, message } from "antd";
 import dayjs from "dayjs";
 import { useNavigate, useLocation } from "react-router-dom";
-import FilterModal from "../../components/client/voucher/filterModal";
-import { AuthContext } from "../../components/context/auth.context";
+import FilterModal from "@/components/client/voucher/filterModal";
+import { AuthContext } from "@/components/context/auth.context";
 import queryString from "query-string";
 import { Helmet } from "react-helmet-async";
-import { PLATFORM_IMAGES } from "../../utils/imageImports";
+import { PLATFORM_IMAGES } from "@/utils/imageImports";
 
 const VoucherPage = () => {
   const navigate = useNavigate();

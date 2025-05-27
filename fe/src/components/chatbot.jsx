@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import "../style/chatbot.css";
-import { robotImg, userImg } from "../utils/imageImports";
+import "@/style/chatbot.css";
+import { robotImg, userImg } from "@/utils/imageImports";
 import { io } from "socket.io-client";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8081";

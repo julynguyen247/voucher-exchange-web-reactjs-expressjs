@@ -1,57 +1,10 @@
 import { useEffect, useState } from "react";
 import { Typography, Carousel, Card } from "antd";
 import { useNavigate } from "react-router-dom";
-import { getVoucher } from "../../utils/api";
-import shopeeImg from "../../assets/Shopee.jpg";
-import tikiImg from "../../assets/Tiki.jpg";
-import lazadaImg from "../../assets/Lazada.jpg";
-import ebayImg from "../../assets/Ebay.jpg";
-import sendoImg from "../../assets/Sendo.jpg";
-import tiktokshopImg from "../../assets/Tiktok.jpg";
-import amazonImg from "../../assets/Amazon.jpg";
-import highlandsImg from "../../assets/Highlands.jpg";
-import starbucksImg from "../../assets/Starbucks.jpg";
-import phelaImg from "../../assets/Phela.jpg";
-import katinatImg from "../../assets/Katinat.jpg";
-import phuclongImg from "../../assets/PhucLong.jpg";
+import { getVoucher } from "@/utils/api";
+import { PLATFORM_IMAGES, BANNERS, BRANDS } from "@/utils/imageImports";
 
 const { Title, Paragraph } = Typography;
-
-const BANNERS = [
-  "src/assets/banner1.jpg",
-  "src/assets/banner2.jpg",
-  "src/assets/banner3.jpg",
-];
-
-const BRANDS = [
-  { name: "Shopee", src: shopeeImg },
-  { name: "Tiki", src: tikiImg },
-  { name: "Lazada", src: lazadaImg },
-  { name: "Ebay", src: ebayImg },
-  { name: "Sendo", src: sendoImg },
-  { name: "TikTok Shop", src: tiktokshopImg },
-  { name: "Amazon", src: amazonImg },
-  { name: "Highlands", src: highlandsImg },
-  { name: "Starbucks", src: starbucksImg },
-  { name: "Phela", src: phelaImg },
-  { name: "Katinat", src: katinatImg },
-  { name: "Phúc Long", src: phuclongImg },
-];
-
-const PLATFORM_IMAGES = {
-  Shopee: shopeeImg,
-  Tiki: tikiImg,
-  Lazada: lazadaImg,
-  Ebay: ebayImg,
-  Sendo: sendoImg,
-  TikTok: tiktokshopImg,
-  Amazon: amazonImg,
-  Highlands: highlandsImg,
-  Starbucks: starbucksImg,
-  Phela: phelaImg,
-  Katinat: katinatImg,
-  "Phúc Long": phuclongImg,
-};
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -80,11 +33,11 @@ const HomePage = () => {
           dots
           className="rounded-xl overflow-hidden shadow-md"
         >
-          {BANNERS.map((src) => (
-            <div key={src}>
+          {BANNERS.map((src, index) => (
+            <div key={index}>
               <img
                 src={src}
-                alt={src}
+                alt={`Banner ${index + 1}`}
                 className="w-full max-h-[400px] object-cover"
               />
             </div>
@@ -103,6 +56,46 @@ const HomePage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto">
+        <Title level={4} className="text-center text-gray-800 mb-16">
+          Voucher nổi bật hôm nay
+        </Title>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {vouchers.map((voucher, index) => (
+            <Card
+              key={index}
+              title={voucher.platform}
+              className="rounded-xl shadow hover:shadow-lg transition"
+              cover={
+                PLATFORM_IMAGES[voucher.platform] && (
+                  <img
+                    alt={voucher.platform}
+                    src={PLATFORM_IMAGES[voucher.platform]}
+                    className="h-[160px] object-contain p-4"
+                  />
+                )
+              }
+              actions={[
+                <button
+                  key={`action-${index}`}
+                  onClick={() => navigate("/voucher")}
+                  className="text-green-600 hover:text-green-700 font-semibold"
+                >
+                  Sử dụng ngay →
+                </button>,
+              ]}
+            >
+              <p className="text-sm text-gray-500 mt-1">
+                {voucher.category} · Giảm {voucher.discountValue}%
+              </p>
+              <p className="text-lg font-bold mt-2">
+                {voucher.price.toLocaleString()} VNĐ
+              </p>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto mt-24">
         <Title level={4} className="text-center text-gray-700 mb-14">
           Thương hiệu nổi bật
         </Title>
@@ -128,74 +121,48 @@ const HomePage = () => {
 
       <div className="bg-gray-50 rounded-xl shadow-md py-24 px-10 mt-16">
         <div className="max-w-7xl mx-auto">
-          <Title level={4} className="text-center text-gray-800 mb-16">
-            Voucher nổi bật hôm nay
-          </Title>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {vouchers.map((voucher, index) => (
-              <Card
-                key={index}
-                title={voucher.platform}
-                className="rounded-xl shadow hover:shadow-lg transition"
-                cover={
-                  PLATFORM_IMAGES[voucher.platform] && (
-                    <img
-                      alt={voucher.platform}
-                      src={PLATFORM_IMAGES[voucher.platform]}
-                      className="h-[160px] object-contain p-4"
-                    />
-                  )
-                }
-                actions={[
-                  <button
-                    key={`action-${index}`}
-                    onClick={() => navigate("/voucher")}
-                    className="text-green-600 hover:text-green-700 font-semibold"
-                  >
-                    Sử dụng ngay →
-                  </button>,
-                ]}
+          <div className="text-center">
+            <Title level={3} className="mb-6 text-blue-600">
+              Không còn phải lo lắng về các đợt khuyến mãi
+            </Title>
+            <Paragraph className="text-lg text-gray-600 max-w-3xl mx-auto mb-12">
+              Chúng tôi tự hào mang đến trải nghiệm mua sắm tiết kiệm nhất với
+              hệ thống voucher và mã giảm giá luôn cập nhật từ hơn 500+ thương
+              hiệu và sàn thương mại điện tử.
+            </Paragraph>
+
+            <div className="flex flex-col md:flex-row justify-center gap-6">
+              <button
+                onClick={() => navigate("/voucher")}
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow transition-all transform hover:translate-y-[-2px]"
               >
-                <p className="text-sm text-gray-500 mt-1">
-                  Giảm {voucher.discountValue?.toLocaleString("vi-VN")}₫ cho đơn
-                  từ {voucher.minimumOrder?.toLocaleString("vi-VN")}₫
-                </p>
-              </Card>
-            ))}
+                Khám phá voucher ngay
+              </button>
+              <button
+                onClick={() => navigate("/ranking")}
+                className="bg-white hover:bg-gray-100 text-green-600 font-bold py-3 px-8 rounded-lg shadow border border-green-600 transition-all transform hover:translate-y-[-2px]"
+              >
+                Xem xếp hạng người dùng
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="relative overflow-hidden py-20 px-6 sm:px-12 rounded-xl shadow-xl max-w-6xl mx-auto bg-gradient-to-r from-green-50 to-white mt-16">
-        <div className="relative z-10 text-center">
-          <Title level={3} className="text-green-700 mb-4">
-            Săn deal cực hot mỗi ngày!
-          </Title>
-          <Paragraph className="text-gray-600 text-base max-w-2xl mx-auto mb-6">
-            Cập nhật hàng trăm voucher từ các thương hiệu nổi bật như Shopee,
-            Tiki, Lazada, Highlands... và tận hưởng ưu đãi mỗi ngày.
-          </Paragraph>
-          <button
-            className="bg-green-600 hover:bg-green-700 text-white px-10 py-3 text-base font-semibold rounded-full shadow-md transition"
-            onClick={() => navigate("/voucher")}
-          >
-            Khám phá ngay
-          </button>
-        </div>
-        <div className="absolute -bottom-4 -right-4 opacity-10 w-52 h-52 bg-[url('/assets/deal-icon.png')] bg-no-repeat bg-contain"></div>
-      </div>
-
-      <footer className="bg-gray-50 text-center py-10 text-sm text-gray-700 mt-16 border-t border-gray-200">
-        <div className="max-w-5xl mx-auto space-y-3">
-          <p className="font-semibold text-lg">Liên hệ với chúng tôi</p>
-          <p>Email: contact@voucher.com</p>
-          <p>Hotline: 0123 456 789</p>
-          <p>
-            Facebook:{" "}
+      <footer className="mt-24 text-center text-gray-500 pb-8">
+        <div>
+          <p>© 2025 Voucher Exchange. All rights reserved.</p>
+          <p className="mt-2">
+            Liên hệ:{" "}
+            <a
+              href="mailto:support@voucher-exchange.com"
+              className="text-green-600 hover:underline"
+            >
+              support@voucher-exchange.com
+            </a>
+            {" | "}
             <a
               href="https://facebook.com/voucher"
-              target="_blank"
-              rel="noopener noreferrer"
               className="text-green-600 hover:underline"
             >
               fb.com/voucher
