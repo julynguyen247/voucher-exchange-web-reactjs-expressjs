@@ -14,6 +14,7 @@
     "google-auth-library": "^9.15.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.16.0",
     "mongoose": "^8.12.1",
     "mongoose-delete": "1.0.2",
     "passport": "^0.7.0",
@@ -28,7 +29,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./src/server.js"
+    "dev": "nodemon ./src/server.js",
+    "start": "node ./src/server.js"
   },
   "author": "july",
   "license": "ISC",

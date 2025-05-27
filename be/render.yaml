@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: voucher-exchange-backend
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    nodeVersion: 18.x
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST_NAME
+        value: 0.0.0.0
+      - key: PORT
+        fromService:
+          type: web
+          name: voucher-exchange-backend
+          envVarKey: PORT
+      - key: MONGO_DB_URL
+        sync: false # This will be manually added via Render dashboard for security
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRED
+        value: 7d
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
