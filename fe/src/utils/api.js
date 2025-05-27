@@ -161,10 +161,34 @@ const uploadApi = (file, folder) => {
     },
   });
 };
-const updateUserApi = (id, name, email, password, phone, image) => {
+const updateUserApi = (
+  id,
+  name,
+  email,
+  password,
+  phone,
+  image,
+  accountNumber,
+  bank
+) => {
   const URL_API = "/v1/api/user";
-  return axios.put(URL_API, { id, name, email, password, phone, image });
+  const payload = {
+    id,
+    name,
+    email,
+    phone,
+    image,
+    accountNumber,
+    bank,
+  };
+
+  if (password) {
+    payload.password = password;
+  }
+
+  return axios.put(URL_API, payload);
 };
+
 const getTransactions = () => {
   const URL_API = `/v1/api/transaction/get`;
   return axios.get(URL_API);
@@ -186,10 +210,7 @@ const getSellerPaymentDetails = (voucherId, bank) => {
     },
   });
 };
-const getBank = () => {
-  const URL_API = `/v1/api/bank`;
-  return axios.get(URL_API);
-};
+
 const addToFavoriteApi = (userId, voucherId) => {
   const URL_API = "/v1/api/favorites";
   const data = { userId, voucherId };
@@ -256,18 +277,20 @@ const ratingApi = {
   getUsers: async (page = 1, limit = 20) => {
     const API_URL = "/v1/api/user/ratings";
     const response = await axios.get(API_URL, {
-      params: { page, limit }
+      params: { page, limit },
     });
     return response.data;
   },
-  
+
   rateUser: async (userId, star) => {
     const API_URL = `/v1/api/user/${userId}/rating`;
     const response = await axios.post(API_URL, { star });
     return response.data;
-  }
+  },
 };
-
+const getBankListApi = () => {
+  return axios.get("/v1/api/bank");
+};
 
 export {
   createUserApi,
@@ -284,7 +307,6 @@ export {
   getTransactions,
   processTransaction,
   getSellerPaymentDetails,
-  getBank,
   addToFavoriteApi,
   getFavoritesApi,
   removeFavoriteApi,
@@ -296,4 +318,5 @@ export {
   getAllTransactionsApi,
   getDashboardStatsApi,
   ratingApi,
+  getBankListApi,
 };
