@@ -6,7 +6,7 @@ import { MdAccessTime, MdAttachMoney } from "react-icons/md";
 import dayjs from "dayjs";
 import { getFavoritesApi, removeFavoriteApi } from "@/utils/api";
 import { AuthContext } from "@/components/context/auth.context";
-import { PLATFORM_IMAGES } from "@/utils/imageImports";
+import { PLATFORM_IMAGES } from "@/utils/imageImports.js";
 
 const Favorites = () => {
   const navigate = useNavigate();

@@ -15,7 +15,7 @@ import FilterModal from "@/components/client/voucher/filterModal";
 import { AuthContext } from "@/components/context/auth.context";
 import queryString from "query-string";
 import { Helmet } from "react-helmet-async";
-import { PLATFORM_IMAGES } from "@/utils/imageImports";
+import { PLATFORM_IMAGES } from "@/utils/imageImports.js";
 
 const VoucherPage = () => {
   const navigate = useNavigate();
