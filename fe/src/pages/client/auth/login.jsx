@@ -27,6 +27,8 @@ const LoginPage = () => {
           id: res.data.user.id ?? "",
           phone: res.data.user.phone ?? "",
           image: res.data.user.image ?? "",
+          bank: res.data.user.bank ?? "",
+          accountNumber: res.data.user.accountNumber ?? "",
         },
       });
       navigate("/");

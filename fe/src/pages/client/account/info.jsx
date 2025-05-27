@@ -1,26 +1,55 @@
-import { Avatar, Button, Form, Input, Upload, Card, message } from "antd";
+import {
+  Avatar,
+  Button,
+  Form,
+  Input,
+  Upload,
+  Card,
+  message,
+  Select,
+} from "antd";
 import React, { useContext, useEffect, useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import { AuthContext } from "../../../components/context/auth.context";
-import { updateUserApi, uploadApi } from "../../../utils/api";
+import { getBankListApi, updateUserApi, uploadApi } from "../../../utils/api";
+
+const { Option } = Select;
 
 const Info = () => {
   const { auth, setAuth } = useContext(AuthContext);
   const [form] = Form.useForm();
   const [userAvatar, setUserAvatar] = useState("");
+  const [bankList, setBankList] = useState([]);
+
   const urlAvatar = `${
     import.meta.env.VITE_BACKEND_URL
   }/images/upload/${userAvatar}`;
 
   useEffect(() => {
+    console.log(auth);
     form.setFieldsValue({
       name: auth.user.name,
       email: auth.user.email,
       phone: auth.user.phone,
       id: auth.user.id,
+      bank: auth.user.bank,
+      accountNumber: auth.user.accountNumber,
     });
     setUserAvatar(auth.user.image);
   }, [auth.user]);
+
+  useEffect(() => {
+    const fetchBanks = async () => {
+      try {
+        const res = await getBankListApi();
+        setBankList(res.data || []);
+      } catch (err) {
+        message.error("Lấy danh sách ngân hàng thất bại");
+      }
+    };
+
+    fetchBanks();
+  }, []);
 
   const handleUploadFile = async (options) => {
     const { onSuccess, onError, file } = options;
@@ -48,15 +77,19 @@ const Info = () => {
   };
 
   const onFinish = async (values) => {
-    const { name, id, phone, email } = values;
+    const { name, id, phone, email, bank, accountNumber } = values;
+
     const res = await updateUserApi(
       id,
       name,
       email,
       undefined,
       phone,
-      userAvatar
+      userAvatar,
+      accountNumber,
+      bank
     );
+
     if (res && res.data) {
       message.success("Cập nhật thành công");
       setAuth((prevAuth) => ({
@@ -66,6 +99,8 @@ const Info = () => {
           name,
           phone,
           image: userAvatar,
+          bank,
+          accountNumber,
         },
       }));
     } else {
@@ -78,7 +113,7 @@ const Info = () => {
       <Card
         className="w-full max-w-xl shadow-xl"
         title="Thông tin cá nhân"
-        bordered={false}
+        variant={false}
       >
         <div className="flex flex-col items-center gap-6 mb-6">
           <Avatar
@@ -122,6 +157,28 @@ const Info = () => {
             rules={[
               { required: true, message: "Vui lòng nhập số điện thoại!" },
             ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Ngân hàng"
+            name="bank"
+            rules={[{ required: true, message: "Vui lòng chọn ngân hàng!" }]}
+          >
+            <Select placeholder="Chọn ngân hàng">
+              {bankList.map((bank) => (
+                <Option key={bank.code} value={bank.code}>
+                  {bank.name} ({bank.code})
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Số tài khoản"
+            name="accountNumber"
+            rules={[{ required: true, message: "Vui lòng nhập số tài khoản!" }]}
           >
             <Input />
           </Form.Item>

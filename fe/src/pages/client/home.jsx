@@ -37,6 +37,7 @@ const BRANDS = [
   { name: "Katinat", src: katinatImg },
   { name: "Phúc Long", src: phuclongImg },
 ];
+
 const PLATFORM_IMAGES = {
   Shopee: shopeeImg,
   Tiki: tikiImg,
@@ -67,7 +68,6 @@ const HomePage = () => {
         console.error("Lỗi khi lấy danh sách voucher:", error);
       }
     };
-
     fetchVouchers();
   }, []);
 
@@ -80,11 +80,11 @@ const HomePage = () => {
           dots
           className="rounded-xl overflow-hidden shadow-md"
         >
-          {BANNERS.map((src, index) => (
-            <div key={index}>
+          {BANNERS.map((src) => (
+            <div key={src}>
               <img
                 src={src}
-                alt={`banner-${index}`}
+                alt={src}
                 className="w-full max-h-[400px] object-cover"
               />
             </div>
@@ -107,9 +107,9 @@ const HomePage = () => {
           Thương hiệu nổi bật
         </Title>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8">
-          {BRANDS.map((brand, index) => (
+          {BRANDS.map((brand) => (
             <div
-              key={index}
+              key={brand.name}
               className="bg-gray-50 p-4 rounded-2xl shadow hover:shadow-md transition hover:-translate-y-1"
               title={brand.name}
             >
@@ -132,23 +132,23 @@ const HomePage = () => {
             Voucher nổi bật hôm nay
           </Title>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {vouchers.map((voucher) => (
+            {vouchers.map((voucher, index) => (
               <Card
-                key={voucher.id}
+                key={index}
                 title={voucher.platform}
                 className="rounded-xl shadow hover:shadow-lg transition"
                 cover={
-                  PLATFORM_IMAGES[voucher.platform] ? (
+                  PLATFORM_IMAGES[voucher.platform] && (
                     <img
                       alt={voucher.platform}
                       src={PLATFORM_IMAGES[voucher.platform]}
                       className="h-[160px] object-contain p-4"
                     />
-                  ) : null
+                  )
                 }
                 actions={[
                   <button
-                    key="action"
+                    key={`action-${index}`}
                     onClick={() => navigate("/voucher")}
                     className="text-green-600 hover:text-green-700 font-semibold"
                   >
