@@ -23,7 +23,15 @@ const hostname = process.env.HOST_NAME || "localhost";
 
 const server = http.createServer(app);
 const io = socketIo(server, {
-  cors: { origin: "*" },
+  cors: { 
+    origin: [
+      "http://localhost:5173",
+      "https://voucher-exchange-frontend-git-master-vngbthangs-projects.vercel.app",
+      "https://voucher-exchange-frontend.vercel.app"
+    ],
+    methods: ["GET", "POST"],
+    credentials: true
+  },
 });
 
 //cấu hình websocket với rasa
@@ -112,7 +120,8 @@ io.on("connection", (socket) => {
 // Cấu hình middleware
 const allowedOrigins = [
   "http://localhost:5173",                         // Local development
-  "https://your-frontend-domain.vercel.app",       // Vercel production (cập nhật domain thực tế của bạn)
+  "https://voucher-exchange-frontend-git-master-vngbthangs-projects.vercel.app", // Vercel production
+  "https://voucher-exchange-frontend.vercel.app",   // Vercel production short URL (nếu có)
   process.env.FRONTEND_URL,                        // Từ biến môi trường nếu được thiết lập
 ];
 
@@ -123,12 +132,13 @@ app.use(
       if (!origin) return callback(null, true);
       
       // Kiểm tra nếu origin nằm trong danh sách cho phép
-      if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes("*")) {
+      if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes("*") || 
+          origin.match(/^https:\/\/voucher-exchange-frontend.*\.vercel\.app$/)) {
         callback(null, true);
       } else {
         console.log("CORS blocked request from:", origin);
-        callback(null, true); // Tạm thời cho phép tất cả origin trong quá trình phát triển
-        // Trong production, có thể chuyển thành: callback(new Error('Not allowed by CORS'))
+        callback(null, true); // Vẫn cho phép tất cả origin, nhưng in log để theo dõi
+        // Để triển khai chặt chẽ hơn trong tương lai: callback(new Error('Not allowed by CORS'))
       }
     },
     credentials: true, // Cho phép gửi cookie và thông tin xác thực
