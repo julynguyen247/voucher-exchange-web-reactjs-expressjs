@@ -49,7 +49,7 @@ const TransactionPage = () => {
 
         if (response.data && response.data.EC === 0) {
           const details = response.data.data;
-          if (newPaymentOption === "momo" || newPaymentOption === "zalo_pay") {
+          if (newPaymentOption === "momo") {
             setSellerPhone(details.sellerPhone || "");
             if (!details.sellerPhone) {
               setMessage(
@@ -73,14 +73,14 @@ const TransactionPage = () => {
         } else {
           setMessage(
             response.data?.message ||
-              `Không thể lấy thông tin cho ${newPaymentOption}.`
+            `Không thể lấy thông tin cho ${newPaymentOption}.`
           );
         }
       } catch (error) {
         console.error("Lỗi khi lấy thông tin thanh toán:", error);
         setMessage(
           error.response?.data?.message ||
-            "Lỗi kết nối khi lấy thông tin thanh toán."
+          "Lỗi kết nối khi lấy thông tin thanh toán."
         );
       } finally {
         setIsLoadingSellerInfo(false);
@@ -103,8 +103,7 @@ const TransactionPage = () => {
       return;
     }
     if (
-      (selectedPaymentOption === "momo" ||
-        selectedPaymentOption === "zalo_pay") &&
+      (selectedPaymentOption === "momo") &&
       !sellerPhone
     ) {
       setMessage(`Thông tin SĐT cho ${selectedPaymentOption} chưa sẵn sàng.`);
@@ -125,6 +124,7 @@ const TransactionPage = () => {
         voucherName,
         price,
         paymentMethod: selectedPaymentOption,
+        status: "pending"
       };
       const response = await processTransaction(transactionData);
       if (response.data && response.data.EC === 0) {
@@ -142,7 +142,7 @@ const TransactionPage = () => {
       vietcombank: "970436",
       techcombank: "970407",
       acb: "970416",
-      mbbank: "970422",
+      MBB: "970422",
       vpbank: "970432",
       bidv: "970418",
       viettinbank: "970415",
@@ -178,13 +178,6 @@ const TransactionPage = () => {
       )}`;
     }
     return qrImageUrl;
-  };
-
-  const generateZaloPayQRString = (phone, amount, desc) => {
-    if (!phone || typeof amount !== "number" || amount <= 0) return null;
-    return `https://qr.zalopay.vn/p?s=0&a=${phone}&m=${encodeURIComponent(
-      desc
-    )}&am=${amount}`;
   };
 
   if (!voucherId || typeof price !== "number") {
@@ -233,18 +226,6 @@ const TransactionPage = () => {
           <label>
             <input
               type="radio"
-              value="zalo_pay"
-              name="paymentOption"
-              checked={selectedPaymentOption === "zalo_pay"}
-              onChange={handlePaymentOptionChange}
-            />{" "}
-            ZaloPay
-          </label>
-        </div>
-        <div className="payment-method-option">
-          <label>
-            <input
-              type="radio"
               value="vietqr_bank_transfer"
               name="paymentOption"
               checked={selectedPaymentOption === "vietqr_bank_transfer"}
@@ -267,33 +248,7 @@ const TransactionPage = () => {
                 <QRCode
                   value={`2|99|${sellerPhone}|||${price}|${encodeURIComponent(
                     `TT Voucher ${voucherName.substring(0, 10)}`
-                  )}|0|0`}
-                  size={256}
-                />
-                <p>
-                  <strong>SĐT người nhận:</strong> {sellerPhone}
-                </p>
-                <p>
-                  <strong>Số tiền:</strong> {price.toLocaleString("vi-VN")} VND
-                </p>
-                <p>
-                  <strong>Nội dung:</strong> TT Voucher{" "}
-                  {voucherName.substring(0, 10)}
-                </p>
-              </div>
-            )}
-
-          {!isLoadingSellerInfo &&
-            selectedPaymentOption === "zalo_pay" &&
-            sellerPhone && (
-              <div>
-                <h3>Quét mã QR để thanh toán bằng ZaloPay</h3>
-                <QRCode
-                  value={generateZaloPayQRString(
-                    sellerPhone,
-                    price,
-                    `TT Voucher ${voucherName.substring(0, 10)}`
-                  )}
+                  )}|0|0&orderID=${voucherId}`}
                   size={256}
                 />
                 <p>
@@ -322,8 +277,7 @@ const TransactionPage = () => {
                     sellerBankAccount,
                     sellerAccountHolderName,
                     price,
-                    `TT VCR ${voucherName.substring(0, 10)} ${
-                      auth.user?.id?.slice(-4) || ""
+                    `TT VCR ${voucherName.substring(0, 10)} ${auth.user?.id?.slice(-4) || ""
                     }`
                   )}
                   alt={`VietQR cho ${sellerBankName}`}
@@ -350,9 +304,8 @@ const TransactionPage = () => {
                 </p>
                 <p>
                   <strong>Nội dung khuyến nghị:</strong>{" "}
-                  {`TT VCR ${voucherName.substring(0, 10)} ${
-                    auth.user?.id?.slice(-4) || ""
-                  }`}
+                  {`TT VCR ${voucherName.substring(0, 10)} ${auth.user?.id?.slice(-4) || ""
+                    }`}
                 </p>
               </div>
             )}
@@ -360,8 +313,7 @@ const TransactionPage = () => {
           {!isLoadingSellerInfo &&
             !message /* Thông báo lỗi chung nếu không có thông tin */ && (
               <>
-                {(selectedPaymentOption === "momo" ||
-                  selectedPaymentOption === "zalo_pay") &&
+                {(selectedPaymentOption === "momo") &&
                   !sellerPhone && (
                     <p>
                       Không thể tải thông tin SĐT cho {selectedPaymentOption}.
@@ -397,9 +349,8 @@ const TransactionPage = () => {
 
       {message && (
         <div
-          className={`message ${
-            message.toLowerCase().includes("thành công") ? "success" : "error"
-          }`}
+          className={`message ${message.toLowerCase().includes("thành công") ? "success" : "error"
+            }`}
         >
           {message}
         </div>
