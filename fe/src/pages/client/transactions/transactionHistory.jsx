@@ -55,19 +55,41 @@ const TransactionHistory = () => {
       dataIndex: "paymentMethod",
       key: "paymentMethod",
       render: (method) =>
-        method === "cash"
-          ? "Tiền mặt"
-          : method === "bank_transfer"
-          ? "Chuyển khoản"
-          : "N/A",
+        method === "momo"
+          ? "Momo"
+          : method === "vietqr_bank_transfer"
+            ? "Chuyển khoản ngân hàng"
+            : "N/A",
     },
     {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
-      render: (status) => (
-        <Tag color={status === "Completed" ? "green" : "red"}>{status}</Tag>
-      ),
+      render: (status) => {
+        let color = "";
+        let text = "";
+
+        switch (status) {
+          case "Pending":
+            color = "orange";
+            text = "Đang chờ";
+            break;
+          case "Completed":
+            color = "green";
+            text = "Hoàn thành";
+            break;
+          case "Failed":
+            color = "red";
+            text = "Thất bại";
+            break;
+          default:
+            color = "gray";
+            text = status || "Không xác định";
+            break;
+        }
+
+        return <Tag color={color}>{text}</Tag>;
+      },
     },
     {
       title: "Ngày",
@@ -79,7 +101,7 @@ const TransactionHistory = () => {
 
   return (
     <div>
-      <h1>Transaction History</h1>
+      <h1>Lịch sử giao dịch</h1>
       {message && <p style={{ color: "red" }}>{message}</p>}
       <Table
         dataSource={Array.isArray(transactions) ? transactions : []}

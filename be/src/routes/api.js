@@ -26,6 +26,8 @@ const {
   getTransactions,
 } = require("../controllers/transactionController");
 
+const { simulateMomoWebhook } = require("../controllers/paymentController");
+
 const transactionController = require("../controllers/transactionController");
 const {
   addFavorite,
@@ -81,6 +83,9 @@ routerAPI.post("/voucher/:id/rate", rateVoucher);
 //transaction
 routerAPI.post("/transaction/process", processTransaction);
 routerAPI.get("/transaction/get", getTransactions);
+
+//payment
+routerAPI.post("payment/momo/simulate-webhook", simulateMomoWebhook);
 
 //favorites
 routerAPI.post("/favorites", addFavorite);

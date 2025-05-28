@@ -16,17 +16,17 @@ const processTransaction = async (req, res) => {
         .json({ success: false, message: "Missing required fields" });
     }
 
-    const voucher = await Voucher.findById(voucherId).populate("uploaderId");
-    if (!voucher || !voucher.uploaderId || !voucher.uploaderId.phone) {
+    const voucher = await Voucher.findById(voucherId).populate("createdBy");
+    if (!voucher || !voucher.createdBy) {
       return res.status(404).json({
         success: false,
         message: "Không tìm thấy thông tin người bán",
       });
     }
 
-    const sellerPhone = voucher.uploaderId.phone;
-    const sellerBankAccount = voucher.uploaderId.bankAccount || "Đang cập nhật";
-    const sellerBankName = voucher.uploaderId.bankName || "Đang cập nhật";
+    const sellerPhone = voucher.createdBy.phone;
+    const sellerBankAccount = voucher.createdBy.bankAccount || "Đang cập nhật";
+    const sellerBankName = voucher.createdBy.bankName || "Đang cập nhật";
 
     const data = await createTransactionService(
       userId,
