@@ -119,6 +119,7 @@ const Rating = () => {
           );
         },
       },
+      
       {
         title: "Tên người dùng",
         dataIndex: "name",
@@ -243,7 +244,7 @@ const Rating = () => {
             >
               <Statistic
                 title={<span className="text-blue-800 font-medium text-sm md:text-base">Tổng số người dùng</span>}
-                value={userData.length}
+                value={pagination.total}
                 prefix={<UserOutlined className="text-blue-600 mr-1" />}
                 className="flex flex-col items-center justify-center h-full"
                 valueStyle={{ 
@@ -363,14 +364,6 @@ const Rating = () => {
                   fontSize: isMobile ? "12px" : "14px"
                 }}>
                   {selectedUser.email}
-                </span>
-              </Descriptions.Item>
-              <Descriptions.Item label="ID">
-                <span className="text-gray-500 font-mono" style={{ 
-                  fontSize: isMobile ? "10px" : "12px",
-                  wordBreak: "break-all"
-                }}>
-                  {selectedUser._id}
                 </span>
               </Descriptions.Item>
               <Descriptions.Item label="Số lượt đánh giá">
