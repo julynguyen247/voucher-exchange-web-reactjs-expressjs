@@ -12,6 +12,7 @@ const {
   getBank,
 } = require("../controllers/userController");
 const auth = require("../middleware/auth");
+const { checkJWT } = require('../middleware/auth');
 const {
   handleUploadImg,
   createVoucher,
@@ -27,7 +28,12 @@ const {
 } = require("../controllers/transactionController");
 
 const { simulateMomoWebhook } = require("../controllers/paymentController");
+const {
+  createPayment,
+  vnpayReturn,
+  checkTransactionStatus,
 
+} = require('../controllers/vnpayController');
 const transactionController = require("../controllers/transactionController");
 const {
   addFavorite,
@@ -85,7 +91,10 @@ routerAPI.post("/transaction/process", processTransaction);
 routerAPI.get("/transaction/get", getTransactions);
 
 //payment
-routerAPI.post("payment/momo/simulate-webhook", simulateMomoWebhook);
+routerAPI.post("/payment/momo/simulate-webhook", simulateMomoWebhook);
+routerAPI.post('/payment/vnpay/create-payment', createPayment);
+routerAPI.get('/payment/vnpay/vnpay-return', vnpayReturn);
+routerAPI.get('/payment/vnpay/check-transaction/:transactionId', auth, checkTransactionStatus);
 
 //favorites
 routerAPI.post("/favorites", addFavorite);

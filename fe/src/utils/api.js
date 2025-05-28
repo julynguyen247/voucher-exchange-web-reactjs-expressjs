@@ -46,9 +46,8 @@ const trackApiCall = () => {
 
   // Track by hour for debugging
   const now = new Date();
-  const hourKey = `${now.getFullYear()}-${
-    now.getMonth() + 1
-  }-${now.getDate()}-${now.getHours()}`;
+  const hourKey = `${now.getFullYear()}-${now.getMonth() + 1
+    }-${now.getDate()}-${now.getHours()}`;
 
   apiCallCounts.byHour[hourKey] = (apiCallCounts.byHour[hourKey] || 0) + 1;
 
@@ -210,6 +209,12 @@ const getSellerPaymentDetails = (voucherId, bank) => {
     },
   });
 };
+const createVnpayPayment = async (data) => {
+  return axios.post('/v1/api/payment/vnpay/create-payment', data);
+};
+const checkVnpayTransaction = async (transactionId) => {
+  return axios.get(`/v1/api/payment/vnpay/check-transaction/${transactionId}`);
+};
 
 const addToFavoriteApi = (userId, voucherId) => {
   const URL_API = "/v1/api/favorites";
@@ -307,6 +312,8 @@ export {
   getTransactions,
   processTransaction,
   getSellerPaymentDetails,
+  createVnpayPayment,
+  checkVnpayTransaction,
   addToFavoriteApi,
   getFavoritesApi,
   removeFavoriteApi,
