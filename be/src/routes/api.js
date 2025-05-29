@@ -12,7 +12,6 @@ const {
   getBank,
 } = require("../controllers/userController");
 const auth = require("../middleware/auth");
-const { checkJWT } = require('../middleware/auth');
 const {
   handleUploadImg,
   createVoucher,
@@ -92,7 +91,7 @@ routerAPI.get("/transaction/get", getTransactions);
 
 //payment
 routerAPI.post("/payment/momo/simulate-webhook", simulateMomoWebhook);
-routerAPI.post('/payment/vnpay/create-payment', createPayment);
+routerAPI.post('/payment/vnpay/create-payment', auth, createPayment);
 routerAPI.get('/payment/vnpay/vnpay-return', vnpayReturn);
 routerAPI.get('/payment/vnpay/check-transaction/:transactionId', auth, checkTransactionStatus);
 
