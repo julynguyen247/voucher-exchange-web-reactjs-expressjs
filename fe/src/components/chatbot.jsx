@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import "../style/chatbot.css";
 import { robotImg, userImg } from "../utils/imageImports.js";
 import { io } from "socket.io-client";
+import { FiCopy, FiCheck } from "react-icons/fi";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8081";
 
@@ -35,6 +36,26 @@ socket.on('disconnect', () => {
 socket.on('connect_error', (error) => {
   console.error('Socket connection error:', error);
 });
+
+const CopyButton = ({ code }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="relative bg-zinc-700 hover:bg-zinc-600 text-white px-2.5 py-1 rounded-[2px] text-xs font-medium flex items-center gap-1.5 transition active:scale-95 shadow-sm"
+    >
+      {copied ? <FiCheck size={14} /> : <FiCopy size={14} />}
+      {copied ? "Copied" : "Copy"}
+    </button>
+  );
+};
 
 const Chatbot = ({ showChatbot, setShowChatbot }) => {
   const [inputText, setInputText] = useState("");
@@ -146,15 +167,8 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
             <div className="voucher-code">
               <span className="detail-label">Mã:</span> 
               <span className="code">{voucher.code}</span>
-              <button 
-                className="copy-btn"
-                onClick={() => {
-                  navigator.clipboard.writeText(voucher.code);
-                  alert("Đã sao chép mã: " + voucher.code);
-                }}
-              >
-                Sao chép
-              </button>
+                <CopyButton code={voucher.code} />
+
             </div>
           )}
         </div>
@@ -169,10 +183,14 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
       return (
         <div className="structured-message">
           {/* Hiển thị text gốc hoặc thông báo riêng */}
-          <div className="message-text">{message}</div>
           
+          {/* <div className="message-text">{message}</div> 
+                cái này là nội dung gốc
+          */ }
+
           {/* Hiển thị danh sách voucher */}
           <div className="vouchers-container">
+            <strong> <i style={{ color: "#360491" }}> Dưới đây là danh sách voucher bạn cần tìm: </i> </strong>
             {structuredData.vouchers.map((voucher, index) => 
               renderVoucher(voucher, index)
             )}
