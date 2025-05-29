@@ -12,12 +12,6 @@ rules:
   - intent: bot_challenge
   - action: utter_iamabot
 
-- rule: Handle generic voucher search
-  steps:
-    - intent: search_voucher
-    - action: voucher_search_form
-    - active_loop: voucher_search_form
-
 - rule: Submit voucher search form
   condition:
     - active_loop: voucher_search_form

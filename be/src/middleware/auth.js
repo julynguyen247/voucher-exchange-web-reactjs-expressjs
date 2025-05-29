@@ -47,8 +47,16 @@ const auth = (req, res, next) => {
     "/logout",
     "/image",
     "/voucher",
+    "/user/ratings",
   ];
-  if (white_lists.find((item) => "/v1/api" + item === req.originalUrl)) {
+  
+  const regex_whitelist = [
+    /^\/v1\/api\/user\/[^/]+\/rating$/,
+    /^\/v1\/api\/user\/ratings\?page=\d+&limit=\d+$/  // khớp với /user/<bất kỳ id>/rating
+  ];
+
+  if (white_lists.find((item) => "/v1/api" + item === req.originalUrl)
+  || regex_whitelist.some((pattern) => pattern.test(req.originalUrl))) {
     authMetrics.publicEndpoints++;
     next();
   } else {
