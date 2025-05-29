@@ -34,6 +34,11 @@ userSchema.methods.addRating = async function (raterId, star, ipAddress) {
     throw new Error("Star must be between 1 and 5");
   }
 
+  // Kiểm tra xem ít nhất một định danh được cung cấp
+  if (!raterId && !ipAddress) {
+    throw new Error("Either raterId or ipAddress must be provided");
+  }
+
   let existingRating;
 
   if (raterId) {
@@ -60,6 +65,9 @@ userSchema.methods.addRating = async function (raterId, star, ipAddress) {
 
   return this.save();
 };
+
+// Thêm các index này để cải thiện hiệu suất truy vấn
+userSchema.index({ ratingAvg: -1, ratingCount: -1 });
 
 const User = mongoose.model("user", userSchema);
 module.exports = User;

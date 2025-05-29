@@ -35,87 +35,8 @@ const io = socketIo(server, {
 });
 
 //cấu hình websocket với rasa
-// Track active connections
-const activeConnections = new Map();
-
-io.on("connection", (socket) => {
-  const clientIp =
-    socket.handshake.headers["x-forwarded-for"] || socket.handshake.address;
-  console.log(`Client connected: ${socket.id} from ${clientIp}`);
-
-  // Add to active connections
-  activeConnections.set(socket.id, {
-    id: socket.id,
-    connectedAt: new Date(),
-    ip: clientIp,
-  });
-
-  // Log total number of connections
-  console.log(`Total active connections: ${activeConnections.size}`);
-
-  socket.on("user_message", async (msg) => {
-    console.log(`User message from ${socket.id}:`, msg);
-
-    try {
-      console.log("Sending message to RASA:", msg);
-      try {
-        const rasaURL = process.env.RASA_URL || "http://localhost:5005";
-        const rasaRes = await axios.post(
-          `${rasaURL}/webhooks/rest/webhook`,
-          {
-            sender: socket.id,
-            message: msg,
-          },
-          { timeout: 5000 } // Có thể cấu hình timeout nếu cần
-        );
-
-        console.log("RASA response:", rasaRes.data);
-
-        // Check if RASA returned any responses
-        if (rasaRes.data && rasaRes.data.length > 0) {
-          // Gửi từng phần tử phản hồi về client (nguyên object, không chỉ text)
-          rasaRes.data.forEach((responseObj) => {
-            socket.emit("bot_reply", responseObj);
-          });
-        } else {
-          // RASA didn't return any meaningful response
-          socket.emit("bot_reply", {
-            text: "Tôi không hiểu câu hỏi của bạn. Vui lòng thử lại với câu hỏi khác.",
-          });
-        }
-      } catch (rasaError) {
-        console.error(
-          "RASA connection error:",
-          rasaError.message,
-          rasaError.code
-        );
-
-        // Provide a helpful fallback response
-        socket.emit("bot_reply", {
-          text: "Xin lỗi, dịch vụ chatbot đang gặp sự cố kết nối. Vui lòng thử lại sau hoặc liên hệ hỗ trợ.",
-        });
-        // Also send a fallback response with common questions
-        setTimeout(() => {
-          socket.emit("bot_reply", {
-            text: "Trong khi chờ dịch vụ chatbot phục hồi, bạn có thể tìm hiểu về cách sử dụng voucher hoặc cách tạo tài khoản bằng cách truy cập mục trợ giúp.",
-          });
-        }, 1000);
-      }
-    } catch (err) {
-      console.error("Socket handling error:", err.message, err.stack);
-      socket.emit("bot_reply", {
-        text: "Xin lỗi, có lỗi xảy ra khi xử lý tin nhắn của bạn.",
-      });
-    }
-  });
-
-  socket.on("disconnect", () => {
-    console.log(`Client disconnected: ${socket.id}`);
-    // Remove from active connections
-    activeConnections.delete(socket.id);
-    console.log(`Remaining active connections: ${activeConnections.size}`);
-  });
-});
+const setupRasaSocket = require("./services/rasaService");
+setupRasaSocket(io);
 
 // Cấu hình middleware
 const allowedOrigins = [

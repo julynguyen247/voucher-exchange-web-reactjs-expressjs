@@ -38,9 +38,7 @@ socket.on('connect_error', (error) => {
 
 const Chatbot = ({ showChatbot, setShowChatbot }) => {
   const [inputText, setInputText] = useState("");
-
   const [isBotTyping, setIsBotTyping] = useState(false);
-
   const [chatMessages, setChatMessages] = useState(() => {
     const saved = sessionStorage.getItem("chat_messages");
     return saved
@@ -64,7 +62,6 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
   
   //nhận tin nhắn từ RASA qua backend Socket.IO
   useEffect(() => {
-    // Log when component mounts
     console.log("Chatbot component mounted, setting up socket listeners");
     
     // Setup socket event listener
@@ -72,22 +69,22 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
       setIsBotTyping(false);
 
       const botMessage = {
-        message: msg,
+        message: msg.text, // Lưu text vào message để tương thích ngược
         sender: "robot",
         id: crypto.randomUUID(),
+        structuredData: msg.structured_data || null // Lưu dữ liệu có cấu trúc nếu có
       };
+      
       setChatMessages((prev) => [...prev, botMessage]);
     });
 
     return () => {
-      // Clean up event listener when component unmounts
       console.log("Chatbot component unmounted, cleaning up socket listeners");
-      socket.off("bot_reply"); // Cleanup để tránh đăng ký nhiều lần
+      socket.off("bot_reply");
     };
   }, []);
 
   const handleSendMessage = () => {
-    // Không cho gửi khi đang gõ hoặc khi input rỗng
     if (!inputText.trim() || isBotTyping) return;
 
     const userMessage = {
@@ -97,27 +94,111 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
     };
     setChatMessages((prev) => [...prev, userMessage]);
     setInputText("");
-  
-    // Thêm dòng "Bot đang nhập..."
     setIsBotTyping(true);
-  
     socket.emit("user_message", inputText);
   };
 
-  // Cập nhật sessionStorage mỗi khi chatMessages thay đổi
   useEffect(() => {
     sessionStorage.setItem("chat_messages", JSON.stringify(chatMessages));
   }, [chatMessages]);
+
+  // Render một voucher
+  const renderVoucher = (voucher, index) => {
+    return (
+      <div className="voucher-card" key={index}>
+        <div className="voucher-header">
+          <strong>Voucher {voucher.number}</strong>
+          {voucher.rating && <span className="rating">⭐ {voucher.rating}</span>}
+        </div>
+        
+        <div className="voucher-details">
+          {voucher.platform && (
+            <div className="voucher-detail">
+              <span className="detail-label">Nền tảng:</span> {voucher.platform}
+            </div>
+          )}
+          
+          {voucher.category && (
+            <div className="voucher-detail">
+              <span className="detail-label">Danh mục:</span> {voucher.category}
+            </div>
+          )}
+          
+          {voucher.discount && (
+            <div className="voucher-detail discount">
+              <span className="detail-label">Giảm giá:</span> {voucher.discount}
+            </div>
+          )}
+          
+          {voucher.price && (
+            <div className="voucher-detail">
+              <span className="detail-label">Giá:</span> {voucher.price}
+            </div>
+          )}
+          
+          {voucher.expiration && (
+            <div className="voucher-detail">
+              <span className="detail-label">Hạn sử dụng:</span> {voucher.expiration}
+            </div>
+          )}
+          
+          {voucher.code && (
+            <div className="voucher-code">
+              <span className="detail-label">Mã:</span> 
+              <span className="code">{voucher.code}</span>
+              <button 
+                className="copy-btn"
+                onClick={() => {
+                  navigator.clipboard.writeText(voucher.code);
+                  alert("Đã sao chép mã: " + voucher.code);
+                }}
+              >
+                Sao chép
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Render nội dung tin nhắn dựa trên loại dữ liệu
+  const renderMessageContent = (message, structuredData) => {
+    // Nếu có dữ liệu voucher có cấu trúc
+    if (structuredData && structuredData.vouchers && structuredData.vouchers.length > 0) {
+      return (
+        <div className="structured-message">
+          {/* Hiển thị text gốc hoặc thông báo riêng */}
+          <div className="message-text">{message}</div>
+          
+          {/* Hiển thị danh sách voucher */}
+          <div className="vouchers-container">
+            {structuredData.vouchers.map((voucher, index) => 
+              renderVoucher(voucher, index)
+            )}
+          </div>
+        </div>
+      );
+    } 
+    
+    // Nếu message là object nhưng không phải dạng voucher có cấu trúc
+    if (typeof message === "object") {
+      return <pre>{JSON.stringify(message, null, 2)}</pre>;
+    }
+    
+    // Trường hợp thông thường: message là text
+    return message;
+  };
 
   return (
     <>
       {showChatbot && (
         <div className="chatbot-container">
           <div className="chatbot-header" onClick={() => setShowChatbot(false)}>
-            <span> 🤖 AI Chatbot</span>
+            <span>🤖 AI Chatbot</span>
           </div>
           <div className="chat-messages-container" ref={chatMessagesRef}>
-            {chatMessages.map(({ message, sender, id }) => (
+            {chatMessages.map(({ message, sender, id, structuredData }) => (
               <div
                 key={id}
                 className={
@@ -131,43 +212,10 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
                     className="chat-message-profile"
                   />
                 )}
+                
                 <div className="chat-message-text">
-                  {typeof message === "object" ? (
-                    <pre>{JSON.stringify(message, null, 2)}</pre> // format object dễ nhìn
-                  ) : (
-                    message
-                  )}
+                  {renderMessageContent(message, structuredData)}
                 </div>
-                {/* <div className="chat-message-text">
-                      {typeof message === "object" ? (
-                        <>
-                          {message.text && <div>{message.text}</div>}
-                          {message.image && (
-                            <img
-                              src={message.image}
-                              alt="bot-media"
-                              style={{ maxWidth: "200px", marginTop: "5px", borderRadius: "8px" }}
-                            />
-                          )}
-                          {message.buttons && (
-                            <div className="bot-buttons">
-                              {message.buttons.map((btn, idx) => (
-                                <button
-                                  key={idx}
-                                  onClick={() => socket.emit("user_message", btn.payload)}
-                                  className="bot-button"
-                                >
-                                  {btn.title}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        message
-                      )}
-                    </div>
-                    */}
 
                 {sender === "user" && (
                   <img
@@ -190,7 +238,6 @@ const Chatbot = ({ showChatbot, setShowChatbot }) => {
                 </div>
               </div>
             )}
-
           </div>
           <div className="chat-input-container">
             <input

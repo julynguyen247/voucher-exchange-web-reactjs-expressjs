@@ -61,9 +61,7 @@ const ModalUser = ({ user }) => {
         <Descriptions column={1} bordered size="small">
           <Descriptions.Item label="Họ tên">{user.name}</Descriptions.Item>
           <Descriptions.Item label="Email">{user.email}</Descriptions.Item>
-          <Descriptions.Item label="ID">
-            {user._id || user.id}
-          </Descriptions.Item>
+
           <Descriptions.Item label="Đã tạo voucher?">
             {hasVoucher ? (
               <Tag color="green">Đã tạo</Tag>
