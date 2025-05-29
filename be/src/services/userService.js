@@ -8,17 +8,17 @@ const aqp = require("api-query-params");
 const createUserService = async (name, email, password, phone, image) => {
   try {
     console.log(`Creating user with email: ${email}`);
-    
+
     const user = await User.findOne({ email });
     if (user) {
       console.log(`Email ${email} already exists, please choose another email`);
       return {
         success: false,
-        message: "Email already exists"
+        message: "Email already exists",
       };
     } else {
       const hashPassword = await bcrypt.hash(password, saltRounds);
-      
+
       const userData = {
         name,
         email,
@@ -27,22 +27,25 @@ const createUserService = async (name, email, password, phone, image) => {
         image,
         role: "USER",
       };
-      
-      console.log("Creating user with data:", JSON.stringify(userData, null, 2));
-      
+
+      console.log(
+        "Creating user with data:",
+        JSON.stringify(userData, null, 2)
+      );
+
       let result = await User.create(userData);
       console.log("User created successfully with ID:", result._id);
-      
+
       return {
         success: true,
-        data: result
+        data: result,
       };
     }
   } catch (error) {
     console.error("Error creating user:", error);
     return {
       success: false,
-      message: error.message
+      message: error.message,
     };
   }
 };
@@ -54,18 +57,19 @@ const loginService = async (email, password) => {
       if (!compare) {
         return {
           EC: 2,
-          EM: "Email/Password khong hop le",
+          EM: "Email/Password không hợp lệ",
         };
       } else {
         const payload = {
           email: user.email,
           name: user.name,
           id: user._id,
-          role: user.role
+          role: user.role,
         };
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
-          expiresIn: "1d", // Chuỗi hợp lệ
+          expiresIn: "1d",
         });
+
         return {
           EC: 0,
           access_token: token,
@@ -75,21 +79,27 @@ const loginService = async (email, password) => {
             id: user._id,
             role: user.role,
             phone: user.phone || "",
-            image: user.image || ""
+            image: user.image || "",
+            bank: user.bank || "",
+            accountNumber: user.accountNumber || "",
           },
         };
       }
     } else {
       return {
         EC: 1,
-        EM: "Email/Password khong hop le",
+        EM: "Email/Password không hợp lệ",
       };
     }
   } catch (error) {
-    console.log(error);
-    return null;
+    console.error("❌ loginService error:", error);
+    return {
+      EC: -1,
+      EM: "Lỗi hệ thống",
+    };
   }
 };
+
 const getUserService = async (limit, page, query) => {
   try {
     let result = null;
@@ -151,15 +161,15 @@ setInterval(() => recentlyFetchedAccounts.clear(), 60000); // Clear every minute
 const fetchAccountService = async (user) => {
   try {
     const userEmail = user.email;
-    
+
     // Only log if we haven't recently seen this account
     if (!recentlyFetchedAccounts.has(userEmail)) {
       console.log("Fetching account for:", userEmail);
       recentlyFetchedAccounts.add(userEmail);
     }
-    
+
     const data = await User.findOne({ email: userEmail }).lean();
-    
+
     if (data && !recentlyFetchedAccounts.has(userEmail + "-found")) {
       console.log("User account found with role:", data.role || "No role");
       recentlyFetchedAccounts.add(userEmail + "-found");
@@ -167,7 +177,7 @@ const fetchAccountService = async (user) => {
       console.log("No user account found for email:", userEmail);
       recentlyFetchedAccounts.add(userEmail + "-notfound");
     }
-    
+
     return data;
   } catch (error) {
     console.error("Error in fetchAccountService:", error);
@@ -198,9 +208,11 @@ const rateUserService = async ({ userId, raterId = null, star, ipAddress }) => {
     // Tìm đánh giá đã có (theo raterId hoặc ipAddress nếu ẩn danh)
     let existingRating;
     if (raterId) {
-      existingRating = user.ratings.find(r => r.rater && r.rater.equals(raterId));
+      existingRating = user.ratings.find(
+        (r) => r.rater && r.rater.equals(raterId)
+      );
     } else if (ipAddress) {
-      existingRating = user.ratings.find(r => r.ipAddress === ipAddress);
+      existingRating = user.ratings.find((r) => r.ipAddress === ipAddress);
     }
 
     if (existingRating) {
@@ -212,7 +224,7 @@ const rateUserService = async ({ userId, raterId = null, star, ipAddress }) => {
       user.ratings.push({
         rater: raterId || undefined,
         ipAddress: ipAddress || undefined,
-        star
+        star,
       });
     }
 
@@ -228,8 +240,8 @@ const rateUserService = async ({ userId, raterId = null, star, ipAddress }) => {
       message: "Đánh giá thành công",
       data: {
         ratingAvg: user.ratingAvg,
-        ratingCount: user.ratingCount
-      }
+        ratingCount: user.ratingCount,
+      },
     };
   } catch (error) {
     console.error("Rating error:", error);
@@ -239,7 +251,6 @@ const rateUserService = async ({ userId, raterId = null, star, ipAddress }) => {
     };
   }
 };
-
 
 module.exports = {
   createUserService,

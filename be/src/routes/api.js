@@ -10,9 +10,10 @@ const {
   getAccount,
   getSellerPaymentDetails,
   getBank,
+  getUserById,
 } = require("../controllers/userController");
 const auth = require("../middleware/auth");
-const { checkJWT } = require('../middleware/auth');
+const { checkJWT } = require("../middleware/auth");
 const {
   handleUploadImg,
   createVoucher,
@@ -32,8 +33,7 @@ const {
   createPayment,
   vnpayReturn,
   checkTransactionStatus,
-
-} = require('../controllers/vnpayController');
+} = require("../controllers/vnpayController");
 const transactionController = require("../controllers/transactionController");
 const {
   addFavorite,
@@ -70,6 +70,7 @@ routerAPI.post("/logout", handleLogout);
 routerAPI.get("/account", handleFetchAccount);
 routerAPI.get("/account-fetch", getAccount);
 routerAPI.get("/seller-payment-details", getSellerPaymentDetails);
+routerAPI.get("/user/:id", getUserById);
 
 //admin
 routerAPI.post("/user", createUser);
@@ -79,7 +80,7 @@ routerAPI.put("/user", updateUser);
 
 //voucher
 routerAPI.post("/image", handleUploadImg);
-routerAPI.post("/voucher", createVoucher); // Don't require auth for admin creation
+routerAPI.post("/voucher", createVoucher);
 routerAPI.get("/voucher", getVoucher);
 routerAPI.delete("/voucher", deleteVoucher);
 routerAPI.get("/voucher/platform", getPlatform);
@@ -92,9 +93,13 @@ routerAPI.get("/transaction/get", getTransactions);
 
 //payment
 routerAPI.post("/payment/momo/simulate-webhook", simulateMomoWebhook);
-routerAPI.post('/payment/vnpay/create-payment', createPayment);
-routerAPI.get('/payment/vnpay/vnpay-return', vnpayReturn);
-routerAPI.get('/payment/vnpay/check-transaction/:transactionId', auth, checkTransactionStatus);
+routerAPI.post("/payment/vnpay/create-payment", createPayment);
+routerAPI.get("/payment/vnpay/vnpay-return", vnpayReturn);
+routerAPI.get(
+  "/payment/vnpay/check-transaction/:transactionId",
+  auth,
+  checkTransactionStatus
+);
 
 //favorites
 routerAPI.post("/favorites", addFavorite);

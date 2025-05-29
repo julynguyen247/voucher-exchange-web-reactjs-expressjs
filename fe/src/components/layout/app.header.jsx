@@ -41,6 +41,8 @@ const AppHeader = () => {
   const handleSearch = () => {
     if (searchValue.trim()) {
       navigate(`/voucher?search=${encodeURIComponent(searchValue.trim())}`);
+      setDrawerVisible(false);
+      setSearchValue("");
     }
   };
 
@@ -49,7 +51,11 @@ const AppHeader = () => {
       {
         key: "1",
         label: (
-          <Link to="/account" style={{ textDecoration: "none" }}>
+          <Link
+            to="/account"
+            style={{ textDecoration: "none" }}
+            onClick={() => setDrawerVisible(false)}
+          >
             Chỉnh sửa thông tin
           </Link>
         ),
@@ -57,7 +63,11 @@ const AppHeader = () => {
       {
         key: "2",
         label: (
-          <Link to="/create-voucher" style={{ textDecoration: "none" }}>
+          <Link
+            to="/create-voucher"
+            style={{ textDecoration: "none" }}
+            onClick={() => setDrawerVisible(false)}
+          >
             Tạo voucher
           </Link>
         ),
@@ -92,13 +102,6 @@ const AppHeader = () => {
             style={{ textDecoration: "none" }}
           >
             Trang chủ
-          </Link>
-          <Link
-            to="/ranking"
-            className="hover:text-green-600"
-            style={{ textDecoration: "none" }}
-          >
-            Xếp hạng
           </Link>
           <Link
             to="/rating"
@@ -174,17 +177,33 @@ const AppHeader = () => {
         className="md:hidden"
       >
         <nav className="flex flex-col gap-4 text-gray-700 text-base">
-          <Link to="/" onClick={() => setDrawerVisible(false)}>
+          <Link
+            to="/"
+            onClick={() => setDrawerVisible(false)}
+            style={{ textDecoration: "none", fontWeight: "600" }}
+          >
             Trang chủ
           </Link>
-          <Link to="/category" onClick={() => setDrawerVisible(false)}>
-            Ngành hàng
+          <Link
+            to="/rating"
+            onClick={() => setDrawerVisible(false)}
+            style={{ textDecoration: "none", fontWeight: "600" }}
+          >
+            Đánh giá
           </Link>
-          <Link to="/voucher" onClick={() => setDrawerVisible(false)}>
+          <Link
+            to="/voucher"
+            onClick={() => setDrawerVisible(false)}
+            style={{ textDecoration: "none", fontWeight: "600" }}
+          >
             Mã giảm giá
           </Link>
-          <Link to="/review" onClick={() => setDrawerVisible(false)}>
-            Đánh giá
+          <Link
+            to="/transaction-history"
+            onClick={() => setDrawerVisible(false)}
+            style={{ textDecoration: "none", fontWeight: "600" }}
+          >
+            Lịch sử giao dịch
           </Link>
         </nav>
 
@@ -197,9 +216,6 @@ const AppHeader = () => {
             onSearch={handleSearch}
           />
           <div className="flex gap-4 items-center">
-            <Tooltip title="Đã lưu">
-              <StarOutlined className="text-xl hover:text-green-600 cursor-pointer" />
-            </Tooltip>
             <Tooltip title="Yêu thích">
               <HeartOutlined
                 className="text-xl hover:text-green-600 cursor-pointer"
@@ -215,14 +231,14 @@ const AppHeader = () => {
                   <img
                     src={userAvatar}
                     alt="avatar"
-                    className="w-8 h-8 rounded-full object-cover border cursor-pointer"
+                    className="w-10 h-10 rounded-full object-cover border cursor-pointer"
                   />
                 </span>
               </Dropdown>
             ) : (
               <Tooltip title="Đăng nhập">
                 <Link to="/login" onClick={() => setDrawerVisible(false)}>
-                  <UserOutlined className="text-xl hover:text-green-600 cursor-pointer" />
+                  <UserOutlined className="text-2xl hover:text-green-600 cursor-pointer" />
                 </Link>
               </Tooltip>
             )}

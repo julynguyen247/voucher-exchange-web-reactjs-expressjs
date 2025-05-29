@@ -29,6 +29,8 @@ import TransactionManagement from "./pages/admin/transactions/TransactionManagem
 
 import AdminProtectedRoute from "./pages/admin/components/AdminProtectedRoute";
 import { HelmetProvider } from "react-helmet-async";
+import Profile from "./pages/client/profile";
+import PublicProfile from "./pages/client/PublicProfile";
 
 const clientId =
   "672007328004-ulrqqgtah8i30rjrlon2of3loi3k8jp5.apps.googleusercontent.com";
@@ -67,10 +69,6 @@ const router = createBrowserRouter([
         element: <TransactionHistory />,
       },
       {
-        path: "/ranking",
-        element: <Ranking />,
-      },
-      {
         path: "/rating",
         element: <Rating />,
       },
@@ -78,6 +76,11 @@ const router = createBrowserRouter([
         path: "/favorites",
         element: <Favorites />,
       },
+      {
+        path: "/profile",
+        element: <Profile />,
+      },
+      { path: "/profile/:id", element: <PublicProfile /> },
     ],
   },
   {
