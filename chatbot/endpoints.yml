@@ -11,12 +11,22 @@
 # https://rasa.com/docs/rasa/custom-actions
 
 action_endpoint:
-  url: "http://localhost:5055/webhook"
+  url: ${RASA_ACTIONS_URL:http://localhost:5055/webhook}
 
 # Tracker store which is used to store the conversations.
 # By default the conversations are stored in memory.
 # https://rasa.com/docs/rasa/tracker-stores
 
+# Bạn có thể uncomment và cấu hình MongoDB nếu muốn lưu trữ các cuộc hội thoại
+#tracker_store:
+#    type: mongod
+#    url: ${MONGO_DB_URL}
+#    db: rasa
+#    username: ${MONGO_USERNAME}
+#    password: ${MONGO_PASSWORD}
+#    auth_source: admin
+
+# Các cấu hình khác giữ nguyên
 #tracker_store:
 #    type: redis
 #    url: <host of the redis instance, e.g. localhost>
@@ -24,13 +34,6 @@ action_endpoint:
 #    db: <number of your database within redis, e.g. 0>
 #    password: <password used for authentication>
 #    use_ssl: <whether or not the communication is encrypted, default false>
-
-#tracker_store:
-#    type: mongod
-#    url: <url to your mongo instance, e.g. mongodb://localhost:27017>
-#    db: <name of the db within your mongo instance, e.g. rasa>
-#    username: <username used for authentication>
-#    password: <password used for authentication>
 
 # Event broker which all conversation events should be streamed to.
 # https://rasa.com/docs/rasa/event-brokers
