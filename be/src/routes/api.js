@@ -13,10 +13,6 @@ const {
   getUserById,
 } = require("../controllers/userController");
 const auth = require("../middleware/auth");
-<<<<<<< HEAD
-const { checkJWT } = require("../middleware/auth");
-=======
->>>>>>> 94c2189928e4b394a36e8aa6eac515c2d5bf2a8c
 const {
   handleUploadImg,
   createVoucher,
@@ -96,19 +92,13 @@ routerAPI.get("/transaction/get", getTransactions);
 
 //payment
 routerAPI.post("/payment/momo/simulate-webhook", simulateMomoWebhook);
-<<<<<<< HEAD
-routerAPI.post("/payment/vnpay/create-payment", createPayment);
+routerAPI.post("/payment/vnpay/create-payment", auth, createPayment);
 routerAPI.get("/payment/vnpay/vnpay-return", vnpayReturn);
 routerAPI.get(
   "/payment/vnpay/check-transaction/:transactionId",
   auth,
   checkTransactionStatus
 );
-=======
-routerAPI.post('/payment/vnpay/create-payment', auth, createPayment);
-routerAPI.get('/payment/vnpay/vnpay-return', vnpayReturn);
-routerAPI.get('/payment/vnpay/check-transaction/:transactionId', auth, checkTransactionStatus);
->>>>>>> 94c2189928e4b394a36e8aa6eac515c2d5bf2a8c
 
 //favorites
 routerAPI.post("/favorites", addFavorite);
