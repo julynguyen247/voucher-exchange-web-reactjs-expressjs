@@ -2,14 +2,6 @@ const crypto = require('crypto');
 const querystring = require('querystring');
 require('dotenv').config();
 
-// Thêm log để kiểm tra cấu hình
-console.log("VNPAY Config:", {
-    vnp_TmnCode: process.env.VNPAY_TMN_CODE ? "✓" : "✗",
-    vnp_HashSecret: process.env.VNPAY_HASH_SECRET ? "✓" : "✗",
-    vnp_Url: process.env.VNPAY_URL,
-    vnp_ReturnUrl: process.env.VNPAY_RETURN_URL
-});
-
 const formatDate = (date) => {
     const pad = (number) => (number < 10 ? '0' + number : number);
 
@@ -30,39 +22,36 @@ const config = {
 };
 
 const createPaymentUrl = (req, amount, orderInfo) => {
-    // Lấy IP của người dùng
     const ipAddr = req.headers['x-forwarded-for'] ||
         req.connection.remoteAddress ||
         req.socket.remoteAddress ||
         req.connection.socket.remoteAddress;
 
-    // Tạo mã giao dịch duy nhất
     const now = new Date();
     const vnp_TxnRef = `${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     const createDate = formatDate(now);
+    const expireDate = new Date(now.getTime() + 15 * 60 * 1000);
+    const vnp_expireDate = formatDate(expireDate);
 
-    // THAY ĐỔI: Đảm bảo amount là số nguyên
     const amountInt = Math.round(amount);
 
-    // Tạo các tham số thanh toán
     let vnp_Params = {
         vnp_Version: '2.1.0',
         vnp_Command: 'pay',
         vnp_TmnCode: config.vnp_TmnCode,
-        vnp_Amount: amountInt * 100, // Chuyển đổi sang đơn vị xu
+        vnp_Amount: amountInt * 100,
+        vnp_BankCode: 'VNPAYQR',
         vnp_CreateDate: createDate,
         vnp_CurrCode: 'VND',
         vnp_IpAddr: ipAddr,
         vnp_Locale: 'vn',
         vnp_OrderInfo: orderInfo || 'Thanh toan don hang',
-        vnp_OrderType: 'other', // THAY ĐỔI: từ 'billpayment' sang 'other' 
+        vnp_OrderType: 'other',
         vnp_ReturnUrl: config.vnp_ReturnUrl,
+        vnp_ExpireDate: vnp_expireDate,
         vnp_TxnRef: vnp_TxnRef
     };
 
-    // THAY ĐỔI: Bỏ vnp_ExpireDate nếu không cần
-
-    // Thêm mã ngân hàng
     if (req.body.bankCode) {
         vnp_Params.vnp_BankCode = req.body.bankCode;
     } else {

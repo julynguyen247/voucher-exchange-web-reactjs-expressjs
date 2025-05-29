@@ -41,10 +41,10 @@ const TransactionPage = () => {
     setSellerBankName("");
     setSellerAccountHolderName("");
 
-    // Nếu là VNPAY, không cần lấy thông tin người bán
-    if (newPaymentOption === "vnpay") {
+    /*if (newPaymentOption === "vnpay") {
       return;
     }
+    */
 
     if (newPaymentOption) {
       setIsLoadingSellerInfo(true);
@@ -95,7 +95,6 @@ const TransactionPage = () => {
     }
   };
 
-  // Xử lý thanh toán VNPAY
   const handleVnpayPayment = async () => {
     setMessage("");
     setIsProcessing(true);
@@ -116,7 +115,6 @@ const TransactionPage = () => {
 
       const response = await createVnpayPayment(paymentData);
       if (response.data && response.data.EC === 0) {
-        // Chuyển hướng người dùng đến trang thanh toán VNPAY
         window.location.href = response.data.data.paymentUrl;
       } else {
         setMessage(response.data?.message || "Không thể tạo thanh toán VNPAY.");
@@ -151,7 +149,6 @@ const TransactionPage = () => {
       return;
     }
 
-    // Kiểm tra nếu là VNPAY thì gọi hàm riêng
     if (selectedPaymentOption === "vnpay") {
       handleVnpayPayment();
       return;
@@ -419,7 +416,6 @@ const TransactionPage = () => {
             Chuyển khoản ngân hàng (VietQR)
           </label>
         </div>
-        {/* Thêm phương thức VNPAY */}
         <div className="payment-method-option">
           <label>
             <input
