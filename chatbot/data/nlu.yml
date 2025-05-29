@@ -1,5 +1,4 @@
 version: "3.1"
-
 nlu:
 - intent: greet
   examples: |
@@ -16,7 +15,7 @@ nlu:
     - goodmorning
     - goodevening
     - good afternoon
-    - chào  
+    - chào
     - xin chào
     - lô
     - hey bro
@@ -32,7 +31,7 @@ nlu:
     - what's up bro
     - ê bro
     - hiii
-
+    - Xin chào
 - intent: goodbye
   examples: |
     - cu
@@ -45,20 +44,19 @@ nlu:
     - see you around
     - bye bye
     - see you later
-    - bai nha bro 
+    - bai nha bro
     - bye bro
     - thankiu
     - bye bye bro
     - thank u bro
-    - thanks 
+    - thanks
     - thank you
     - bai bai
-    - see u 
+    - see u
     - éc éc
-    - đi ngủ đây bro 
-    - ngủ ngon 
-    - ngủ ngon nha bro 
-
+    - đi ngủ đây bro
+    - ngủ ngon
+    - ngủ ngon nha bro
 - intent: affirm
   examples: |
     - yes
@@ -73,7 +71,6 @@ nlu:
     - ừ
     - được
     - chắc chắn
-
 - intent: deny
   examples: |
     - no
@@ -91,14 +88,12 @@ nlu:
     - hông thích
     - không phải
     - không có gì
-
 - intent: bot_challenge
   examples: |
     - are you a bot?
     - are you a human?
     - am I talking to a bot?
     - am I talking to a human?
-
 - intent: search_voucher
   examples: |
     - Có mã giảm giá nào cho [Shopee](platform)?
@@ -111,7 +106,8 @@ nlu:
     - Tìm voucher cho [Shopee](platform) giảm [50%](discount)
     - Có mã nào cho [thời trang](category) dưới [100k](amount)?
     - Voucher [Lazada](platform) còn hạn đến [31/12/2024](date)?
-
+    - Tôi cần voucher [tiki]{"entity": "platform", "value": "Tiki"}
+    - Tôi cần voucher [Shopee](platform) hehe
 - intent: recommend_voucher
   examples: |
     - Gợi ý cho tôi vài voucher hot
@@ -119,11 +115,10 @@ nlu:
     - Có ưu đãi nào đang thịnh hành không?
     - Hôm nay có voucher nào ngon không bro?
     - Gợi ý cho tôi voucher hot nhất hôm nay
-    - Có mã giảm giá nào đang hot không? 
+    - Có mã giảm giá nào đang hot không?
     - Nghèo quá bro, coi thử hôm nay có mã nào giảm 5 củ không bro?
     - Có mã nào giảm 5 củ không bro?
     - Bro coi dùm tui nay có mã sốp pi nào ko
-
 - intent: out_of_scope
   examples: |
     - Bạn bao nhiêu tuổi?
@@ -136,18 +131,6 @@ nlu:
     - Lập trình Python sao vậy bạn?
     - Bạn có yêu tôi không?
     - Hôm nay thời tiết thế nào?
-
-
-- regex: price
-  examples: |
-    - \b\d{1,3}(?:\.\d{3})*(?:\s*(?:[kK]|[mM]|[đĐ]|nghìn|triệu|đồng))\b
-    - \b\d+\s*(?:[kK]|[mM]|[đĐ]|nghìn|triệu|đồng)\b
-
-- regex: date
-  examples: |
-    - \b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b
-    - \b(?:hôm nay|ngày mai|ngày mốt)\b
-
 - intent: ask_voucher_by_category
   examples: |
     - Tôi muốn voucher thời trang
@@ -155,7 +138,8 @@ nlu:
     - Voucher nào cho đồ công nghệ?
     - Mã giảm giá cho [điện tử](category)
     - Voucher cho [thực phẩm](category) có không?
-
+    - tôi muốn mua [đồ ăn](category), cho tôi 1 vài voucher
+    - tôi muốn mua voucher cho [quần áo](category)
 - intent: ask_voucher_by_platform
   examples: |
     - Có voucher nào cho [Shopee](platform) không?
@@ -166,7 +150,7 @@ nlu:
     - Có mã nào cho [Thế Giới Di Động](platform) không?
     - Có mã nào cho [Điện Máy Xanh](platform) không?
     - Có mã nào cho [FPT Play](platform) không?
-
+    - Có voucher [tiki]{"entity": "platform", "value": "Tiki"} không
 - intent: ask_voucher_by_discount
   examples: |
     - Có mã nào giảm 50% không?
@@ -176,16 +160,15 @@ nlu:
     - Có mã nào giảm 5% không?
     - Có mã nào giảm 15% không?
     - Có mã nào giảm 25% không?
-  
 - intent: ask_voucher_by_price
   examples: |
-    - Có mã nào dưới [100k](price:amount) không?
-    - Tôi muốn voucher dưới [100k](price:amount)
-    - Có mã nào dưới [20k](price:amount) không?
-    - Có mã nào dưới [50k](price:amount) không?
-    - Có mã nào dưới [80k](price:amount) không?
-    - Có mã nào dưới [300k](price:amount) không?
-
+    - Có mã nào dưới [100k]{"entity": "price", "value": "amount"} không?
+    - Tôi muốn voucher dưới [100k]{"entity": "price", "value": "amount"}
+    - Có mã nào dưới [20k]{"entity": "price", "value": "amount"} không?
+    - Có mã nào dưới [50k]{"entity": "price", "value": "amount"} không?
+    - Có mã nào dưới [80k]{"entity": "price", "value": "amount"} không?
+    - Có mã nào dưới [300k]{"entity": "price", "value": "amount"} không?
+    - mã nào giảm [50k]{"entity": "price", "value": "amount"} không
 - intent: ask_voucher_by_expiration
   examples: |
     - Có mã nào hết hạn [4/7/2025](date)?
@@ -195,3 +178,18 @@ nlu:
     - Mã nào còn dùng được ngày mai?
     - Mã nào sắp hết hạn trong ngày mốt?
     - Có mã nào dùng được trong hôm nay không?
+- synonym: amount
+  examples: |
+    - 100k
+    - 20k
+    - 50k
+    - 80k
+    - 300k
+- regex: date
+  examples: |
+    - \b(?:hôm nay|ngày mai|ngày mốt)\b
+    - \b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b
+- regex: price
+  examples: |
+    - \b\d+\s*(?:[kK]|[mM]|[đĐ]|nghìn|triệu|đồng)\b
+    - \b\d{1,3}(?:\.\d{3})*(?:\s*(?:[kK]|[mM]|[đĐ]|nghìn|triệu|đồng))\b

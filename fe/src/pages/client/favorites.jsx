@@ -4,18 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { RiDiscountPercentLine } from "react-icons/ri";
 import { MdAccessTime, MdAttachMoney } from "react-icons/md";
 import dayjs from "dayjs";
-import { getFavoritesApi, removeFavoriteApi } from "../../utils/api";
-import { AuthContext } from "../../components/context/auth.context";
-
-const platformImages = {
-  Shopee: "src/assets/Shopee.jpg",
-  Lazada: "src/assets/Lazada.jpg",
-  Tiki: "src/assets/Tiki.jpg",
-  Sendo: "src/assets/Sendo.jpg",
-  Ebay: "src/assets/Ebay.jpg",
-  Amazon: "src/assets/Amazon.jpg",
-  Tiktok: "src/assets/Tiktok.jpg",
-};
+import { getFavoritesApi, removeFavoriteApi } from "../../utils/api.js";
+import { AuthContext } from "../../components/context/auth.context.jsx";
+import { PLATFORM_IMAGES } from "../../utils/imageImports.js";
 
 const Favorites = () => {
   const navigate = useNavigate();
@@ -68,9 +59,9 @@ const Favorites = () => {
               key={item._id}
               className="relative border border-gray-300 rounded-xl p-4 shadow-sm flex flex-col justify-between h-full hover:shadow-md transition-all"
             >
-              {platformImages[item.platform] && (
+              {PLATFORM_IMAGES[item.platform] && (
                 <img
-                  src={platformImages[item.platform]}
+                  src={PLATFORM_IMAGES[item.platform]}
                   alt={item.platform}
                   className="w-full h-24 object-contain rounded-md mb-3"
                 />

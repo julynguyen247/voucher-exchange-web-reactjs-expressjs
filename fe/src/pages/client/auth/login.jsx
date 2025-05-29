@@ -41,8 +41,9 @@ const LoginPage = () => {
   const handleGoogleSuccess = async (response) => {
     const credential = response.credential;
     try {
+      const apiUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8081";
       const res = await axios.post(
-        "http://localhost:8081/api/v1/auth/google-login",
+        `${apiUrl}/api/v1/auth/google-login`,
         { credential }
       );
 

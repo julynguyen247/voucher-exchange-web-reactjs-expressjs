@@ -46,7 +46,7 @@ class MongoDBConnection:
     def __init__(self):
         # Kết nối MongoDB (thay đổi URL và thông tin kết nối của bạn)
         self.client = pymongo.MongoClient(os.getenv("MONGODB_URI"))
-        self.db = self.client['voucher']  # Thay đổi với tên database của bạn
+        self.db = self.client['test']  # Thay đổi với tên database của bạn
         self.collection = self.db['vouchers']  # Thay đổi với tên collection của bạn
 
 class ValidateVoucherSearchForm(FormValidationAction):
@@ -111,11 +111,41 @@ class ActionGetVoucherByCategory(MongoDBConnection, Action):
         try:
             logger.info(f"Querying vouchers with category: {category}")
             vouchers = self.collection.find({"category": category}).limit(10)
-            voucher_list = [f"{voucher['name']} (Giảm: {voucher['discount']}, Hạn: {voucher['expiration']})" for voucher in vouchers]
+
+            voucher_list = []
+            for voucher in vouchers:
+                platform = voucher.get('platform', 'Không có thông tin')
+                category = voucher.get('category', 'Không có thông tin')
+
+
+                discount = voucher.get('discountValue', 'Không có thông tin')
+                price = voucher.get('price', 'Không có thông tin')
+
+
+                code = voucher.get('code', 'Không có thông tin')
+
+                expiration = voucher.get('expirationDate', 'Không có thông tin') 
+
+                rating = voucher.get('rating', 'Không có thông tin')
+                
+                voucher_info = (
+                    f"Nền tảng: {platform}\n"
+                    f"Danh mục: {category}\n"
+                    f"Giảm giá: {discount}\n"
+                    f"Giá: {price}\n" 
+                    f"Mã: {code}\n"
+                    f"Hạn sử dụng: {expiration}\n"
+                    f"Đánh giá: {rating}/5\n"
+                    "-----------------------------"
+                )
+                voucher_list.append(voucher_info)
             if voucher_list:
-                dispatcher.utter_message(text=f"Đây là những voucher thuộc danh mục {category}: {', '.join(voucher_list)}")
+                message = "Đây là những voucher bạn muốn tìm:\n"
+                for i, voucher_info in enumerate(voucher_list, start=1):
+                    message += f"Voucher {i}:\n{voucher_info}\n"
+                dispatcher.utter_message(text=message)
             else:
-                dispatcher.utter_message(text=f"Không tìm thấy voucher nào thuộc danh mục {category}.")
+                dispatcher.utter_message(text="Không tìm thấy voucher nào phù hợp với yêu cầu của bạn.")
         except pymongo.errors.PyMongoError as e:
             dispatcher.utter_message(text="Lỗi khi truy vấn voucher. Vui lòng thử lại sau.")
             logger.error(f"MongoDB Error: {str(e)}")
@@ -133,11 +163,46 @@ class ActionGetVoucherByPlatform(MongoDBConnection, Action):
         try:
             logger.info(f"Querying vouchers with platform: {platform}")
             vouchers = self.collection.find({"platform": platform}).limit(10)
-            voucher_list = [f"{voucher['name']} (Giảm: {voucher['discount']}, Hạn: {voucher['expiration']})" for voucher in vouchers]
+
+            voucher_list = []
+            for voucher in vouchers:
+                platform = voucher.get('platform', 'Không có thông tin')
+                category = voucher.get('category', 'Không có thông tin')
+
+
+                discount = voucher.get('discountValue', 'Không có thông tin')
+                price = voucher.get('price', 'Không có thông tin')
+
+
+                code = voucher.get('code', 'Không có thông tin')
+
+                expiration = voucher.get('expirationDate', 'Không có thông tin') 
+
+                rating = voucher.get('rating', 'Không có thông tin')
+                
+                voucher_info = (
+                    f"Nền tảng: {platform}\n"
+                    f"Danh mục: {category}\n"
+                    f"Giảm giá: {discount}\n"
+                    f"Giá: {price}\n" 
+
+                    f"Mã: {code}\n"
+
+
+
+                    f"Hạn sử dụng: {expiration}\n"
+                    f"Đánh giá: {rating}/5\n"
+                    "-----------------------------"
+                )
+                voucher_list.append(voucher_info)           
+
             if voucher_list:
-                dispatcher.utter_message(text=f"Đây là những voucher từ {platform}: {', '.join(voucher_list)}")
+                message = "Đây là những voucher bạn muốn tìm:\n"
+                for i, voucher_info in enumerate(voucher_list, start=1):
+                    message += f"Voucher {i}:\n{voucher_info}\n"
+                dispatcher.utter_message(text=message)
             else:
-                dispatcher.utter_message(text=f"Không tìm thấy voucher nào từ {platform}.")
+                dispatcher.utter_message(text="Không tìm thấy voucher nào phù hợp với yêu cầu của bạn.")
         except pymongo.errors.PyMongoError as e:
             dispatcher.utter_message(text="Lỗi khi truy vấn voucher. Vui lòng thử lại sau.")
             logger.error(f"MongoDB Error: {str(e)}")
@@ -148,18 +213,53 @@ class ActionGetVoucherByDiscount(MongoDBConnection, Action):
         return "action_get_voucher_by_discount"
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        discount = tracker.get_slot("discount")
+        discount = tracker.get_slot("discountValue")
         if not discount:
             dispatcher.utter_message(text="Vui lòng cung cấp mức giảm giá để tìm voucher.")
             return []
         try:
             logger.info(f"Querying vouchers with discount: {discount}")
             vouchers = self.collection.find({"discount": discount}).limit(10)
-            voucher_list = [f"{voucher['name']} (Giảm: {voucher['discount']}, Hạn: {voucher['expiration']})" for voucher in vouchers]
+
+            voucher_list = []
+            for voucher in vouchers:
+                platform = voucher.get('platform', 'Không có thông tin')
+                category = voucher.get('category', 'Không có thông tin')
+
+
+                discount = voucher.get('discountValue', 'Không có thông tin')
+                price = voucher.get('price', 'Không có thông tin')
+
+
+                code = voucher.get('code', 'Không có thông tin')
+
+                expiration = voucher.get('expirationDate', 'Không có thông tin') 
+
+                rating = voucher.get('rating', 'Không có thông tin')
+                
+                voucher_info = (
+                    f"Nền tảng: {platform}\n"
+                    f"Danh mục: {category}\n"
+                    f"Giảm giá: {discount}\n"
+                    f"Giá: {price}\n" 
+
+                    f"Mã: {code}\n"
+
+
+
+                    f"Hạn sử dụng: {expiration}\n"
+                    f"Đánh giá: {rating}/5\n"
+                    "-----------------------------"
+                )
+                voucher_list.append(voucher_info)
+
             if voucher_list:
-                dispatcher.utter_message(text=f"Đây là những voucher giảm {discount}: {', '.join(voucher_list)}")
+                message = "Đây là những voucher bạn muốn tìm:\n"
+                for i, voucher_info in enumerate(voucher_list, start=1):
+                    message += f"Voucher {i}:\n{voucher_info}\n"
+                dispatcher.utter_message(text=message)
             else:
-                dispatcher.utter_message(text=f"Không tìm thấy voucher nào giảm {discount}.")
+                dispatcher.utter_message(text="Không tìm thấy voucher nào phù hợp với yêu cầu của bạn.")
         except pymongo.errors.PyMongoError as e:
             dispatcher.utter_message(text="Lỗi khi truy vấn voucher. Vui lòng thử lại sau.")
             logger.error(f"MongoDB Error: {str(e)}")
@@ -170,7 +270,7 @@ class ActionGetVoucherByExpiration(MongoDBConnection, Action):
         return "action_get_voucher_by_expiration"
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        expiration = tracker.get_slot("expiration")
+        expiration = tracker.get_slot("expirationDate")
         if not expiration:
             dispatcher.utter_message(text="Vui lòng cung cấp ngày hết hạn để tìm voucher.")
             return []
@@ -216,11 +316,46 @@ class ActionGetVoucherByExpiration(MongoDBConnection, Action):
         try:
             logger.info(f"Querying vouchers with expiration: {expiration}")
             vouchers = self.collection.find(query).limit(10)
-            voucher_list = [f"{voucher['name']} (Giảm: {voucher['discount']}, Hạn: {voucher['expiration']})" for voucher in vouchers]
+
+            voucher_list = []
+            for voucher in vouchers:
+                platform = voucher.get('platform', 'Không có thông tin')
+                category = voucher.get('category', 'Không có thông tin')
+
+
+                discount = voucher.get('discountValue', 'Không có thông tin')
+                price = voucher.get('price', 'Không có thông tin')
+
+
+                code = voucher.get('code', 'Không có thông tin')
+
+                expiration = voucher.get('expirationDate', 'Không có thông tin') 
+
+                rating = voucher.get('rating', 'Không có thông tin')
+                
+                voucher_info = (
+                    f"Nền tảng: {platform}\n"
+                    f"Danh mục: {category}\n"
+                    f"Giảm giá: {discount}\n"
+                    f"Giá: {price}\n" 
+
+                    f"Mã: {code}\n"
+
+
+
+                    f"Hạn sử dụng: {expiration}\n"
+                    f"Đánh giá: {rating}/5\n"
+                    "-----------------------------"
+                )
+                voucher_list.append(voucher_info)
+
             if voucher_list:
-                dispatcher.utter_message(text=f"Đây là những voucher có hạn đến {expiration}: {', '.join(voucher_list)}")
+                message = "Đây là những voucher bạn muốn tìm:\n"
+                for i, voucher_info in enumerate(voucher_list, start=1):
+                    message += f"Voucher {i}:\n{voucher_info}\n"
+                dispatcher.utter_message(text=message)
             else:
-                dispatcher.utter_message(text=f"Không tìm thấy voucher nào có hạn đến {expiration}.")
+                dispatcher.utter_message(text="Không tìm thấy voucher nào phù hợp với yêu cầu của bạn.")
         except pymongo.errors.PyMongoError as e:
             dispatcher.utter_message(text="Lỗi khi truy vấn voucher. Vui lòng thử lại sau.")
             logger.error(f"MongoDB Error: {str(e)}")
@@ -238,11 +373,45 @@ class ActionGetVoucherByPrice(MongoDBConnection, Action):
         try:
             logger.info(f"Querying vouchers with price: {price}")
             vouchers = self.collection.find({"price": price}).limit(10)
-            voucher_list = [f"{voucher['name']} (Giảm: {voucher['discount']}, Hạn: {voucher['expiration']})" for voucher in vouchers]
+
+            voucher_list = []
+            for voucher in vouchers:
+                platform = voucher.get('platform', 'Không có thông tin')
+                category = voucher.get('category', 'Không có thông tin')
+
+
+                discount = voucher.get('discountValue', 'Không có thông tin')
+                price = voucher.get('price', 'Không có thông tin')
+
+
+                code = voucher.get('code', 'Không có thông tin')
+
+                expiration = voucher.get('expirationDate', 'Không có thông tin') 
+
+                rating = voucher.get('rating', 'Không có thông tin')
+                
+                voucher_info = (
+                    f"Nền tảng: {platform}\n"
+                    f"Danh mục: {category}\n"
+                    f"Giảm giá: {discount}\n"
+                    f"Giá: {price}\n" 
+
+                    f"Mã: {code}\n"
+
+
+
+                    f"Hạn sử dụng: {expiration}\n"
+                    f"Đánh giá: {rating}/5\n"
+                    "-----------------------------"
+                )
+                voucher_list.append(voucher_info)
             if voucher_list:
-                dispatcher.utter_message(text=f"Đây là những voucher có giá {price}: {', '.join(voucher_list)}")
+                message = "Đây là những voucher bạn muốn tìm:\n"
+                for i, voucher_info in enumerate(voucher_list, start=1):
+                    message += f"Voucher {i}:\n{voucher_info}\n"
+                dispatcher.utter_message(text=message)
             else:
-                dispatcher.utter_message(text=f"Không tìm thấy voucher nào có giá {price}.")
+                dispatcher.utter_message(text="Không tìm thấy voucher nào phù hợp với yêu cầu của bạn.")
         except pymongo.errors.PyMongoError as e:
             dispatcher.utter_message(text="Lỗi khi truy vấn voucher. Vui lòng thử lại sau.")
             logger.error(f"MongoDB Error: {str(e)}")
@@ -260,46 +429,91 @@ class ActionSearchVoucher(MongoDBConnection, Action):
         expiration = tracker.get_slot("expiration")
 
         query = {}
+
         if category:
             query["category"] = category
         if platform:
             query["platform"] = platform
         if discount:
-            query["discount"] = discount
+            query["discountValue"] = discount
         if price:
             query["price"] = price
+
         if expiration:
-            if expiration in ["hôm nay", "ngày mai", "ngày mốt"]:
-                # Xử lý logic cho hôm nay, ngày mai, ngày mốt
-                today = datetime.now()
-                if expiration == "hôm nay":
-                    query["expiration"] = {"$gte": today, "$lte": today}
-                elif expiration == "ngày mai":
-                    tomorrow = today + timedelta(days=1)
-                    query["expiration"] = {"$gte": tomorrow, "$lte": tomorrow}
-                elif expiration == "ngày mốt":
-                    day_after = today + timedelta(days=2)
-                    query["expiration"] = {"$gte": day_after, "$lte": day_after}
+            today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            if expiration == "hôm nay":
+                query["expirationDate"] = {
+                    "$gte": today,
+                    "$lt": today + timedelta(days=1)
+                }
+            elif expiration == "ngày mai":
+                tomorrow = today + timedelta(days=1)
+                query["expirationDate"] = {
+                    "$gte": tomorrow,
+                    "$lt": tomorrow + timedelta(days=1)
+                }
+            elif expiration == "ngày mốt":
+                day_after = today + timedelta(days=2)
+                query["expirationDate"] = {
+                    "$gte": day_after,
+                    "$lt": day_after + timedelta(days=1)
+                }
             else:
                 try:
                     exp_date = datetime.strptime(expiration, "%d/%m/%Y")
-                    query["expiration"] = {"$gte": exp_date, "$lte": exp_date}
+                    query["expirationDate"] = {
+                        "$gte": exp_date,
+                        "$lt": exp_date + timedelta(days=1)
+                    }
                 except ValueError:
-                    exp_date = datetime.strptime(expiration, "%d-%m-%Y")
-                    query["expiration"] = {"$gte": exp_date, "$lte": exp_date}
+                    try:
+                        exp_date = datetime.strptime(expiration, "%d-%m-%Y")
+                        query["expirationDate"] = {
+                            "$gte": exp_date,
+                            "$lt": exp_date + timedelta(days=1)
+                        }
+                    except ValueError:
+                        dispatcher.utter_message(text="Ngày hết hạn không hợp lệ.")
+                        return []
 
         try:
-            vouchers = self.collection.find(query)
-            voucher_list = [f"{voucher['name']} (Giảm: {voucher['discount']}, Hạn: {voucher['expiration']})" for voucher in vouchers]
-            if voucher_list:
-                dispatcher.utter_message(text=f"Tìm được các voucher: {', '.join(voucher_list)}")
-            else:
-                dispatcher.utter_message(text="Không tìm thấy voucher nào phù hợp với yêu cầu.")
-        except pymongo.errors.PyMongoError as e:
-            dispatcher.utter_message(text="Lỗi khi truy vấn voucher. Vui lòng thử lại sau.")
-            print(f"MongoDB Error: {str(e)}")
+            logger.info(f"Tìm voucher với điều kiện: {query}")
+            vouchers = self.collection.find(query).limit(10)
 
+            voucher_list = []
+            for voucher in vouchers:
+                platform = voucher.get('platform', 'Không có thông tin')
+                category = voucher.get('category', 'Không có thông tin')
+                discount = voucher.get('discountValue', 'Không có thông tin')
+                price = voucher.get('price', 'Không có thông tin')
+                code = voucher.get('code', 'Không có thông tin')
+                expiration = voucher.get('expirationDate', 'Không có thông tin')
+                rating = voucher.get('rating', 'Không có thông tin')
+
+                voucher_info = (
+                    f"Nền tảng: {platform}\n"
+                    f"Danh mục: {category}\n"
+                    f"Giảm giá: {discount}\n"
+                    f"Giá: {price}\n"
+                    f"Mã: {code}\n"
+                    f"Hạn sử dụng: {expiration}\n"
+                    f"Đánh giá: {rating}/5\n"
+                    "-----------------------------"
+                )
+                voucher_list.append(voucher_info)
+
+            if voucher_list:
+                message = "Đây là những voucher bạn muốn tìm:\n"
+                for i, voucher_info in enumerate(voucher_list, start=1):
+                    message += f"Voucher {i}:\n{voucher_info}\n"
+                dispatcher.utter_message(text=message)
+            else:
+                dispatcher.utter_message(text="Không tìm thấy voucher nào phù hợp với yêu cầu của bạn.")
+        except pymongo.errors.PyMongoError as e:
+            dispatcher.utter_message(text="Lỗi khi truy vấn dữ liệu. Vui lòng thử lại sau.")
+            logger.error(f"MongoDB Error: {str(e)}")
         return []
+
     
 
 

@@ -195,6 +195,14 @@ const rateUserService = async ({ userId, raterId = null, star, ipAddress }) => {
       return { success: false, message: "Thiếu userId cần được đánh giá" };
     }
 
+    // Kiểm tra xem có ít nhất một định danh
+    if (!raterId && !ipAddress) {
+      return {
+        success: false,
+        message: "Thiếu thông tin người đánh giá hoặc IP",
+      };
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       return { success: false, message: "Người dùng không tồn tại" };
@@ -205,35 +213,8 @@ const rateUserService = async ({ userId, raterId = null, star, ipAddress }) => {
       return { success: false, message: "Không thể tự đánh giá chính mình" };
     }
 
-    // Tìm đánh giá đã có (theo raterId hoặc ipAddress nếu ẩn danh)
-    let existingRating;
-    if (raterId) {
-      existingRating = user.ratings.find(
-        (r) => r.rater && r.rater.equals(raterId)
-      );
-    } else if (ipAddress) {
-      existingRating = user.ratings.find((r) => r.ipAddress === ipAddress);
-    }
-
-    if (existingRating) {
-      // Update rating
-      existingRating.star = star;
-      existingRating.createdAt = Date.now();
-    } else {
-      // Thêm mới
-      user.ratings.push({
-        rater: raterId || undefined,
-        ipAddress: ipAddress || undefined,
-        star,
-      });
-    }
-
-    // Cập nhật count + average
-    user.ratingCount = user.ratings.length;
-    const total = user.ratings.reduce((sum, r) => sum + r.star, 0);
-    user.ratingAvg = total / user.ratings.length;
-
-    await user.save();
+    // Use the model's method
+    await user.addRating(raterId, star, ipAddress);
 
     return {
       success: true,
