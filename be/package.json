@@ -6,6 +6,8 @@
     "bcrypt": "5.1.1",
     "compression": "^1.8.0",
     "cors": "2.8.5",
+    "crypto": "^1.0.1",
+    "dateformat": "^5.0.3",
     "dotenv": "^16.5.0",
     "express": "4.21.2",
     "express-fileupload": "1.5.1",
@@ -14,11 +16,13 @@
     "google-auth-library": "^9.15.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.16.0",
     "mongoose": "^8.12.1",
     "mongoose-delete": "1.0.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "qrcode.react": "^4.2.0",
+    "querystring": "^0.2.1",
     "sharp": "^0.33.5",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1"
@@ -28,7 +32,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./src/server.js"
+    "dev": "nodemon ./src/server.js",
+    "start": "node ./src/server.js"
   },
   "author": "july",
   "license": "ISC",

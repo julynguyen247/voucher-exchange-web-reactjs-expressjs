@@ -12,7 +12,7 @@ const transactionSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   paymentMethod: {
     type: String,
-    enum: ["cash", "bank_transfer"],
+    enum: ["momo", "vietqr_bank_transfer", "vnpay"],
     required: true,
   },
   status: {
@@ -21,6 +21,10 @@ const transactionSchema = new mongoose.Schema({
     default: "Pending",
   },
   createdAt: { type: Date, default: Date.now },
+  createBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  //vnpay
+  vnpayTxnRef: { type: String },
+  vnpayTransactionNo: { type: String },
 });
 transactionSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
