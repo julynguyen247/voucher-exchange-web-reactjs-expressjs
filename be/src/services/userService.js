@@ -175,46 +175,6 @@ const fetchAccountService = async (user) => {
   }
 };
 
-// rank user
-const getUsersWithRankService = async (page = 1, pageSize = 20) => {
-  // Lấy toàn bộ user với trường cần thiết, chuyển thành object thuần
-  const allUsers = await User.find({}, 'name email ratingCount ratingAvg').lean();
-
-  // Tính tổng ratingCount và tổng điểm để tính trung bình cộng C
-  const totalRatings = allUsers.reduce((acc, u) => acc + u.ratingCount, 0);
-  const totalScore = allUsers.reduce((acc, u) => acc + (u.ratingAvg * u.ratingCount), 0);
-  const C = totalRatings ? totalScore / totalRatings : 0;
-
-  // Tính weightedScore cho từng user
-  allUsers.forEach(user => {
-    const v = user.ratingCount;
-    const R = user.ratingAvg;
-    user.weightedScore = (v / (v + m)) * R + (m / (v + m)) * C;
-  });
-
-  // Sắp xếp giảm dần theo weightedScore
-  allUsers.sort((a, b) => b.weightedScore - a.weightedScore);
-
-  // Gán rank theo thứ tự sắp xếp
-  allUsers.forEach((user, index) => {
-    user.rank = index + 1;
-  });
-
-  // Phân trang
-  const skip = (page - 1) * pageSize;
-  const pagedUsers = allUsers.slice(skip, skip + pageSize);
-
-  return {
-    users: pagedUsers,
-    pagination: {
-      page,
-      limit: pageSize,
-      total: allUsers.length,
-    },
-  };
-};
-
-
 const rateUserService = async ({ userId, raterId = null, star, ipAddress }) => {
   try {
     if (!star || star < 1 || star > 5) {
@@ -268,6 +228,5 @@ module.exports = {
   deleteAUserService,
   updateAUserService,
   fetchAccountService,
-  getUsersWithRankService,
   rateUserService,
 };
