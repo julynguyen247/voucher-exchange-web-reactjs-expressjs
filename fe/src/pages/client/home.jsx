@@ -88,7 +88,9 @@ const HomePage = () => {
                 {voucher.category} · Giảm {voucher.discountValue}%
               </p>
               <p className="text-lg font-bold mt-2">
-                {voucher.price.toLocaleString()} VNĐ
+                {voucher.price != null
+                  ? `${voucher.price.toLocaleString()} VNĐ`
+                  : "Không rõ giá"}
               </p>
             </Card>
           ))}

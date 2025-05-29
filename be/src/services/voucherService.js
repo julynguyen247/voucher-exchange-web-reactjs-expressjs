@@ -13,7 +13,7 @@ const uploadImgService = async (image) => {
 
   const path = require("path");
   const fs = require("fs");
-  
+
   // Ensure upload directory exists
   const uploadPath = path.resolve(__dirname, "../public/images/upload");
   if (!fs.existsSync(uploadPath)) {
@@ -29,12 +29,12 @@ const uploadImgService = async (image) => {
   try {
     // Log the path where we're trying to save the file
     console.log(`Attempting to save image to: ${finalPath}`);
-    
+
     // Move the file to the upload directory
     await image.mv(finalPath);
-    
+
     // Check if the file was successfully saved
-    const fs = require('fs');
+    const fs = require("fs");
     if (fs.existsSync(finalPath)) {
       console.log(`File successfully saved to: ${finalPath}`);
       return {
@@ -48,7 +48,8 @@ const uploadImgService = async (image) => {
       return {
         status: "failed",
         path: null,
-        error: "File move operation completed but file does not exist at destination",
+        error:
+          "File move operation completed but file does not exist at destination",
       };
     }
   } catch (error) {
@@ -76,22 +77,31 @@ const createVoucherService = async (
 ) => {
   try {
     console.log("Creating voucher with params:", {
-      minimumOrder, platform, category, image, code, discountValue, 
-      expirationDate, email, price, bankAccount, bankName
+      minimumOrder,
+      platform,
+      category,
+      image,
+      code,
+      discountValue,
+      expirationDate,
+      email,
+      price,
+      bankAccount,
+      bankName,
     });
 
     // Find user by email, or use admin account if specified
     let userId = null;
     let user = null;
-    
+
     if (email) {
       console.log(`Looking for user with email: ${email}`);
       user = await User.findOne({ email: email });
-      
+
       if (user) {
         console.log(`Found user with email ${email}:`, user._id);
         userId = user._id;
-      } else if (email === 'admin@voucher-exchange.com') {
+      } else if (email === "admin@voucher-exchange.com") {
         // Try to find an admin user
         console.log("Looking for admin user");
         const adminUser = await User.findOne({ role: "ADMIN" });
@@ -99,7 +109,9 @@ const createVoucherService = async (
           console.log("Using admin user:", adminUser._id);
           userId = adminUser._id;
         } else {
-          console.log("No admin user found, creating voucher without user association");
+          console.log(
+            "No admin user found, creating voucher without user association"
+          );
         }
       } else {
         console.log(`No user found with email ${email}`);
@@ -107,16 +119,16 @@ const createVoucherService = async (
     } else {
       console.log("No email provided");
     }
-    
+
     // Format the date correctly
     let formattedDate;
     try {
-      if (typeof expirationDate === 'string') {
+      if (typeof expirationDate === "string") {
         formattedDate = new Date(expirationDate);
       } else {
         formattedDate = expirationDate;
       }
-      
+
       // Check if date is valid
       if (isNaN(formattedDate.getTime())) {
         console.error("Invalid date format:", expirationDate);
@@ -141,34 +153,39 @@ const createVoucherService = async (
       status: "Available",
       price: Number(price) || 0,
       rating: 5,
-      totalRatings: 1
+      totalRatings: 1,
     };
 
     // Only add user-specific fields if a user was found
     if (userId) {
       voucherData.createdBy = userId;
     }
-    
+
     if (bankAccount) voucherData.bankAccount = bankAccount;
     if (bankName) voucherData.bankName = bankName;
-    
+
     console.log("Creating voucher with data:", voucherData);
-    
+
     // Wrap the creation in a try-catch block to provide detailed error info
     try {
       // Create the voucher with strict validation
-      console.log("Creating voucher with final data:", JSON.stringify(voucherData, null, 2));
+      console.log(
+        "Creating voucher with final data:",
+        JSON.stringify(voucherData, null, 2)
+      );
       let result = await Voucher.create(voucherData);
       console.log("Voucher created successfully with ID:", result._id);
-      
+
       // Verify the voucher was created by retrieving it
       const verified = await Voucher.findById(result._id);
       if (!verified) {
-        console.error("Failed to verify voucher creation, voucher not found after creation");
+        console.error(
+          "Failed to verify voucher creation, voucher not found after creation"
+        );
       } else {
         console.log("Voucher creation verified successfully");
       }
-      
+
       return result;
     } catch (dbError) {
       console.error("Database error creating voucher:", dbError);
@@ -184,38 +201,38 @@ const getVoucherService = async (limit, page, query) => {
     let result = null;
     if (limit && page) {
       let offset = (page - 1) * limit;
-      
+
       // Parse query parameters safely
       const { filter = {} } = query ? aqp(query) : { filter: {} };
-      
+
       // Handle special query parameters
       if (query) {
         const includeLowRating = query.includeLowRating === "true";
-        
+
         // Remove pagination params from filter
         delete filter.page;
         delete filter.limit;
         delete filter.admin;
         delete filter.includeLowRating;
-        
+
         // Apply rating filter unless explicitly including low ratings
         if (!includeLowRating) {
           filter.rating = { ...(filter.rating || {}), $gte: 3 };
         }
-        
+
         // Add search query if present
         if (query.q) {
-          const searchRegex = new RegExp(query.q, 'i');
+          const searchRegex = new RegExp(query.q, "i");
           filter.$or = [
             { code: searchRegex },
             { platform: searchRegex },
-            { category: searchRegex }
+            { category: searchRegex },
           ];
         }
       }
-      
+
       console.log("Voucher query filter:", filter);
-      
+
       result = await Voucher.find(filter)
         .sort({ createdAt: -1 }) // Sort by newest first
         .limit(parseInt(limit))

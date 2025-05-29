@@ -21,7 +21,6 @@
     "mongoose-delete": "1.0.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "qrcode.react": "^4.2.0",
     "querystring": "^0.2.1",
     "sharp": "^0.33.5",
     "socket.io": "^4.8.1",

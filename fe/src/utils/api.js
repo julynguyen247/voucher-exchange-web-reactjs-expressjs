@@ -46,8 +46,9 @@ const trackApiCall = () => {
 
   // Track by hour for debugging
   const now = new Date();
-  const hourKey = `${now.getFullYear()}-${now.getMonth() + 1
-    }-${now.getDate()}-${now.getHours()}`;
+  const hourKey = `${now.getFullYear()}-${
+    now.getMonth() + 1
+  }-${now.getDate()}-${now.getHours()}`;
 
   apiCallCounts.byHour[hourKey] = (apiCallCounts.byHour[hourKey] || 0) + 1;
 
@@ -121,7 +122,8 @@ const createVoucher = (
   image,
   discountValue,
   expirationDate,
-  price
+  price,
+  email
 ) => {
   const URL_API = "/v1/api/voucher";
 
@@ -131,11 +133,12 @@ const createVoucher = (
     minimumOrder,
     platform,
     category,
-    image,
     code,
+    image,
     discountValue,
     expirationDate,
     price,
+    email,
   });
 };
 
@@ -210,7 +213,7 @@ const getSellerPaymentDetails = (voucherId, bank) => {
   });
 };
 const createVnpayPayment = async (data) => {
-  return axios.post('/v1/api/payment/vnpay/create-payment', data);
+  return axios.post("/v1/api/payment/vnpay/create-payment", data);
 };
 const checkVnpayTransaction = async (transactionId) => {
   return axios.get(`/v1/api/payment/vnpay/check-transaction/${transactionId}`);
@@ -296,6 +299,9 @@ const ratingApi = {
 const getBankListApi = () => {
   return axios.get("/v1/api/bank");
 };
+const getUserByIdApi = (id) => {
+  return axios.get(`/v1/api/user/${id}`);
+};
 
 export {
   createUserApi,
@@ -326,4 +332,5 @@ export {
   getDashboardStatsApi,
   ratingApi,
   getBankListApi,
+  getUserByIdApi,
 };
