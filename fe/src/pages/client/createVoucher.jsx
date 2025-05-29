@@ -8,14 +8,15 @@ import {
   uploadApi,
 } from "../../utils/api";
 import { useNavigate } from "react-router-dom";
-
+import { AuthContext } from "../../components/context/auth.context";
+import { useContext } from "react";
 const CreateVoucherPage = () => {
   const navigate = useNavigate();
   const [voucherPlatform, setVoucherPlatform] = useState([]);
   const [voucherCategory, setVoucherCategory] = useState([]);
   const [imageUrl, setImageUrl] = useState("");
   const [fileList, setFileList] = useState([]);
-
+  const { auth, setAuth } = useContext(AuthContext);
   useEffect(() => {
     const fetchPlatform = async () => {
       const res = await getVoucherPlatform();
@@ -42,9 +43,10 @@ const CreateVoucherPage = () => {
   const handleUploadFile = async (options) => {
     const { onSuccess, file } = options;
     const res = await uploadApi(file, "voucher");
-    if (res?.data) {
-      setImageUrl(res.data.name);
-      setFileList([file]);
+
+    if (res?.data?.path) {
+      const fileName = res.data.path.split("/").pop(); // lấy "logo-....png"
+      setImageUrl(fileName); // chỉ lưu tên file
       onSuccess?.("ok");
       message.success("Upload thành công!");
     } else {
@@ -75,11 +77,12 @@ const CreateVoucherPage = () => {
       minimumOrder,
       platform,
       category,
-      imageUrl,
       code,
+      imageUrl,
       discountValue,
       expirationDate,
-      price
+      price,
+      auth.user.email
     );
 
     if (res?.data) {

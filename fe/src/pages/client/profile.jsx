@@ -117,6 +117,7 @@ const Profile = () => {
                   border: "1px solid #1677ff",
                   color: "#1677ff",
                   fontWeight: 500,
+                  padding: 16,
                 }}
                 type="default"
                 size="small"

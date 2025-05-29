@@ -122,7 +122,8 @@ const createVoucher = (
   image,
   discountValue,
   expirationDate,
-  price
+  price,
+  email
 ) => {
   const URL_API = "/v1/api/voucher";
 
@@ -132,11 +133,12 @@ const createVoucher = (
     minimumOrder,
     platform,
     category,
-    image,
     code,
+    image,
     discountValue,
     expirationDate,
     price,
+    email,
   });
 };
 
