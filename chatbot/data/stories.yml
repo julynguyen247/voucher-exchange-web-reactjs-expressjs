@@ -113,3 +113,46 @@ stories:
   - action: voucher_search_form
   - slot_was_set:
     - requested_slot: category
+
+- story: interactive_story_1
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_voucher_by_platform
+    entities:
+    - platform: Shopee
+  - slot_was_set:
+    - platform: Shopee
+  - action: action_get_voucher_by_platform
+  - intent: affirm
+  - action: action_default_fallback
+
+- story: interactive_story_2
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- story: interactive_story_1
+  steps:
+  - intent: ask_voucher_by_platform
+    entities:
+    - platform: Tiki
+  - slot_was_set:
+    - platform: Tiki
+  - action: action_get_voucher_by_platform
+  - intent: ask_voucher_by_price
+    entities:
+    - price: amount
+  - slot_was_set:
+    - price: amount
+  - action: action_get_voucher_by_discount
+  - intent: ask_voucher_by_price
+    entities:
+    - price: amount
+  - slot_was_set:
+    - price: amount
+  - intent: ask_voucher_by_discount
+    entities:
+    - price: amount
+    - amount: 50%
+  - action: action_get_voucher_by_discount

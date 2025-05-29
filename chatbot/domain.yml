@@ -14,6 +14,7 @@ intents:
 - recommend_voucher
 - search_voucher
 entities:
+- amount
 - price
 - platform
 - category
@@ -80,10 +81,10 @@ responses:
   utter_out_of_scope:
   - text: Vui lòng hỏi về voucher, tui chỉ rành cái đó thôi bro 😅
 actions:
-- action_get_voucher_by_platform
 - action_get_voucher_by_discount
-- action_get_voucher_by_category
+- action_get_voucher_by_platform
 - utter_greet
+- action_get_voucher_by_category
 - action_get_voucher_by_price
 - action_get_voucher_by_expiration
 - action_search_voucher

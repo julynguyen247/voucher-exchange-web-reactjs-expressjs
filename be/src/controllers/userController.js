@@ -168,8 +168,6 @@ const updateUser = async (req, res) => {
   });
 };
 const getSellerPaymentDetails = async (req, res) => {
-  //console.log(">>> Request received at getSellerPaymentDetails controller");
-  //console.log("Query params:", req.query);
   try {
     const { voucherId, bank: paymentType } = req.query;
 
@@ -202,8 +200,7 @@ const getSellerPaymentDetails = async (req, res) => {
     let paymentDetails = {};
 
     if (
-      paymentType.toLowerCase() === "momo" ||
-      paymentType.toLowerCase() === "zalo_pay"
+      paymentType.toLowerCase() === "momo"
     ) {
       if (seller.phone) {
         paymentDetails.sellerPhone = seller.phone;
@@ -273,8 +270,7 @@ const handleFetchAccount = async (req, res) => {
   // Report metrics every hour
   if (currentTime - apiMetrics.lastReported > 3600000) {
     console.log(
-      `API Metrics Report: ${apiMetrics.totalCalls} total calls, ${
-        apiMetrics.cacheHits
+      `API Metrics Report: ${apiMetrics.totalCalls} total calls, ${apiMetrics.cacheHits
       } cache hits (${Math.round(
         (apiMetrics.cacheHits / apiMetrics.totalCalls) * 100
       )}%), ${apiMetrics.cacheMisses} cache misses (${Math.round(
