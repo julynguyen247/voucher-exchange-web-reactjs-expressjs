@@ -6,7 +6,8 @@ const createTransactionService = async (
   voucherId,
   voucherName,
   price,
-  paymentMethod
+  paymentMethod,
+  code
 ) => {
   try {
     const transaction = new Transaction({
@@ -17,6 +18,7 @@ const createTransactionService = async (
       paymentMethod,
       status: "Completed",
       createdAt: new Date(),
+      code,
     });
 
     const savedTransaction = await transaction.save();
