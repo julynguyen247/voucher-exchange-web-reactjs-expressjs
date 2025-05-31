@@ -92,7 +92,7 @@ const AppHeader = () => {
           style={{ textDecoration: "none" }}
         >
           <img
-            src="/public/logo-black.png"
+            src="/logo-black.png"
             alt="logo"
             className="w-30 h-10 object-cover  bg-white"
           />

@@ -135,16 +135,46 @@ const VoucherPage = () => {
   return (
     <div className="p-4 max-w-7xl mx-auto">
       <Helmet>
-        <title>Mua Bán Voucher Uy Tín - Giảm Giá Cực Sốc</title>
+        <title>
+          Mua Bán Voucher Uy Tín | Giảm Giá Shopee, Tiki, Lazada - Siêu Voucher
+        </title>
         <meta
           name="description"
-          content="Mua bán voucher giảm giá trực tuyến: Shopee, Tiki, Lazada, Amazon... Cam kết uy tín, mã giảm giá đa dạng, tiết kiệm chi phí!"
+          content="Siêu Voucher - Nền tảng mua bán voucher giảm giá uy tín. Mã giảm giá Shopee, Tiki, Lazada, Amazon... Giúp bạn tiết kiệm chi phí và mua sắm thông minh hơn mỗi ngày."
         />
         <meta
           name="keywords"
-          content="mua bán voucher, mã giảm giá, voucher Shopee, bán voucher Tiki, sàn thương mại điện tử, khuyến mãi"
+          content="voucher, mã giảm giá, mua bán voucher, voucher Shopee, Tiki, Lazada, mã khuyến mãi, siêu voucher"
         />
-        <link rel="canonical" href="https://yourdomain.com/voucher" />
+        <meta name="robots" content="index, follow" />
+        <meta
+          property="og:title"
+          content="Mua Bán Voucher Online - Siêu Giảm Giá Mỗi Ngày"
+        />
+        <meta
+          property="og:description"
+          content="Hàng ngàn voucher từ Shopee, Tiki, Lazada... giúp bạn mua sắm tiết kiệm hơn."
+        />
+        <meta property="og:url" content="https://sieuvoucher.id.vn/voucher" />
+        <meta
+          property="og:image"
+          content="https://sieuvoucher.id.vn/og-image.jpg"
+        />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="Siêu Voucher - Mua Bán Mã Giảm Giá"
+        />
+        <meta
+          name="twitter:description"
+          content="Nền tảng mua bán voucher trực tuyến uy tín và tiết kiệm chi phí."
+        />
+        <meta
+          name="twitter:image"
+          content="https://sieuvoucher.id.vn/og-image.jpg"
+        />
+        <link rel="canonical" href="https://sieuvoucher.id.vn/voucher" />
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
         </script>
@@ -158,7 +188,9 @@ const VoucherPage = () => {
           <FaArrowLeft size={20} />
           <span className="font-medium">Quay lại Trang chủ</span>
         </div>
-
+        <h1 className="text-2xl md:text-3xl font-bold text-center mb-6 text-blue-700">
+          Mua Bán Voucher Online - Ưu Đãi Hấp Dẫn Mỗi Ngày
+        </h1>
         <FaFilter
           color="#3685f9"
           size={22}
@@ -168,9 +200,9 @@ const VoucherPage = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-        {paginatedVouchers.map((item, index) => (
+        {paginatedVouchers.map((item) => (
           <div
-            key={index}
+            key={item._id}
             className="relative border border-gray-300 rounded-xl p-4 shadow-sm flex flex-col justify-between h-full hover:shadow-md transition-all"
           >
             <div
@@ -190,7 +222,7 @@ const VoucherPage = () => {
             {PLATFORM_IMAGES[item.platform] && (
               <img
                 src={PLATFORM_IMAGES[item.platform]}
-                alt={`Voucher ${item.platform}`}
+                alt={`Mã giảm giá ${item.platform} - ${item.category}`}
                 className="w-full h-24 object-contain rounded-md mb-3"
                 loading="lazy"
               />
@@ -256,9 +288,6 @@ const VoucherPage = () => {
       </div>
 
       <footer className="mt-12 bg-blue-50 rounded-2xl p-6 shadow-inner text-center">
-        <h2 className="text-xl font-semibold text-blue-700 mb-2">
-          Mua Bán Voucher - Tiết Kiệm Mỗi Ngày
-        </h2>
         <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
           Nền tảng <strong>mua bán voucher</strong> uy tín với hàng ngàn{" "}
           <strong>mã giảm giá</strong> hấp dẫn từ Shopee, Lazada, Tiki,
