@@ -10,12 +10,6 @@ const processTransaction = async (req, res) => {
   try {
     const { userId, voucherId, voucherName, price, paymentMethod } = req.body;
 
-    if (!userId || !voucherId || !voucherName || !price || !paymentMethod) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing required fields" });
-    }
-
     const voucher = await Voucher.findById(voucherId).populate("createdBy");
     if (!voucher || !voucher.createdBy) {
       return res.status(404).json({
@@ -24,6 +18,7 @@ const processTransaction = async (req, res) => {
       });
     }
 
+    const code = voucher.code;
     const sellerPhone = voucher.createdBy.phone;
     const sellerBankAccount = voucher.createdBy.bankAccount || "Đang cập nhật";
     const sellerBankName = voucher.createdBy.bankName || "Đang cập nhật";
@@ -33,7 +28,8 @@ const processTransaction = async (req, res) => {
       voucherId,
       voucherName,
       price,
-      paymentMethod
+      paymentMethod,
+      code
     );
 
     return res.status(200).json({

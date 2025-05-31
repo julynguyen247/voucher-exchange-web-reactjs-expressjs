@@ -222,7 +222,10 @@ const getSellerPaymentDetails = async (req, res) => {
             "Người bán chưa cập nhật đủ thông tin tài khoản ngân hàng (tên ngân hàng, STK, tên chủ TK).",
         });
       }
-    } else {
+    } else if (paymentType.toLowerCase() === "vnpay") {
+      paymentDetails.type = "vnpay";
+    }
+    else {
       return res
         .status(400)
         .json({ EC: 1, message: "Loại thanh toán không được hỗ trợ." });

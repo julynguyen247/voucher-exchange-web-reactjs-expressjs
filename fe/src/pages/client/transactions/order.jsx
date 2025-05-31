@@ -7,7 +7,7 @@ const OrderPage = () => {
   const location = useLocation();
 
   const { voucherId, voucherName, price, userId } = location.state || {};
-
+  console.log(voucherId);
   const handlePayment = () => {
     navigate("/transaction", {
       state: { voucherId, voucherName, price, userId },
