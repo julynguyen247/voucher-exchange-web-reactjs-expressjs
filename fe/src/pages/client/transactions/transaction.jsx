@@ -45,7 +45,6 @@ const TransactionPage = () => {
       return;
     }
     */
-
     if (newPaymentOption) {
       setIsLoadingSellerInfo(true);
       try {
@@ -195,49 +194,6 @@ const TransactionPage = () => {
     }
   };
 
-  const getBankBin = (bankNameKey) => {
-    const bankBins = {
-      vietcombank: "970436",
-      techcombank: "970407",
-      acb: "970416",
-      mbbank: "970422",
-      vpbank: "970432",
-      bidv: "970418",
-      viettinbank: "970415",
-      agribank: "970405",
-      sacombank: "970403",
-      dongabank: "970406",
-    };
-    const normalizedKey = bankNameKey
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, "");
-    return bankBins[normalizedKey];
-  };
-
-  const generateVietQRImageUrl = (
-    sellerBank,
-    accountNo,
-    accountHolder,
-    amount,
-    description
-  ) => {
-    const bankBin = getBankBin(sellerBank);
-    if (!bankBin || !accountNo || typeof amount !== "number" || amount <= 0)
-      return null;
-    const template = "compact2";
-    let qrImageUrl = `https://img.vietqr.io/image/${bankBin}-${accountNo}-${template}.png?amount=${amount}&addInfo=${encodeURIComponent(
-      description
-    )}`;
-    if (accountHolder) {
-      qrImageUrl += `&accountName=${encodeURIComponent(
-        accountHolder.toUpperCase()
-      )}`;
-    }
-    return qrImageUrl;
-  };
-
   // Render phần hướng dẫn thanh toán theo phương thức
   const renderPaymentInstructions = () => {
     if (isLoadingSellerInfo) {
@@ -298,23 +254,6 @@ const TransactionPage = () => {
       return (
         <div>
           <h3>Chuyển khoản thủ công</h3>
-          <img
-            src={generateVietQRImageUrl(
-              sellerBankName,
-              sellerBankAccount,
-              sellerAccountHolderName,
-              price,
-              `TT VCR ${voucherName.substring(0, 10)} ${auth.user?.id?.slice(-4) || ""}`
-            )}
-            alt={`VietQR cho ${sellerBankName}`}
-            style={{
-              width: 256,
-              height: "auto",
-              display: "block",
-              margin: "10px auto",
-              border: "1px solid #eee",
-            }}
-          />
           <p>
             <strong>Ngân hàng người bán:</strong>{" "}
             {sellerBankName.toUpperCase()}
