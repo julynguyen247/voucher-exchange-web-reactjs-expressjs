@@ -43,7 +43,6 @@ export const AuthWrapper = (props) => {
       };
 
   const [auth, setAuthState] = useState(initialAuth);
-  const [fetchCount, setFetchCount] = useState(0);
 
   const setAuth = (newAuth) => {
     if (!newAuth || !newAuth.user) return;

@@ -10,14 +10,11 @@ import Layout from "./layout";
 import LoginPage from "../src/pages/client/auth/login";
 import RegisterPage from "../src/pages/client/auth/register";
 import { createRoot } from "react-dom/client";
-
-import Chatbot from "./components/chatbot";
 import React from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import OrderPage from "./pages/client/transactions/order";
 import TransactionPage from "./pages/client/transactions/transaction";
 import TransactionHistory from "./pages/client/transactions/transactionHistory";
-import Ranking from "./pages/client/ranking";
 import Favorites from "./pages/client/favorites";
 import Rating from "./pages/client/rating";
 

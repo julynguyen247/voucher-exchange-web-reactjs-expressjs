@@ -40,12 +40,8 @@ const Info = () => {
 
   useEffect(() => {
     const fetchBanks = async () => {
-      try {
-        const res = await getBankListApi();
-        setBankList(res.data || []);
-      } catch (err) {
-        message.error("Lấy danh sách ngân hàng thất bại");
-      }
+      const res = await getBankListApi();
+      setBankList(res.data || []);
     };
 
     fetchBanks();

@@ -34,6 +34,7 @@ const PublicProfile = () => {
         setVouchers(filtered);
       } catch (err) {
         message.error("Không thể tải dữ liệu người dùng.");
+        console.log(err);
       }
     };
 

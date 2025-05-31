@@ -40,6 +40,7 @@ const Profile = () => {
         setUserVouchers(filtered);
       } catch (error) {
         message.error("Lấy danh sách voucher thất bại");
+        console.log(err);
       }
     };
 

@@ -16,7 +16,7 @@ const CreateVoucherPage = () => {
   const [voucherCategory, setVoucherCategory] = useState([]);
   const [imageUrl, setImageUrl] = useState("");
   const [fileList, setFileList] = useState([]);
-  const { auth, setAuth } = useContext(AuthContext);
+  const { auth } = useContext(AuthContext);
   useEffect(() => {
     const fetchPlatform = async () => {
       const res = await getVoucherPlatform();
