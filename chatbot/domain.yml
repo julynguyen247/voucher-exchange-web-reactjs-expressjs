@@ -1,0 +1,101 @@
+version: '3.1'
+intents:
+- affirm
+- ask_voucher_by_category
+- ask_voucher_by_discount
+- ask_voucher_by_expiration
+- ask_voucher_by_platform
+- ask_voucher_by_price
+- bot_challenge
+- deny
+- goodbye
+- greet
+- out_of_scope
+- recommend_voucher
+- search_voucher
+entities:
+- amount
+- price
+- platform
+- category
+- discount
+- expiration
+- date
+slots:
+  category:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: category
+  discount:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: discount
+  price:
+    type: float
+    mappings:
+    - type: from_entity
+      entity: price
+  platform:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: platform
+  expiration:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: expiration
+  date:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: date
+responses:
+  utter_greet:
+  - text: Xin chào, tôi có thể giúp gì cho bạn? 😎
+  utter_cheer_up:
+  - text: 'Here is something to cheer you up:'
+    image: https://i.imgur.com/nGF1K8f.jpg
+  utter_did_that_help:
+  - text: Bạn đã hài lòng với dịch vụ của chúng mình chưa ạ? 😁
+  utter_goodbye:
+  - text: Xin chào, hẹn gặp lại bạn sau nhé! 😎
+  utter_iamabot:
+  - text: Tui là bot, ko phải top.
+  utter_ask_category:
+  - text: 'Bạn muốn dùng voucher vào danh mục nào? Ví dụ: thời trang, ẩm thực, công nghệ, v.v.'
+  utter_ask_platform:
+  - text: 'Bạn sử dụng voucher trên nền tảng nào? Ví dụ: Shopee, Tiki, Lazada, Grab, v.v.'
+  utter_ask_discount:
+  - text: Bạn muốn giảm giá bao nhiêu?
+  utter_ask_price:
+  - text: Bạn muốn voucher giá bao nhiêu?
+  utter_ask_expiration:
+  - text: Bạn muốn voucher còn hạn đến ngày nào? Hoặc bạn có thể nói 'hôm nay', 'ngày mai', 'ngày mốt' để tìm
+  utter_thank_you:
+  - text: Cảm ơn vì đã xài tui
+  utter_fallback:
+  - text: Tui chưa hiểu lắm ạ, hỏi cái gì về voucher/giftcard đi bro? 😅
+  utter_out_of_scope:
+  - text: Vui lòng hỏi về voucher, tui chỉ rành cái đó thôi bro 😅
+actions:
+- action_get_voucher_by_discount
+- action_get_voucher_by_platform
+- utter_greet
+- action_get_voucher_by_category
+- action_get_voucher_by_price
+- action_get_voucher_by_expiration
+- action_search_voucher
+forms:
+  voucher_search_form:
+    required_slots:
+    - category
+    - platform
+    - discount
+    - price
+    - expiration
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

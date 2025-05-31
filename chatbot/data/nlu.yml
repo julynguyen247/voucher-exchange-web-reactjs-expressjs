@@ -1,0 +1,427 @@
+version: "3.1"
+nlu:
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - moin
+    - hey there
+    - let's go
+    - hey dude
+    - goodmorning
+    - goodevening
+    - good afternoon
+    - chào
+    - xin chào
+    - lô
+    - hey bro
+    - chào bạn
+    - chào cậu
+    - chào ông
+    - chào em
+    - chào mày
+    - chào nha
+    - wassup
+    - wassup bro
+    - what's up
+    - what's up bro
+    - ê bro
+    - hiii
+    - Xin chào
+    - chào buổi sáng
+    - chào buổi tối
+    - alo
+    - yo
+    - hi bạn ơi
+    - chào anh
+    - dạ em chào anh
+    - hello bạn nha
+    - chào xíu nghen
+    - hế lô
+    - dạ em xin chào
+- intent: goodbye
+  examples: |
+    - cu
+    - good by
+    - cee you later
+    - good night
+    - bye
+    - goodbye
+    - have a nice day
+    - see you around
+    - bye bye
+    - see you later
+    - bai nha bro
+    - bye bro
+    - thankiu
+    - bye bye bro
+    - thank u bro
+    - thanks
+    - thank you
+    - bai bai
+    - see u
+    - éc éc
+    - đi ngủ đây bro
+    - ngủ ngon
+    - ngủ ngon nha bro
+    - tạm biệt
+    - chúc ngủ ngon
+    - gặp lại sau nha
+    - tôi đi đây
+    - ok cảm ơn nha
+    - thôi nghỉ nha bro
+    - tạm biệt bro
+    - ngủ thôi, bye
+    - để mai nói tiếp
+    - thôi đi nha
+- intent: affirm
+  examples: |
+    - yes
+    - y
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+    - đúng
+    - oke
+    - phải
+    - ừ
+    - được
+    - chắc chắn
+    - ừ đúng rồi
+    - chuẩn luôn
+    - chuẩn xác
+    - hợp lý
+    - chắc chắn rồi
+    - tất nhiên
+    - ừm
+    - okie
+    - đúng vậy đó
+    - không sai
+- intent: deny
+  examples: |
+    - no
+    - nope
+    - never
+    - I don't think so
+    - don't like that
+    - no way
+    - not really
+    - không
+    - hổng
+    - chưa
+    - không có
+    - không được
+    - hông thích
+    - không phải
+    - không có gì
+    - không đâu
+    - sai rồi
+    - không đúng
+    - tôi không cần
+    - không phải cái đó
+    - tôi nghĩ không
+    - không hợp lý
+    - không cần đâu
+    - thôi khỏi
+    - tôi không muốn
+- intent: bot_challenge
+  examples: |
+    - are you a bot?
+    - are you a human?
+    - am I talking to a bot?
+    - am I talking to a human?
+    - bạn là AI đúng không?
+    - bạn là người máy à?
+    - bạn được lập trình hả?
+    - bạn có thật không?
+    - bạn sống ở đâu?
+    - bạn biết tôi là ai không?
+    - ai lập trình ra bạn?
+- intent: search_voucher
+  examples: |
+    - Có mã giảm giá nào cho [Shopee](platform)?
+    - Voucher [Lazada](platform) hôm nay là gì?
+    - Tôi cần mã ưu đãi cho [điện thoại](category)
+    - Tìm cho tôi mã giảm giá [Tiki](platform)
+    - Tôi muốn tìm mã giảm giá cho [điện máy](category)
+    - Có mã giảm giá nào cho [điện thoại](category) không?
+    - Có mã giảm giá nào trên [Tiki](platform) không?
+    - Tìm voucher cho [Shopee](platform) giảm [50%](discount)
+    - Có mã nào cho [thời trang](category) dưới [100k](amount)?
+    - Voucher [Lazada](platform) còn hạn đến [31/12/2024](date)?
+    - Tôi cần voucher [tiki]{"entity": "platform", "value": "Tiki"}
+    - Tôi cần voucher [Shopee](platform) hehe
+    - Cho tôi tìm mã khuyến mãi [Shopee](platform)
+    - Có mã nào cho [mỹ phẩm](category) không?
+    - Kiểm tra xem [Tiki](platform) có mã gì mới không?
+    - Cần voucher cho [điện lạnh](category)
+    - Tìm giúp tôi mã giảm giá [Grab](platform)
+    - Có mã giảm cho [thiết bị gia dụng](category) dưới [500k](amount)?
+    - Có mã nào giảm từ [20%](discount) cho [Tiki](platform)?
+    - Có voucher nào cho [FPT Shop](platform) hôm nay không?
+    - Tôi cần mã giảm giá cho [điện thoại](category) trên [Shopee](platform)
+    - Tìm voucher [Lazada](platform) cho đồ [thời trang](category)
+    - Có mã giảm giá cho [điện máy](category) đến ngày [31/12/2025](date) không?
+    - Tôi muốn tìm mã giảm giá cho [tiki](platform) dưới [100k](amount)
+    - Có voucher nào giảm giá [30%](discount) cho [đồ chơi trẻ em](category) không?
+    - Cho tôi mã ưu đãi [Shopee](platform) giảm từ [50k](price)
+    - Có mã giảm giá nào cho [máy tính xách tay](category) trên [Lazada](platform) không?
+    - Có voucher [Tiki](platform) dùng được hôm nay không?
+    - Tôi muốn mã giảm giá cho [đồ gia dụng](category)
+    - Có voucher nào cho [thể thao](category) giá dưới [200k](amount) không?
+    - Tìm mã giảm giá cho [Shopee](platform) còn hạn tới [15-06-2025](date)
+    - Mã giảm giá nào còn dùng được trong tuần này cho [điện tử](category)?
+    - Tôi cần voucher [Grab](platform) giảm giá
+    - Có mã giảm giá cho [đồ công nghệ](category) không?
+    - Tìm mã giảm giá [Shopee](platform) cho đồ [thời trang](category) từ [20%](discount) trở lên
+    - Tôi muốn mã giảm giá cho [FPT Shop](platform) giá dưới [50k](price)
+    - Có voucher nào giảm giá cho [điện thoại](category) dùng được ngày mai không?
+    - Mã giảm giá cho [đồ ăn nhanh](category) có không?
+    - Cho tôi mã giảm giá của [Shopee](platform) cho đơn hàng trên [500k](price)
+    - Tìm voucher trên [Shopee](platform) giảm [20%](discount) cho [thời trang](category) còn hạn đến cuối tháng này
+    - Có mã giảm giá cho [điện thoại](category) trên [Tiki](platform) với giá dưới [100k](amount) không?
+    - Tôi muốn voucher cho [điện tử](category), giảm ít nhất [30%](discount) và còn dùng được hôm nay
+    - Có voucher [Lazada](platform) cho khách hàng mới giảm trên [50%](discount) không?
+    - Mã giảm giá cho [đồ gia dụng](category) ở [Hà Nội](location) có hạn sử dụng đến [31/12/2025](date)
+    - Tìm voucher giảm giá cho [thể thao](category), áp dụng trong dịp [Black Friday](occasion)
+    - Cho tôi mã giảm giá [Shopee](platform), dùng cho thành viên cũ, còn hiệu lực đến [10/06/2025](date)
+    - Có mã giảm giá cho [điện thoại](category), giá trị dưới [500k](price), dùng được ở [TP.HCM](location)?
+    - Tìm mã giảm giá [Tiki](platform) cho đơn hàng trên [1 triệu](price), còn hạn tới [ngày mai](date)
+    - Voucher giảm giá cho [đồ ăn](category), áp dụng dịp [sinh nhật](occasion) và dùng được online
+- intent: recommend_voucher
+  examples: |
+    - Gợi ý cho tôi vài voucher hot
+    - Tôi nên dùng voucher nào?
+    - Có ưu đãi nào đang thịnh hành không?
+    - Hôm nay có voucher nào ngon không bro?
+    - Gợi ý cho tôi voucher hot nhất hôm nay
+    - Có mã giảm giá nào đang hot không?
+    - Nghèo quá bro, coi thử hôm nay có mã nào giảm 5 củ không bro?
+    - Có mã nào giảm 5 củ không bro?
+    - Bro coi dùm tui nay có mã sốp pi nào ko
+    - Giới thiệu cho tôi những voucher hot
+    - Gợi ý mấy mã đang hot đi
+    - Có chương trình khuyến mãi nào hấp dẫn không?
+    - Mấy mã nào đang được dùng nhiều nhất vậy?
+    - Voucher nào đang được ưa chuộng?
+    - Có gì ngon bổ rẻ không bro?
+    - Đưa tôi vài mã giá trị cao đi
+    - Bạn có thể gợi ý vài voucher giảm giá tốt không?
+    - Cho tôi xem mấy voucher giảm giá hot nhất hiện nay
+    - Gợi ý mấy mã ưu đãi đáng dùng đi
+    - Có mã giảm giá nào đang được nhiều người dùng không?
+    - Tôi muốn biết voucher nào đáng chú ý hôm nay
+    - Mấy voucher mới ra mắt có gì hot không?
+    - Cho tôi danh sách mã giảm giá mới nhất
+    - Tôi cần voucher giá trị lớn để mua điện thoại
+    - Bro, có mã giảm giá lớn nào cho Shopee không?
+    - Giới thiệu cho tôi mấy mã giảm giá cho Lazada
+    - Có ưu đãi nào cho ngày hôm nay không?
+    - Gợi ý cho tôi voucher phù hợp với đồ điện tử
+    - Gợi ý voucher Shopee cho khách hàng mới, giảm ít nhất 20%
+    - Tôi muốn voucher Tiki cho đồ công nghệ, có hiệu lực đến hết tháng này
+    - Có voucher nào cho dịp [Black Friday](occasion) đang hot không?
+    - Bro, cho tôi voucher giảm giá cho thành viên cũ, áp dụng ở [Hà Nội](location)
+    - Gợi ý mã giảm giá Lazada cho đơn hàng trên 500k, còn hiệu lực ít nhất 1 tuần
+    - Cho tôi mấy voucher giảm giá cho đồ gia dụng dùng được ở [TP.HCM](location)
+    - Có mã giảm giá nào cho sinh nhật giảm ít nhất 30% không?
+    - Mấy voucher hot nhất hôm nay cho Shopee và Tiki cho tôi
+    - Tiki có voucher giảm giá cho đồ điện tử, dùng được cho khách hàng mới không?
+- intent: out_of_scope
+  examples: |
+    - Bạn bao nhiêu tuổi?
+    - Bạn tên gì?
+    - Bạn thích ăn gì?
+    - Trái đất hình tròn hay vuông?
+    - Bạn có thể đặt hàng giúp tôi không?
+    - Mấy giờ rồi?
+    - Cách làm món bò kho
+    - Lập trình Python sao vậy bạn?
+    - Bạn có yêu tôi không?
+    - Hôm nay thời tiết thế nào?
+    - Bạn biết hát không?
+    - Làm sao để nấu cơm?
+    - Bạn có đi học không?
+    - Bạn biết lái xe không?
+    - Ai là tổng thống Mỹ?
+    - Cách làm bánh flan
+    - Mèo với chó con nào thông minh hơn?
+- intent: ask_voucher_by_category
+  examples: |
+    - Tôi muốn voucher thời trang
+    - Có voucher nào cho ẩm thực không?
+    - Voucher nào cho đồ công nghệ?
+    - Mã giảm giá cho [điện tử](category)
+    - Voucher cho [thực phẩm](category) có không?
+    - tôi muốn mua [đồ ăn](category), cho tôi 1 vài voucher
+    - tôi muốn mua voucher cho [quần áo](category)
+    - Mã giảm giá cho [điện tử](category) là gì?
+    - Tôi muốn voucher cho [thời trang nam](category)
+    - Có mã giảm giá cho [đồ gia dụng](category) không?
+    - Cho tôi mấy voucher cho [mỹ phẩm](category)
+    - Tôi muốn mã giảm giá cho [đồ chơi trẻ em](category)
+    - Có voucher cho [thực phẩm](category) không?
+    - Voucher nào phù hợp với [đồ thể thao](category)?
+    - Tìm voucher cho [đồ dùng học tập](category)
+    - Có mã giảm giá cho [điện thoại](category) dưới [200k](amount) không?
+    - Tôi cần voucher cho [đồ nội thất](category)
+    - Có ưu đãi cho [đồ điện tử gia dụng](category) hôm nay không?
+    - Tôi muốn voucher cho [phụ kiện điện thoại](category)
+    - Tôi cần voucher thời trang giảm trên 30%, còn hiệu lực ít nhất 3 ngày
+    - Có mã giảm giá cho đồ công nghệ, áp dụng cho dịp Tết không?
+    - Mã giảm giá cho đồ ăn, dùng được ở [TP.HCM](location)
+    - Voucher thời trang cho khách hàng mới có không?
+    - Có voucher nào cho đồ điện tử, giảm ít nhất 50%, còn hạn đến cuối tháng?
+    - Tôi muốn voucher cho đồ gia dụng, áp dụng dịp sinh nhật
+    - Mã giảm giá cho đồ chơi trẻ em, áp dụng online và offline
+    - Có voucher nào cho mỹ phẩm dùng trong dịp lễ Tết không?
+- intent: ask_voucher_by_platform
+  examples: |
+    - Có voucher nào cho [Shopee](platform) không?
+    - Tôi muốn voucher [Tiki](platform)
+    - Có mã nào cho [Lazada](platform) không?
+    - Cho tôi voucher [Grab](platform)
+    - Có mã nào cho [FPT Shop](platform) không?
+    - Có mã nào cho [Thế Giới Di Động](platform) không?
+    - Có mã nào cho [Điện Máy Xanh](platform) không?
+    - Có mã nào cho [FPT Play](platform) không?
+    - Có voucher [tiki]{"entity": "platform", "value": "Tiki"} không
+    - cho tôi vài voucher [shopee]{"entity": "platform", "value": "Shopee"}
+    - Voucher của [AEON Mall](platform) có không?
+    - Tìm mã bên [ZaloPay](platform)
+    - Có khuyến mãi bên [GrabFood](platform) không?
+    - Cho tôi danh sách voucher bên [Now](platform)
+    - [Sendo](platform) có mã gì không vậy?
+    - Có mã giảm giá nào cho [Shopee](platform) hôm nay?
+    - Tôi muốn voucher cho [Lazada](platform)
+    - Tiki có voucher gì mới không?
+    - Mã giảm giá của [FPT Shop](platform) là gì?
+    - Có ưu đãi trên [Điện Máy Xanh](platform) không?
+    - Cho tôi mã giảm giá cho [Thế Giới Di Động](platform)
+    - Có voucher nào cho [Grab](platform) không?
+    - Tôi muốn voucher cho [ShopeeFood](platform)
+    - Có mã giảm giá nào cho [Sendo](platform)?
+    - Mã giảm giá cho [Now](platform) là gì?
+    - Tiki có voucher giảm giá cho đơn hàng trên [300k](amount) không?
+    - Shopee có voucher giảm giá trên [50%](discount) không?
+    - Có voucher Shopee cho khách hàng mới giảm ít nhất 30% không?
+    - Tôi muốn mã giảm giá Tiki, dùng được ở Hà Nội, còn hạn tới cuối tháng
+    - Lazada có voucher dịp Black Friday không?
+    - Có mã giảm giá Điện Máy Xanh giảm trên 200k không?
+    - Voucher FPT Shop áp dụng cho thành viên cũ còn hiệu lực ngày mai?
+    - Tôi cần voucher Grab giảm giá cho đơn hàng trên 100k
+    - Mã giảm giá Thế Giới Di Động dùng được ở TP.HCM còn không?
+    - Xin voucher [tiki]{"entity": "platform", "value": "Tiki"}
+- intent: ask_voucher_by_discount
+  examples: |
+    - Có mã nào giảm 50% không?
+    - Tôi muốn voucher giảm 20%
+    - Có mã nào giảm 30% không?
+    - Có mã nào giảm 10% không?
+    - Có mã nào giảm 5% không?
+    - Có mã nào giảm 15% không?
+    - Có mã nào giảm 25% không?
+    - Có mã nào giảm hơn [40%](discount) không?
+    - Tôi muốn ưu đãi ít nhất [60%](discount)
+    - Mã nào giảm giá cao nhất hiện tại?
+    - Giảm nhiều nhất là bao nhiêu phần trăm?
+    - Có mã giảm tới [90%](discount) không vậy?
+    - Có mã giảm giá nào từ [10%](discount) đến [30%](discount)?
+    - Tôi muốn voucher giảm giá ít nhất [50%](discount)
+    - Có voucher giảm giá trên [20%](discount) không?
+    - Mã giảm giá cao nhất là bao nhiêu phần trăm?
+    - Tìm mã giảm giá từ [15%](discount) trở lên
+    - Có voucher giảm giá [40%](discount) cho đồ điện tử không?
+    - Mã giảm giá có mức giảm từ [5%](discount) đến [10%](discount)
+    - Tôi muốn voucher giảm giá từ [25%](discount)
+    - Có mã giảm giá cho đơn hàng trên [20%](discount) không?
+    - Có mã giảm giá từ 10% đến 50% cho Shopee không?
+    - Voucher giảm giá trên 30% cho đồ gia dụng còn hiệu lực đến cuối tháng?
+    - Mã giảm giá Tiki từ 20% trở lên, áp dụng dịp sinh nhật
+    - Tôi muốn voucher giảm ít nhất 25%, còn dùng được hôm nay
+    - Có voucher giảm 40% cho khách hàng mới dùng online không?
+    - [50k]{"entity": "price", "value": "amount"}, hoặc [50%](amount) cũng được
+- intent: ask_voucher_by_price
+  examples: |
+    - Có mã nào dưới [100k]{"entity": "price", "value": "amount"} không?
+    - Tôi muốn voucher dưới [100k]{"entity": "price", "value": "amount"}
+    - Có mã nào dưới [20k]{"entity": "price", "value": "amount"} không?
+    - Có mã nào dưới [50k]{"entity": "price", "value": "amount"} không?
+    - Có mã nào dưới [80k]{"entity": "price", "value": "amount"} không?
+    - Có mã nào dưới [300k]{"entity": "price", "value": "amount"} không?
+    - mã nào giảm [50k]{"entity": "price", "value": "amount"} không
+    - Voucher giá khoảng [200k](amount) có không?
+    - Tôi cần mã dưới [150k](amount)
+    - Mã tầm [70k](amount) thì sao?
+    - Mã nào phù hợp với giá [500k](amount) không?
+    - Có ưu đãi nào cho đơn trên [1 triệu](amount) không?
+    - Có voucher nào giảm giá từ [50k](amount) trở lên?
+    - Tôi muốn mã giảm giá dưới [150k](amount)
+    - Mã giảm giá giá trị từ [20k](amount) đến [100k](amount)
+    - Voucher giảm giá dưới [200k](amount) có không?
+    - Tôi cần voucher giảm giá trên [300k](amount)
+    - Tìm mã giảm giá từ [100k](amount)
+    - Có mã giảm giá nhỏ hơn [30k](amount) không?
+    - Mã giảm giá từ [80k](amount) trở lên
+    - Tôi muốn voucher giá trị cao cho đơn hàng lớn
+    - Có voucher dưới 100k cho Shopee dùng trong tháng này không?
+    - Tìm mã giảm giá Tiki có giá trị trên 300k, áp dụng cho đồ điện tử
+    - Mã giảm giá dưới 50k, còn hạn đến ngày 30/6/2025?
+    - Voucher giảm giá dưới 150k cho đồ gia dụng dùng được tại Hà Nội
+    - Tôi cần voucher giảm trên 200k cho đơn hàng trên 1 triệu
+    - voucher nào giảm [50k]{"entity": "price", "value": "amount"}
+- intent: ask_voucher_by_expiration
+  examples: |
+    - Có mã nào hết hạn [4/7/2025](date)?
+    - Có mã nào hết hạn vào ngày [10-10-2025](date)?
+    - Voucher nào có hiệu lực đến [31/12/2024](date)?
+    - Có mã nào còn hiệu lực hôm nay không?
+    - Mã nào còn dùng được ngày mai?
+    - Mã nào sắp hết hạn trong ngày mốt?
+    - Có mã nào dùng được trong hôm nay không?
+    - Có mã nào còn hạn đến [15-08-2025](date) không?
+    - Ưu đãi nào còn dùng được trong tuần này?
+    - Có mã nào hết hạn tuần sau không?
+    - Mã nào có hiệu lực tới cuối tháng?
+    - Ưu đãi sắp hết hạn là gì?
+    - Cho tôi mấy mã có thời hạn dài
+    - Có mã giảm giá hết hạn vào ngày [01/06/2025](date) không?
+    - Mã giảm giá nào còn hiệu lực đến hết tháng này?
+    - Voucher nào còn dùng được ngày mai?
+    - Tìm mã giảm giá sắp hết hạn trong tuần này
+    - Có voucher nào dùng được trong tháng [7](date)?
+    - Mã giảm giá có hạn sử dụng dài nhất là bao lâu?
+    - Tôi muốn voucher còn hiệu lực ít nhất 1 tháng
+    - Có mã giảm giá hết hạn hôm nay không?
+    - Voucher nào dùng được đến [31/12/2025](date)?
+    - Có mã hết hạn trong tuần này cho Shopee không?
+    - Voucher còn dùng được đến hết tháng cho Tiki giảm 20%
+    - Mã giảm giá hết hạn ngày 10/7/2025 dùng cho đồ gia dụng
+    - Tìm voucher còn hiệu lực 3 ngày cho Lazada
+    - Có voucher Shopee hết hạn trong tháng này, giảm giá trên 30%?
+- synonym: Tiki
+  examples: |
+    - tiki
+- synonym: Shopee
+  examples: |
+    - shopee
+- synonym: amount
+  examples: |
+    - 100k
+    - 20k
+    - 50k
+    - 80k
+    - 300k
+- regex: date
+  examples: |
+    - \b(?:hôm nay|ngày mai|ngày mốt)\b
+    - \b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b
+- regex: price
+  examples: |
+    - \b\d+\s*(?:[kK]|[mM]|[đĐ]|nghìn|triệu|đồng)\b
+    - \b\d{1,3}(?:\.\d{3})*(?:\s*(?:[kK]|[mM]|[đĐ]|nghìn|triệu|đồng))\b

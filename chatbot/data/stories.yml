@@ -1,0 +1,158 @@
+version: "3.1"
+
+stories:
+
+- story: ask voucher by category
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_voucher_by_category
+    - action: voucher_search_form
+    - active_loop: voucher_search_form
+
+- story: ask voucher by platform
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_voucher_by_platform
+    - action: voucher_search_form
+    - active_loop: voucher_search_form
+
+- story: ask voucher by discount
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_voucher_by_discount
+    - action: voucher_search_form
+    - active_loop: voucher_search_form
+
+- story: ask voucher by price
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_voucher_by_price
+    - action: voucher_search_form
+    - active_loop: voucher_search_form
+
+- story: ask voucher by expiration
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_voucher_by_expiration
+    - action: voucher_search_form
+    - active_loop: voucher_search_form
+
+- story: search voucher with form
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - or:
+        - intent: search_voucher
+        - intent: recommend_voucher
+        - intent: ask_voucher_by_category
+        - intent: ask_voucher_by_platform
+        - intent: ask_voucher_by_discount
+        - intent: ask_voucher_by_price
+        - intent: ask_voucher_by_expiration
+    - action: voucher_search_form
+    - active_loop: voucher_search_form
+    - active_loop: null
+    - action: action_search_voucher
+
+- story: interactive_story_1
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: search_voucher
+    entities:
+    - platform: Tiki
+  - slot_was_set:
+    - platform: Tiki
+  - action: action_get_voucher_by_platform
+  - intent: search_voucher
+    entities:
+    - platform: Tiki
+  - slot_was_set:
+    - platform: Tiki
+  - action: voucher_search_form
+  - active_loop: voucher_search_form
+  - slot_was_set:
+    - platform: Tiki
+  - slot_was_set:
+    - requested_slot: category
+  - action: action_get_voucher_by_platform
+  - intent: search_voucher
+    entities:
+    - platform: Shopee
+  - slot_was_set:
+    - platform: Shopee
+  - action: voucher_search_form
+  - slot_was_set:
+    - requested_slot: category
+  - intent: ask_voucher_by_platform
+    entities:
+    - platform: Tiki
+  - slot_was_set:
+    - platform: Tiki
+  - action: action_get_voucher_by_platform
+  - intent: ask_voucher_by_price
+    entities:
+    - price: amount
+  - slot_was_set:
+    - price: amount
+  - action: action_get_voucher_by_discount
+  - intent: ask_voucher_by_discount
+  - intent: ask_voucher_by_category
+    entities:
+    - category: đồ ăn
+  - action: action_get_voucher_by_category
+  - intent: ask_voucher_by_platform
+  - intent: ask_voucher_by_category
+    entities:
+    - category: quần áo
+  - action: voucher_search_form
+  - slot_was_set:
+    - requested_slot: category
+
+- story: interactive_story_1
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_voucher_by_platform
+    entities:
+    - platform: Shopee
+  - slot_was_set:
+    - platform: Shopee
+  - action: action_get_voucher_by_platform
+  - intent: affirm
+  - action: action_default_fallback
+
+- story: interactive_story_2
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- story: interactive_story_1
+  steps:
+  - intent: ask_voucher_by_platform
+    entities:
+    - platform: Tiki
+  - slot_was_set:
+    - platform: Tiki
+  - action: action_get_voucher_by_platform
+  - intent: ask_voucher_by_price
+    entities:
+    - price: amount
+  - slot_was_set:
+    - price: amount
+  - action: action_get_voucher_by_discount
+  - intent: ask_voucher_by_price
+    entities:
+    - price: amount
+  - slot_was_set:
+    - price: amount
+  - intent: ask_voucher_by_discount
+    entities:
+    - price: amount
+    - amount: 50%
+  - action: action_get_voucher_by_discount

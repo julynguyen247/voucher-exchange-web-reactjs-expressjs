@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.log
+*.db
+*.sqlite3
+*.env
+.env
+
+# RASA
+.rasa/
+.rasa/cache/
+models/             # Nếu bạn không muốn lưu mô hình đã train, chỉ chia sẻ code
+*.json              # Log Rasa nếu có tạo bằng `--debug`
+*.md                # Nếu bạn dùng Rasa 1.x
+*.yml.backup        # Tập tin tạm khi chỉnh sửa yaml
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# Jupyter
+.ipynb_checkpoints
+
+# VSCode
+.vscode/
+
+# Mac
+.DS_Store
+
