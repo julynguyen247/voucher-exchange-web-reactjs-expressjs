@@ -110,11 +110,7 @@ const Info = () => {
 
   return (
     <div className="flex justify-center mt-10 px-4">
-      <Card
-        className="w-full max-w-xl shadow-xl"
-        title="Thông tin cá nhân"
-        variant={false}
-      >
+      <Card className="w-full max-w-xl shadow-xl " variant={false}>
         <div className="flex flex-col items-center gap-6 mb-6">
           <Avatar
             size={120}

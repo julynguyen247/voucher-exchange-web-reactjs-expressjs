@@ -26,6 +26,9 @@ const AppHeader = () => {
           phone: "",
           id: "",
           image: "",
+          accountNumber: "",
+          bank: "",
+          role: "",
         },
       });
       navigate("/login");
@@ -50,7 +53,7 @@ const AppHeader = () => {
             style={{
               textDecoration: "none",
               fontSize: "16px",
-              padding: "8px 12px",
+
               display: "block",
               fontWeight: 600,
               color: "#2563EB",
@@ -69,7 +72,7 @@ const AppHeader = () => {
             style={{
               textDecoration: "none",
               fontSize: "16px",
-              padding: "8px 12px",
+
               display: "block",
               fontWeight: 600,
               color: "#2563EB",
@@ -78,6 +81,25 @@ const AppHeader = () => {
           >
             Tạo voucher
           </Link>
+        ),
+      },
+      {
+        key: "3",
+        label: (
+          <div
+            onClick={handleLogout}
+            style={{
+              textDecoration: "none",
+              fontSize: "16px",
+
+              display: "block",
+              fontWeight: 600,
+              color: "#dc2626",
+              cursor: "pointer",
+            }}
+          >
+            Đăng xuất
+          </div>
         ),
       },
     ],
@@ -154,7 +176,11 @@ const AppHeader = () => {
           </Tooltip>
 
           {auth.isAuthenticated ? (
-            <Dropdown menu={menu} placement="bottomRight">
+            <Dropdown
+              menu={menu}
+              placement="bottomRight"
+              className="hidden md:block"
+            >
               <img
                 src={userAvatar}
                 alt="avatar"
@@ -230,21 +256,32 @@ const AppHeader = () => {
             >
               Lịch sử giao dịch
             </Link>
+            <Link
+              to="/create-voucher"
+              onClick={() => setDrawerVisible(false)}
+              style={{ textDecoration: "none", fontWeight: "600" }}
+            >
+              Tạo voucher
+            </Link>
           </nav>
         </div>
 
         <div className="mt-6 flex flex-col gap-4">
           <div className="flex gap-4 items-center">
             {auth.isAuthenticated ? (
-              <Dropdown menu={menu} placement="bottomRight">
+              <div className="flex flex-col gap-2">
                 <span>
                   <img
                     src={userAvatar}
                     alt="avatar"
                     className="w-15 h-15 rounded-full object-cover border cursor-pointer"
+                    onClick={() => {
+                      navigate("/account");
+                      setDrawerVisible(false);
+                    }}
                   />
                 </span>
-              </Dropdown>
+              </div>
             ) : (
               <Tooltip title="Đăng nhập">
                 <Link to="/login" onClick={() => setDrawerVisible(false)}>
@@ -263,7 +300,7 @@ const AppHeader = () => {
             </Tooltip>
           </div>
           {auth.isAuthenticated && (
-            <div className="mt-6">
+            <div className="mt-2">
               <Button danger block onClick={handleLogout}>
                 Đăng xuất
               </Button>
