@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Transaction = require("../models/transaction");
+const Voucher = require("../models/voucher");
 
 const createTransactionService = async (
   userId,
@@ -22,6 +23,7 @@ const createTransactionService = async (
     });
 
     const savedTransaction = await transaction.save();
+    await Voucher.findByIdAndUpdate(voucherId, { deleted: true });
     return { success: true, transaction: savedTransaction };
   } catch (error) {
     console.error("Error creating transaction:", error);

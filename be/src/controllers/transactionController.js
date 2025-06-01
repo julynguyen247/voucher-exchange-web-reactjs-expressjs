@@ -32,6 +32,13 @@ const processTransaction = async (req, res) => {
       code
     );
 
+    // Kiểm tra nếu giao dịch đã hoàn tất
+    if (data.transaction && data.transaction.status === "Completed") {
+      // Đánh dấu voucher đã được bán
+      await Voucher.findByIdAndUpdate(voucherId, { deleted: true });
+      console.log(`Voucher ${voucherId} has been marked as deleted after successful transaction`);
+    }
+
     return res.status(200).json({
       success: true,
       message: "Transaction successful",

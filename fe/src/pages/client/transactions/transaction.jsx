@@ -178,7 +178,8 @@ const TransactionPage = () => {
         voucherName,
         price,
         paymentMethod: selectedPaymentOption,
-        status: "pending"
+        status: "pending",
+        deleted: true
       };
 
       const response = await processTransaction(transactionData);
