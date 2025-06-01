@@ -1,10 +1,8 @@
 .order-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
   max-width: 600px;
-  margin: 20px 10px;
+  width: 90%;
+  margin: 100px auto;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -16,7 +14,9 @@
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  width: 350px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
   text-align: center;
 }
 
@@ -51,4 +51,42 @@
 
 .payment-button:hover {
   background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .order-container {
+    width: 95%;
+    margin: 60px auto;
+    padding: 15px;
+  }
+
+  .order-title {
+    font-size: 22px;
+  }
+
+  .payment-button {
+    padding: 12px 20px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-container {
+    width: 98%;
+    margin: 40px auto;
+    padding: 10px;
+  }
+
+  .order-card {
+    padding: 15px;
+  }
+
+  .order-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .order-detail {
+    font-size: 14px;
+  }
 }

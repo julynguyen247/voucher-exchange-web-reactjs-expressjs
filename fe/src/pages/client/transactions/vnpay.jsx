@@ -33,6 +33,9 @@ const VnpayReturn = () => {
                     orderInfo: vnp_OrderInfo
                 }
             });
+            setTimeout(() => {
+                navigate("/transaction-history");
+            }, 1500);
         } else {
             setPaymentStatus({
                 success: false,

@@ -205,6 +205,9 @@ const getVoucherService = async (limit, page, query) => {
       // Parse query parameters safely
       const { filter = {} } = query ? aqp(query) : { filter: {} };
 
+      // voucher condition
+      filter.deleted = { $ne: true };
+
       // Handle special query parameters
       if (query) {
         const includeLowRating = query.includeLowRating === "true";
