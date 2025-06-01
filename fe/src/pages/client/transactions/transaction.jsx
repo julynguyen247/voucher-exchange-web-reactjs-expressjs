@@ -41,10 +41,10 @@ const TransactionPage = () => {
     setSellerBankName("");
     setSellerAccountHolderName("");
 
-    /*if (newPaymentOption === "vnpay") {
+    if (newPaymentOption === "vnpay") {
       return;
     }
-    */
+
     if (newPaymentOption) {
       setIsLoadingSellerInfo(true);
       try {
@@ -184,6 +184,9 @@ const TransactionPage = () => {
       const response = await processTransaction(transactionData);
       if (response.data && response.data.EC === 0) {
         setMessage(response.data.message || "Giao dịch thành công!");
+        setTimeout(() => {
+          navigate("/transaction-history");
+        }, 1500);
       } else {
         setMessage(response.data?.message || "Giao dịch thất bại.");
       }
@@ -194,7 +197,6 @@ const TransactionPage = () => {
     }
   };
 
-  // Render phần hướng dẫn thanh toán theo phương thức
   const renderPaymentInstructions = () => {
     if (isLoadingSellerInfo) {
       return <p>Đang tải thông tin thanh toán...</p>;
@@ -352,7 +354,7 @@ const TransactionPage = () => {
               checked={selectedPaymentOption === "vietqr_bank_transfer"}
               onChange={handlePaymentOptionChange}
             />{" "}
-            Chuyển khoản ngân hàng (VietQR)
+            Chuyển khoản ngân hàng
           </label>
         </div>
         <div className="payment-method-option">
@@ -392,7 +394,7 @@ const TransactionPage = () => {
 
       {message && (
         <div
-          className={`message ${message.toLowerCase().includes("thành công") ? "success" : "error"}`}
+          className={`message ${message.toLowerCase().includes("success") ? "success" : "error"}`}
         >
           {message}
         </div>
