@@ -168,8 +168,6 @@ const updateUser = async (req, res) => {
   });
 };
 const getSellerPaymentDetails = async (req, res) => {
-  //console.log(">>> Request received at getSellerPaymentDetails controller");
-  //console.log("Query params:", req.query);
   try {
     const { voucherId, bank: paymentType } = req.query;
 
@@ -202,8 +200,7 @@ const getSellerPaymentDetails = async (req, res) => {
     let paymentDetails = {};
 
     if (
-      paymentType.toLowerCase() === "momo" ||
-      paymentType.toLowerCase() === "zalo_pay"
+      paymentType.toLowerCase() === "momo"
     ) {
       if (seller.phone) {
         paymentDetails.sellerPhone = seller.phone;
@@ -225,7 +222,10 @@ const getSellerPaymentDetails = async (req, res) => {
             "Người bán chưa cập nhật đủ thông tin tài khoản ngân hàng (tên ngân hàng, STK, tên chủ TK).",
         });
       }
-    } else {
+    } else if (paymentType.toLowerCase() === "vnpay") {
+      paymentDetails.type = "vnpay";
+    }
+    else {
       return res
         .status(400)
         .json({ EC: 1, message: "Loại thanh toán không được hỗ trợ." });
@@ -273,8 +273,7 @@ const handleFetchAccount = async (req, res) => {
   // Report metrics every hour
   if (currentTime - apiMetrics.lastReported > 3600000) {
     console.log(
-      `API Metrics Report: ${apiMetrics.totalCalls} total calls, ${
-        apiMetrics.cacheHits
+      `API Metrics Report: ${apiMetrics.totalCalls} total calls, ${apiMetrics.cacheHits
       } cache hits (${Math.round(
         (apiMetrics.cacheHits / apiMetrics.totalCalls) * 100
       )}%), ${apiMetrics.cacheMisses} cache misses (${Math.round(
@@ -327,8 +326,20 @@ const handleFetchAccount = async (req, res) => {
   });
 };
 const getAccount = async (req, res) => {
-  req.user.id = req.user._id;
-  return res.status(200).json(req.user);
+  try {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "Người dùng không tồn tại" });
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin người dùng:", error);
+    return res.status(500).json({ message: "Lỗi server" });
+  }
 };
 
 const handleGoogleLogin = async (req, res) => {
@@ -399,6 +410,28 @@ const getBank = async (req, res) => {
     { name: "SCB", code: "SCB" },
   ]);
 };
+const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy người dùng",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    console.error("Lỗi khi lấy người dùng:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Đã xảy ra lỗi máy chủ",
+    });
+  }
+};
 
 module.exports = {
   createUser,
@@ -412,4 +445,5 @@ module.exports = {
   getSellerPaymentDetails,
   handleGoogleLogin,
   getBank,
+  getUserById,
 };

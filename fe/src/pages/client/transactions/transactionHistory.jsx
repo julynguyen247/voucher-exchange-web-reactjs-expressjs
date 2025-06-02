@@ -13,21 +13,15 @@ const TransactionHistory = () => {
     const fetchTransactions = async () => {
       try {
         const userId = auth?.user?.id;
-
         console.log("Fetching transactions for userId:", userId);
 
         const response = await getTransactions();
         console.log("API Response:", response);
         if (response.data) {
+          console.log("Transactions Data:", response.data.data);
           setTransactions(response.data.data || []);
-        } else {
-          setMessage(response.data.message || "Failed to fetch transactions.");
         }
       } catch (error) {
-        console.error(
-          "Failed to fetch transactions:",
-          error.response?.data || error.message
-        );
         setMessage(
           error.response?.data?.message || "Failed to fetch transactions."
         );
@@ -51,6 +45,14 @@ const TransactionHistory = () => {
       render: (price) => `${price} VND`,
     },
     {
+      title: "Mã",
+      dataIndex: "code",
+      key: "code",
+      render: (code, record) => {
+        return record.status === "Completed" ? code : "Chưa hoàn tất giao dịch";
+      },
+    },
+    {
       title: "Phương thức thanh toán",
       dataIndex: "paymentMethod",
       key: "paymentMethod",
@@ -59,7 +61,9 @@ const TransactionHistory = () => {
           ? "Momo"
           : method === "vietqr_bank_transfer"
             ? "Chuyển khoản ngân hàng"
-            : "N/A",
+            : method === "vnpay"
+              ? "VNPay"
+              : "Khhông xác định"
     },
     {
       title: "Trạng thái",

@@ -2,13 +2,7 @@ import React, { useContext, useState } from "react";
 import { AuthContext } from "../context/auth.context";
 import { logoutApi } from "../../utils/api";
 import { Input, Tooltip, Drawer, Button, Dropdown } from "antd";
-import {
-  HeartOutlined,
-  StarOutlined,
-  UserOutlined,
-  SearchOutlined,
-  MenuOutlined,
-} from "@ant-design/icons";
+import { HeartOutlined, UserOutlined, MenuOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 
 const AppHeader = () => {
@@ -16,9 +10,9 @@ const AppHeader = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
-  const userAvatar = `${import.meta.env.VITE_BACKEND_URL}/images/upload/${
-    auth.user.image
-  }`;
+  const userAvatar = auth.user.image
+    ? `${import.meta.env.VITE_BACKEND_URL}/images/upload/${auth.user.image}`
+    : "../../assets/user.png";
 
   const handleLogout = async () => {
     const res = await logoutApi();
@@ -32,6 +26,9 @@ const AppHeader = () => {
           phone: "",
           id: "",
           image: "",
+          accountNumber: "",
+          bank: "",
+          role: "",
         },
       });
       navigate("/login");
@@ -41,6 +38,8 @@ const AppHeader = () => {
   const handleSearch = () => {
     if (searchValue.trim()) {
       navigate(`/voucher?search=${encodeURIComponent(searchValue.trim())}`);
+      setDrawerVisible(false);
+      setSearchValue("");
     }
   };
 
@@ -49,7 +48,18 @@ const AppHeader = () => {
       {
         key: "1",
         label: (
-          <Link to="/account" style={{ textDecoration: "none" }}>
+          <Link
+            to="/account"
+            style={{
+              textDecoration: "none",
+              fontSize: "16px",
+
+              display: "block",
+              fontWeight: 600,
+              color: "#2563EB",
+            }}
+            onClick={() => setDrawerVisible(false)}
+          >
             Chỉnh sửa thông tin
           </Link>
         ),
@@ -57,14 +67,40 @@ const AppHeader = () => {
       {
         key: "2",
         label: (
-          <Link to="/create-voucher" style={{ textDecoration: "none" }}>
+          <Link
+            to="/create-voucher"
+            style={{
+              textDecoration: "none",
+              fontSize: "16px",
+
+              display: "block",
+              fontWeight: 600,
+              color: "#2563EB",
+            }}
+            onClick={() => setDrawerVisible(false)}
+          >
             Tạo voucher
           </Link>
         ),
       },
       {
         key: "3",
-        label: <span onClick={handleLogout}>Đăng xuất</span>,
+        label: (
+          <div
+            onClick={handleLogout}
+            style={{
+              textDecoration: "none",
+              fontSize: "16px",
+
+              display: "block",
+              fontWeight: 600,
+              color: "#dc2626",
+              cursor: "pointer",
+            }}
+          >
+            Đăng xuất
+          </div>
+        ),
       },
     ],
   };
@@ -78,11 +114,10 @@ const AppHeader = () => {
           style={{ textDecoration: "none" }}
         >
           <img
-            src={`${import.meta.env.VITE_BACKEND_URL}/images/upload/logo.jpg`}
+            src="/logo-black.png"
             alt="logo"
-            className="w-10 h-10 rounded-full object-cover border"
+            className="w-30 h-10 object-cover  bg-white"
           />
-          <span className="text-xl font-bold text-blue-400">VOUCHERS</span>
         </Link>
 
         <nav className="hidden md:flex gap-6 text-gray-700 text-sm font-medium">
@@ -92,13 +127,6 @@ const AppHeader = () => {
             style={{ textDecoration: "none" }}
           >
             Trang chủ
-          </Link>
-          <Link
-            to="/ranking"
-            className="hover:text-green-600"
-            style={{ textDecoration: "none" }}
-          >
-            Xếp hạng
           </Link>
           <Link
             to="/rating"
@@ -113,6 +141,13 @@ const AppHeader = () => {
             style={{ textDecoration: "none" }}
           >
             Mã giảm giá
+          </Link>
+          <Link
+            to="/profile"
+            className="hover:text-green-600"
+            style={{ textDecoration: "none" }}
+          >
+            Trang cá nhân
           </Link>
           <Link
             to="/transaction-history"
@@ -141,7 +176,11 @@ const AppHeader = () => {
           </Tooltip>
 
           {auth.isAuthenticated ? (
-            <Dropdown menu={menu} placement="bottomRight">
+            <Dropdown
+              menu={menu}
+              placement="bottomRight"
+              className="hidden md:block"
+            >
               <img
                 src={userAvatar}
                 alt="avatar"
@@ -173,22 +212,7 @@ const AppHeader = () => {
         open={drawerVisible}
         className="md:hidden"
       >
-        <nav className="flex flex-col gap-4 text-gray-700 text-base">
-          <Link to="/" onClick={() => setDrawerVisible(false)}>
-            Trang chủ
-          </Link>
-          <Link to="/category" onClick={() => setDrawerVisible(false)}>
-            Ngành hàng
-          </Link>
-          <Link to="/voucher" onClick={() => setDrawerVisible(false)}>
-            Mã giảm giá
-          </Link>
-          <Link to="/review" onClick={() => setDrawerVisible(false)}>
-            Đánh giá
-          </Link>
-        </nav>
-
-        <div className="mt-6 flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           <Input.Search
             placeholder="Tìm kiếm voucher..."
             enterButton
@@ -196,37 +220,92 @@ const AppHeader = () => {
             onChange={(e) => setSearchValue(e.target.value)}
             onSearch={handleSearch}
           />
+          <nav className="flex flex-col gap-4 text-gray-700 text-base">
+            <Link
+              to="/"
+              onClick={() => setDrawerVisible(false)}
+              style={{ textDecoration: "none", fontWeight: "600" }}
+            >
+              Trang chủ
+            </Link>
+            <Link
+              to="/rating"
+              onClick={() => setDrawerVisible(false)}
+              style={{ textDecoration: "none", fontWeight: "600" }}
+            >
+              Đánh giá
+            </Link>
+            <Link
+              to="/voucher"
+              onClick={() => setDrawerVisible(false)}
+              style={{ textDecoration: "none", fontWeight: "600" }}
+            >
+              Mã giảm giá
+            </Link>
+            <Link
+              to="/profile"
+              onClick={() => setDrawerVisible(false)}
+              style={{ textDecoration: "none", fontWeight: "600" }}
+            >
+              Trang cá nhân
+            </Link>
+            <Link
+              to="/transaction-history"
+              onClick={() => setDrawerVisible(false)}
+              style={{ textDecoration: "none", fontWeight: "600" }}
+            >
+              Lịch sử giao dịch
+            </Link>
+            <Link
+              to="/create-voucher"
+              onClick={() => setDrawerVisible(false)}
+              style={{ textDecoration: "none", fontWeight: "600" }}
+            >
+              Tạo voucher
+            </Link>
+          </nav>
+        </div>
+
+        <div className="mt-6 flex flex-col gap-4">
           <div className="flex gap-4 items-center">
-            <Tooltip title="Đã lưu">
-              <StarOutlined className="text-xl hover:text-green-600 cursor-pointer" />
-            </Tooltip>
+            {auth.isAuthenticated ? (
+              <div className="flex flex-col gap-2">
+                <span>
+                  <img
+                    src={userAvatar}
+                    alt="avatar"
+                    className="w-15 h-15 rounded-full object-cover border cursor-pointer"
+                    onClick={() => {
+                      navigate("/account");
+                      setDrawerVisible(false);
+                    }}
+                  />
+                </span>
+              </div>
+            ) : (
+              <Tooltip title="Đăng nhập">
+                <Link to="/login" onClick={() => setDrawerVisible(false)}>
+                  <UserOutlined className="text-2xl hover:text-green-600 cursor-pointer" />
+                </Link>
+              </Tooltip>
+            )}
             <Tooltip title="Yêu thích">
               <HeartOutlined
-                className="text-xl hover:text-green-600 cursor-pointer"
+                className="text-2xl hover:text-green-600 cursor-pointer"
                 onClick={() => {
                   setDrawerVisible(false);
                   navigate("/favorites");
                 }}
               />
             </Tooltip>
-            {auth.isAuthenticated ? (
-              <Dropdown menu={menu} placement="bottomRight">
-                <span>
-                  <img
-                    src={userAvatar}
-                    alt="avatar"
-                    className="w-8 h-8 rounded-full object-cover border cursor-pointer"
-                  />
-                </span>
-              </Dropdown>
-            ) : (
-              <Tooltip title="Đăng nhập">
-                <Link to="/login" onClick={() => setDrawerVisible(false)}>
-                  <UserOutlined className="text-xl hover:text-green-600 cursor-pointer" />
-                </Link>
-              </Tooltip>
-            )}
           </div>
+          {auth.isAuthenticated && (
+            <div className="mt-2">
+              <Button danger block onClick={handleLogout}>
+                Đăng xuất
+              </Button>
+            </div>
+          )}
         </div>
       </Drawer>
     </header>

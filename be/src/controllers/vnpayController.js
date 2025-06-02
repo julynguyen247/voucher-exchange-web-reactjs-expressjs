@@ -2,6 +2,16 @@ const { createPaymentUrl, verifyReturnUrl } = require('../services/vnpayService'
 const Transaction = require('../models/transaction');
 const mongoose = require('mongoose');
 
+const sanitizeOrderInfo = (text) => {
+    return text
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\w\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .substring(0, 100);
+};
+
 const createPayment = async (req, res) => {
     try {
         const { userId, voucherId, voucherName, price } = req.body;
@@ -13,7 +23,8 @@ const createPayment = async (req, res) => {
             });
         }
 
-        const orderInfo = `Thanh toan voucher: ${voucherName.substring(0, 30)}`;
+        const sanitizedVoucherName = sanitizeOrderInfo(voucherName);
+        const orderInfo = `Thanh toan voucher ${sanitizedVoucherName}`;
 
         const paymentData = createPaymentUrl(req, price, orderInfo);
 

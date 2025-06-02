@@ -11,8 +11,13 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import { AuthContext } from "../../../components/context/auth.context";
-import { getBankListApi, updateUserApi, uploadApi } from "../../../utils/api";
-
+import {
+  getBankListApi,
+  updateUserApi,
+  uploadApi,
+  logoutApi,
+} from "../../../utils/api";
+import { useNavigate } from "react-router-dom";
 const { Option } = Select;
 
 const Info = () => {
@@ -20,11 +25,32 @@ const Info = () => {
   const [form] = Form.useForm();
   const [userAvatar, setUserAvatar] = useState("");
   const [bankList, setBankList] = useState([]);
-
+  const [uploading, setUploading] = useState(false);
+  const [fileList, setFileList] = useState([]);
   const urlAvatar = `${
     import.meta.env.VITE_BACKEND_URL
   }/images/upload/${userAvatar}`;
-
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    const res = await logoutApi();
+    if (res && res.data) {
+      localStorage.removeItem("access_token");
+      setAuth({
+        isAuthenticated: false,
+        user: {
+          email: "",
+          name: "",
+          phone: "",
+          id: "",
+          image: "",
+          accountNumber: "",
+          bank: "",
+          role: "",
+        },
+      });
+      navigate("/login");
+    }
+  };
   useEffect(() => {
     console.log(auth);
     form.setFieldsValue({
@@ -52,28 +78,25 @@ const Info = () => {
   }, []);
 
   const handleUploadFile = async (options) => {
-    const { onSuccess, onError, file } = options;
-    try {
-      const res = await uploadApi(file, "avatar");
-      if (res && res.data) {
-        const newAvatar = res.data.name;
-        setUserAvatar(newAvatar);
-        onSuccess?.("ok");
-        message.success("Tải ảnh thành công!");
-      } else {
-        throw new Error(res.message);
-      }
-    } catch (err) {
-      onError?.(err);
-      message.error("Tải ảnh thất bại!");
+    const { onSuccess, file } = options;
+    const res = await uploadApi(file, "avatar");
+
+    if (res?.data?.path) {
+      const fileName = res.data.path.split("/").pop();
+      setUserAvatar(fileName);
+      onSuccess?.("ok");
+
+      message.success("Upload thành công!");
+    } else {
+      message.error("Upload thất bại!");
     }
   };
-
   const propsUpload = {
     maxCount: 1,
     multiple: false,
     showUploadList: false,
     customRequest: handleUploadFile,
+    fileList,
   };
 
   const onFinish = async (values) => {
@@ -89,7 +112,7 @@ const Info = () => {
       accountNumber,
       bank
     );
-
+    console.log(res);
     if (res && res.data) {
       message.success("Cập nhật thành công");
       setAuth((prevAuth) => ({
@@ -103,6 +126,7 @@ const Info = () => {
           accountNumber,
         },
       }));
+      handleLogout();
     } else {
       message.error("Cập nhật thất bại");
     }
@@ -110,22 +134,23 @@ const Info = () => {
 
   return (
     <div className="flex justify-center mt-10 px-4">
-      <Card
-        className="w-full max-w-xl shadow-xl"
-        title="Thông tin cá nhân"
-        variant={false}
-      >
+      <Card className="w-full max-w-xl shadow-xl " variant={false}>
         <div className="flex flex-col items-center gap-6 mb-6">
           <Avatar
             size={120}
             src={urlAvatar}
+            icon={!userAvatar && !uploading ? <UploadOutlined /> : null}
             style={{
               border: "2px solid #1677ff",
               objectFit: "cover",
+              backgroundColor: "#f0f0f0",
             }}
           />
+
           <Upload {...propsUpload}>
-            <Button icon={<UploadOutlined />}>Thay ảnh đại diện</Button>
+            <Button icon={<UploadOutlined />} loading={uploading}>
+              {uploading ? "Đang tải..." : "Thay ảnh đại diện"}
+            </Button>
           </Upload>
         </div>
 
