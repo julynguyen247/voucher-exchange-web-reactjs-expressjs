@@ -35,7 +35,7 @@ const Profile = () => {
         const res = await getVoucher();
         const vouchers = res?.data?.data?.vouchers || [];
         const filtered = vouchers.filter(
-          (v) => v.createdBy === auth.user.id || v.createdBy === auth.user._id
+          (v) => v.createdBy && v.createdBy._id?.toString() === auth.user.id
         );
         setUserVouchers(filtered);
       } catch (error) {
