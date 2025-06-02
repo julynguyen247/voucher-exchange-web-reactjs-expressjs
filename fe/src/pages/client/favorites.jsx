@@ -43,98 +43,127 @@ const Favorites = () => {
   };
 
   return (
-    <div className="p-4 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-pink-600">
-        ❤️ Yêu thích của bạn
-      </h1>
+    <>
+      <div className="p-4 max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6 text-pink-600">
+          ❤️ Yêu thích của bạn
+        </h1>
 
-      {favorites.length === 0 ? (
-        <div className="text-center text-gray-500 italic">
-          Bạn chưa có voucher nào trong danh sách yêu thích.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-          {favorites.map((item) => (
-            <div
-              key={item._id}
-              className="relative border border-gray-300 rounded-xl p-4 shadow-sm flex flex-col justify-between h-full hover:shadow-md transition-all"
+        {favorites.length === 0 ? (
+          <div className="text-center text-gray-500 italic">
+            Bạn chưa có voucher nào trong danh sách yêu thích.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+            {favorites.map((item) => (
+              <div
+                key={item._id}
+                className="relative border border-gray-300 rounded-xl p-4 shadow-sm flex flex-col justify-between h-full hover:shadow-md transition-all"
+              >
+                {PLATFORM_IMAGES[item.platform] && (
+                  <img
+                    src={PLATFORM_IMAGES[item.platform]}
+                    alt={item.platform}
+                    className="w-full h-24 object-contain rounded-md mb-3"
+                  />
+                )}
+
+                <div className="text-sm flex-1">
+                  <p className="font-semibold mb-1">
+                    Giảm {item.discountValue}% đơn tối thiểu{" "}
+                    {item.minimumOrder.toLocaleString()}đ
+                  </p>
+                  <p className="text-gray-500 text-xs mb-2">{item.platform}</p>
+
+                  <div className="mb-2">
+                    <Rate disabled allowHalf defaultValue={item.rating || 0} />
+                    <span className="text-xs text-gray-500 ml-2">
+                      ({item.rating || 0}/5)
+                    </span>
+                  </div>
+
+                  <div className="space-y-1 text-xs">
+                    <div className="flex items-center gap-2">
+                      <RiDiscountPercentLine size={14} />
+                      <span>{item.category}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MdAccessTime size={14} />
+                      <span>
+                        {dayjs(item.expirationDate).format("DD/MM/YYYY")}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MdAttachMoney size={14} />
+                      <span>
+                        {item.price === 0
+                          ? "Free"
+                          : `${item.price.toLocaleString()}đ`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex gap-2">
+                  <Button
+                    block
+                    size="small"
+                    style={{ text: "black" }}
+                    onClick={() =>
+                      navigate("/order", {
+                        state: {
+                          voucherId: item._id,
+                          voucherName: `Giảm ${item.discountValue}% đơn tối thiểu ${item.minimumOrder}đ`,
+                          price: item.price,
+                        },
+                      })
+                    }
+                  >
+                    Mua ngay
+                  </Button>
+                  <Button
+                    block
+                    size="small"
+                    danger
+                    className="text-xs"
+                    onClick={() => handleRemove(item._id)}
+                  >
+                    Bỏ thích
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <footer className="mt-12 bg-blue-50 rounded-2xl p-6 shadow-inner text-center">
+        <div>
+          <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+            Nền tảng <strong>mua bán voucher</strong> uy tín với hàng ngàn{" "}
+            <strong>mã giảm giá</strong> hấp dẫn từ Shopee, Lazada, Tiki,
+            Amazon,... Cập nhật mỗi ngày, giúp bạn{" "}
+            <strong>tiết kiệm chi phí</strong> và mua sắm thông minh hơn.
+          </p>
+          <p>© 2025 Voucher Exchange. All rights reserved.</p>
+          <p className="mt-2">
+            Liên hệ:{" "}
+            <a
+              href="mailto:support@voucher-exchange.com"
+              className="text-green-600 hover:underline"
             >
-              {PLATFORM_IMAGES[item.platform] && (
-                <img
-                  src={PLATFORM_IMAGES[item.platform]}
-                  alt={item.platform}
-                  className="w-full h-24 object-contain rounded-md mb-3"
-                />
-              )}
-
-              <div className="text-sm flex-1">
-                <p className="font-semibold mb-1">
-                  Giảm {item.discountValue}% đơn tối thiểu{" "}
-                  {item.minimumOrder.toLocaleString()}đ
-                </p>
-                <p className="text-gray-500 text-xs mb-2">{item.platform}</p>
-
-                <div className="mb-2">
-                  <Rate disabled allowHalf defaultValue={item.rating || 0} />
-                  <span className="text-xs text-gray-500 ml-2">
-                    ({item.rating || 0}/5)
-                  </span>
-                </div>
-
-                <div className="space-y-1 text-xs">
-                  <div className="flex items-center gap-2">
-                    <RiDiscountPercentLine size={14} />
-                    <span>{item.category}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MdAccessTime size={14} />
-                    <span>
-                      {dayjs(item.expirationDate).format("DD/MM/YYYY")}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MdAttachMoney size={14} />
-                    <span>
-                      {item.price === 0
-                        ? "Free"
-                        : `${item.price.toLocaleString()}đ`}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4 flex gap-2">
-                <Button
-                  block
-                  size="small"
-                  style={{ text: "black" }}
-                  onClick={() =>
-                    navigate("/order", {
-                      state: {
-                        voucherId: item._id,
-                        voucherName: `Giảm ${item.discountValue}% đơn tối thiểu ${item.minimumOrder}đ`,
-                        price: item.price,
-                      },
-                    })
-                  }
-                >
-                  Mua ngay
-                </Button>
-                <Button
-                  block
-                  size="small"
-                  danger
-                  className="text-xs"
-                  onClick={() => handleRemove(item._id)}
-                >
-                  Bỏ thích
-                </Button>
-              </div>
-            </div>
-          ))}
+              support@voucher-exchange.com
+            </a>
+            {" | "}
+            <a
+              href="https://facebook.com/voucher"
+              className="text-green-600 hover:underline"
+            >
+              fb.com/voucher
+            </a>
+          </p>
         </div>
-      )}
-    </div>
+      </footer>
+    </>
   );
 };
 
