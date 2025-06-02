@@ -153,21 +153,21 @@ const HomePage = () => {
 
       <footer className="mt-24 text-center text-gray-500 pb-8">
         <div>
-          <p>© 2025 Voucher Exchange. All rights reserved.</p>
+          <p>© 2025 SieuVoucherVN. All rights reserved.</p>
           <p className="mt-2">
             Liên hệ:{" "}
             <a
-              href="mailto:support@voucher-exchange.com"
+              href="mailto:support@sieuvouchervn.com"
               className="text-green-600 hover:underline"
             >
-              support@voucher-exchange.com
+              support@sieuvouchervn.com
             </a>
             {" | "}
             <a
-              href="https://facebook.com/voucher"
+              href="https://facebook.com/sieuvouchervn"
               className="text-green-600 hover:underline"
             >
-              fb.com/voucher
+              https://facebook.com/sieuvouchervn
             </a>
           </p>
         </div>

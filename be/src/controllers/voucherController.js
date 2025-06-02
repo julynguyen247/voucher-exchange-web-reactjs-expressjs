@@ -193,6 +193,55 @@ const rateVoucher = async (req, res) => {
     return res.status(400).json({ message: error.message });
   }
 };
+const updateVoucher = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      title,
+      discountValue,
+      expirationDate,
+      platform,
+      category,
+      minimumOrder,
+      price,
+      imageUrl,
+    } = req.body;
+
+    const updated = await Voucher.findByIdAndUpdate(
+      id,
+      {
+        title,
+        discountValue,
+        expirationDate,
+        platform,
+        category,
+        minimumOrder,
+        price,
+        imageUrl,
+      },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({
+        EC: 1,
+        message: "Voucher không tồn tại",
+      });
+    }
+
+    return res.status(200).json({
+      EC: 0,
+      message: "Cập nhật voucher thành công",
+      data: updated,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      EC: -1,
+      message: "Lỗi server khi cập nhật voucher",
+    });
+  }
+};
 module.exports = {
   handleUploadImg,
   createVoucher,
@@ -201,4 +250,5 @@ module.exports = {
   getPlatform,
   getCategory,
   rateVoucher,
+  updateVoucher,
 };

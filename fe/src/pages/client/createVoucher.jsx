@@ -164,9 +164,9 @@ const CreateVoucherPage = () => {
           <Form.Item
             label="Giá trị giảm"
             name="discountValue"
-            rules={[{ required: true, message: "Nhập số tiền giảm!" }]}
+            rules={[{ required: true, message: "Nhập số phần trăm giảm!" }]}
           >
-            <Input type="number" placeholder="VD: 50000" />
+            <Input type="number" placeholder="VD: 50" />
           </Form.Item>
 
           <Form.Item

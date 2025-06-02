@@ -182,17 +182,17 @@ const VoucherPage = () => {
 
       <div className="flex flex-wrap gap-3 items-center justify-between mb-4">
         <div
-          className="flex items-center gap-2 cursor-pointer text-blue-600"
+          className="flex items-center gap-2 cursor-pointer "
           onClick={() => navigate("/")}
         >
           <FaArrowLeft size={20} />
           <span className="font-medium">Quay lại Trang chủ</span>
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-center mb-6 text-blue-700">
+        <h1 className="text-2xl md:text-3xl font-bold text-center mb-6 ">
           Mua Bán Voucher Online - Ưu Đãi Hấp Dẫn Mỗi Ngày
         </h1>
         <FaFilter
-          color="#3685f9"
+          color="black"
           size={22}
           className="cursor-pointer"
           onClick={() => setOpenModal(true)}
