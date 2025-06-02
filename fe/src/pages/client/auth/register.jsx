@@ -9,17 +9,20 @@ const RegisterPage = () => {
   const urlAvatar = `${
     import.meta.env.VITE_BACKEND_URL
   }/images/upload/${userAvatar}`;
+  const [fileList, setFileList] = useState([]);
   const navigate = useNavigate();
-
   const handleUploadFile = async (options) => {
     const { onSuccess, file } = options;
     const res = await uploadApi(file, "avatar");
 
-    if (res?.data) {
-      setUserAvatar(res.data.name);
+    if (res?.data?.path) {
+      const fileName = res.data.path.split("/").pop();
+      setUserAvatar(fileName);
       onSuccess?.("ok");
+
+      message.success("Upload thành công!");
     } else {
-      message.error(res.message || "Lỗi khi upload!");
+      message.error("Upload thất bại!");
     }
   };
 
@@ -28,13 +31,7 @@ const RegisterPage = () => {
     multiple: false,
     showUploadList: false,
     customRequest: handleUploadFile,
-    onChange(info) {
-      if (info.file.status === "done") {
-        message.success("Upload ảnh thành công");
-      } else if (info.file.status === "error") {
-        message.error("Upload ảnh thất bại");
-      }
-    },
+    fileList,
   };
 
   const onFinish = async (values) => {
@@ -45,16 +42,24 @@ const RegisterPage = () => {
       return;
     }
 
-    const res = await registerApi(name, email, password, phone, userAvatar);
-    if (res?.data) {
-      if (res.data.result === null) {
-        message.error("Email đã tồn tại!");
-      } else {
+    if (!userAvatar) {
+      message.error("Vui lòng tải ảnh đại diện trước khi đăng ký!");
+      return;
+    }
+
+    try {
+      const res = await registerApi(name, email, password, phone, userAvatar);
+
+      if (res?.data?.EC === 0) {
         message.success("Đăng ký thành công!");
         navigate("/login");
+      } else {
+        message.error(res?.data?.message || "Đăng ký thất bại!");
       }
-    } else {
-      message.error("Lỗi khi đăng ký, vui lòng thử lại!");
+    } catch (err) {
+      const msg = err?.response?.data?.message || "Lỗi không xác định!";
+      message.error(`Đăng ký thất bại: ${msg}`);
+      console.error(" Axios error:", err);
     }
   };
 
@@ -65,16 +70,17 @@ const RegisterPage = () => {
           Đăng ký
         </h1>
 
-        <div className="flex justify-center flex-col items-center mb-4">
+        <div className="flex flex-col items-center gap-6 mb-6">
           <Avatar
-            size={100}
-            src={userAvatar ? urlAvatar : undefined}
-            style={{ border: "1px solid #ccc", objectFit: "cover" }}
+            size={120}
+            src={urlAvatar}
+            style={{
+              border: "2px solid #1677ff",
+              objectFit: "cover",
+            }}
           />
           <Upload {...propsUpload}>
-            <Button icon={<UploadOutlined />} className="mt-2" type="default">
-              Tải ảnh đại diện
-            </Button>
+            <Button icon={<UploadOutlined />}>Thay ảnh đại diện</Button>
           </Upload>
         </div>
 

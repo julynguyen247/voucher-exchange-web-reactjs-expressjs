@@ -45,8 +45,8 @@ const CreateVoucherPage = () => {
     const res = await uploadApi(file, "voucher");
 
     if (res?.data?.path) {
-      const fileName = res.data.path.split("/").pop(); // lấy "logo-....png"
-      setImageUrl(fileName); // chỉ lưu tên file
+      const fileName = res.data.path.split("/").pop();
+      setImageUrl(fileName);
       onSuccess?.("ok");
       message.success("Upload thành công!");
     } else {
