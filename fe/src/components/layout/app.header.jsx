@@ -224,42 +224,66 @@ const AppHeader = () => {
             <Link
               to="/"
               onClick={() => setDrawerVisible(false)}
-              style={{ textDecoration: "none", fontWeight: "600" }}
+              style={{
+                textDecoration: "none",
+                fontWeight: "600",
+                color: "black",
+              }}
             >
               Trang chủ
             </Link>
             <Link
               to="/rating"
               onClick={() => setDrawerVisible(false)}
-              style={{ textDecoration: "none", fontWeight: "600" }}
+              style={{
+                textDecoration: "none",
+                fontWeight: "600",
+                color: "black",
+              }}
             >
               Đánh giá
             </Link>
             <Link
               to="/voucher"
               onClick={() => setDrawerVisible(false)}
-              style={{ textDecoration: "none", fontWeight: "600" }}
+              style={{
+                textDecoration: "none",
+                fontWeight: "600",
+                color: "black",
+              }}
             >
               Mã giảm giá
             </Link>
             <Link
               to="/profile"
               onClick={() => setDrawerVisible(false)}
-              style={{ textDecoration: "none", fontWeight: "600" }}
+              style={{
+                textDecoration: "none",
+                fontWeight: "600",
+                color: "black",
+              }}
             >
               Trang cá nhân
             </Link>
             <Link
               to="/transaction-history"
               onClick={() => setDrawerVisible(false)}
-              style={{ textDecoration: "none", fontWeight: "600" }}
+              style={{
+                textDecoration: "none",
+                fontWeight: "600",
+                color: "black",
+              }}
             >
               Lịch sử giao dịch
             </Link>
             <Link
               to="/create-voucher"
               onClick={() => setDrawerVisible(false)}
-              style={{ textDecoration: "none", fontWeight: "600" }}
+              style={{
+                textDecoration: "none",
+                fontWeight: "600",
+                color: "black",
+              }}
             >
               Tạo voucher
             </Link>

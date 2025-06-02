@@ -78,7 +78,7 @@ const HomePage = () => {
                 <button
                   key={`action-${index}`}
                   onClick={() => navigate("/voucher")}
-                  className="text-green-600 hover:text-green-700 font-semibold"
+                  className="text-[#1677ff] hover:text-blue-400 font-semibold"
                 >
                   Sử dụng ngay →
                 </button>,
@@ -111,7 +111,7 @@ const HomePage = () => {
               <img
                 src={brand.src}
                 alt={brand.name}
-                className="w-full h-[60px] rounded-xl border border-gray-200 object-cover"
+                className="w-full h-[60px] rounded-xl border border-gray-200 object-contain"
               />
               <p className="text-center text-sm text-gray-700 mt-3 font-medium">
                 {brand.name}
@@ -136,13 +136,13 @@ const HomePage = () => {
             <div className="flex flex-col md:flex-row justify-center gap-6">
               <button
                 onClick={() => navigate("/voucher")}
-                className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow transition-all transform hover:translate-y-[-2px]"
+                className="bg-[#1677ff] hover:bg-blue-400 text-white font-bold py-3 px-8 rounded-lg shadow transition-all transform hover:translate-y-[-2px]"
               >
                 Khám phá voucher ngay
               </button>
               <button
                 onClick={() => navigate("/ranking")}
-                className="bg-white hover:bg-gray-100 text-green-600 font-bold py-3 px-8 rounded-lg shadow border border-green-600 transition-all transform hover:translate-y-[-2px]"
+                className="bg-white hover:bg-gray-100 text-[#1677ff] font-bold py-3 px-8 rounded-lg shadow border border-green-600 transition-all transform hover:translate-y-[-2px]"
               >
                 Xem xếp hạng người dùng
               </button>
