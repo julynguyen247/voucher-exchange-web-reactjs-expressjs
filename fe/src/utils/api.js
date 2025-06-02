@@ -302,7 +302,9 @@ const getBankListApi = () => {
 const getUserByIdApi = (id) => {
   return axios.get(`/v1/api/user/${id}`);
 };
-
+const updateVoucherApi = (id, data) => {
+  return axios.put(`/v1/api/voucher/${id}`, data);
+};
 export {
   createUserApi,
   loginApi,
@@ -333,4 +335,5 @@ export {
   ratingApi,
   getBankListApi,
   getUserByIdApi,
+  updateVoucherApi,
 };

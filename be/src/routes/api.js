@@ -21,6 +21,7 @@ const {
   getPlatform,
   getCategory,
   rateVoucher,
+  updateVoucher,
 } = require("../controllers/voucherController");
 const {
   processTransaction,
@@ -84,6 +85,7 @@ routerAPI.get("/voucher", getVoucher);
 routerAPI.delete("/voucher", deleteVoucher);
 routerAPI.get("/voucher/platform", getPlatform);
 routerAPI.get("/voucher/category", getCategory);
+routerAPI.put("/voucher/:id", updateVoucher);
 routerAPI.post("/voucher/:id/rate", rateVoucher);
 
 //transaction

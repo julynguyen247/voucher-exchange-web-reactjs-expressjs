@@ -9,13 +9,14 @@ import {
   Tag,
   Typography,
   message,
+  Modal,
 } from "antd";
 import { AuthContext } from "../../components/context/auth.context";
-import { getVoucher } from "../../utils/api";
+import { getVoucher, deleteVoucherApi } from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { QRCodeCanvas } from "qrcode.react";
-import { Modal } from "antd";
+import VoucherUpdate from "../../components/client/voucher/voucherUpdate";
 
 const { Title } = Typography;
 
@@ -23,28 +24,48 @@ const Profile = () => {
   const { auth } = useContext(AuthContext);
   const [userVouchers, setUserVouchers] = useState([]);
   const [qrVisible, setQrVisible] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedVoucher, setSelectedVoucher] = useState(null);
 
   const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/images/upload/${
     auth.user.image
   }`;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchUserVouchers = async () => {
-      try {
-        const res = await getVoucher();
-        const vouchers = res?.data?.data?.vouchers || [];
-        const filtered = vouchers.filter(
-          (v) => v.createdBy && v.createdBy._id?.toString() === auth.user.id
-        );
-        setUserVouchers(filtered);
-      } catch (error) {
-        message.error("Lấy danh sách voucher thất bại");
-      }
-    };
+  const fetchUserVouchers = async () => {
+    try {
+      const res = await getVoucher();
+      const vouchers = res?.data?.data?.vouchers || [];
+      const filtered = vouchers.filter(
+        (v) => v.createdBy && v.createdBy._id?.toString() === auth.user.id
+      );
+      setUserVouchers(filtered);
+    } catch (error) {
+      message.error("Lấy danh sách voucher thất bại");
+    }
+  };
 
+  useEffect(() => {
     fetchUserVouchers();
   }, [auth.user.id]);
+
+  const handleDelete = (id, title) => {
+    Modal.confirm({
+      title: "Bạn có chắc chắn muốn xóa voucher này?",
+      okText: "Xóa",
+      okType: "danger",
+      cancelText: "Hủy",
+      onOk: async () => {
+        try {
+          await deleteVoucherApi(id);
+          message.success("Đã xóa voucher");
+          fetchUserVouchers();
+        } catch (err) {
+          message.error("Xóa voucher thất bại");
+        }
+      },
+    });
+  };
 
   return (
     <div className="max-w-4xl mx-auto mt-10 px-4">
@@ -101,7 +122,7 @@ const Profile = () => {
             <div className="flex flex-col w-full">
               <span className="font-semibold text-blue-600">{item.title}</span>
               <span className="text-sm text-gray-500">
-                Giảm: {item.discountValue}đ – Hạn:{" "}
+                Giảm: {item.discountValue}% – Hạn:{" "}
                 {dayjs(item.expirationDate).format("DD/MM/YYYY")}
               </span>
               <div className="flex flex-wrap gap-2 mt-1">
@@ -111,32 +132,31 @@ const Profile = () => {
                 </Tag>
               </div>
 
-              <Button
-                className="mt-2 w-full sm:w-auto"
-                style={{
-                  border: "1px solid #1677ff",
-                  color: "#1677ff",
-                  fontWeight: 500,
-                  padding: 16,
-                }}
-                type="default"
-                size="small"
-                onClick={() => {
-                  navigate("/order", {
-                    state: {
-                      voucherId: item._id,
-                      voucherName: `Giảm ${item.discountValue}% đơn tối thiểu ${item.minimumOrder}đ`,
-                      price: item.price,
-                    },
-                  });
-                }}
-              >
-                Sử dụng ngay
-              </Button>
+              <div className="flex gap-3 mt-2 flex-wrap">
+                <Button
+                  type="primary"
+                  size="small"
+                  onClick={() => {
+                    setSelectedVoucher(item);
+                    setEditModalOpen(true);
+                  }}
+                >
+                  Cập nhật
+                </Button>
+
+                <Button
+                  danger
+                  size="small"
+                  onClick={() => handleDelete(item._id, item.title)}
+                >
+                  Xóa
+                </Button>
+              </div>
             </div>
           </List.Item>
         )}
       />
+
       <Modal
         open={qrVisible}
         onCancel={() => setQrVisible(false)}
@@ -154,6 +174,13 @@ const Profile = () => {
           </div>
         </div>
       </Modal>
+
+      <VoucherUpdate
+        open={editModalOpen}
+        voucher={selectedVoucher}
+        onCancel={() => setEditModalOpen(false)}
+        onUpdated={fetchUserVouchers}
+      />
     </div>
   );
 };
