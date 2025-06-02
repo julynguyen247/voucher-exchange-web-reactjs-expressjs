@@ -10,9 +10,9 @@ const AppHeader = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
-  const userAvatar = `${import.meta.env.VITE_BACKEND_URL}/images/upload/${
-    auth.user.image
-  }`;
+  const userAvatar = auth.user.image
+    ? `${import.meta.env.VITE_BACKEND_URL}/images/upload/${auth.user.image}`
+    : "../../assets/user.png";
 
   const handleLogout = async () => {
     const res = await logoutApi();
