@@ -203,7 +203,15 @@ const TransactionHistory = () => {
             placeholder="Tìm theo tên voucher..."
             onSearch={handleSearch}
             onChange={(e) => { if (e.target.value === "") setSearchText(""); }}
-            enterButton={<Button icon={<SearchOutlined />} type="primary">Tìm kiếm</Button>}
+            enterButton={
+              <Button
+                icon={<SearchOutlined />}
+                type="primary"
+                aria-label="Tìm kiếm voucher"
+              >
+                Tìm kiếm
+              </Button>
+            }
             allowClear
             defaultValue={searchText}
             style={{ width: '100%' }}
@@ -218,7 +226,11 @@ const TransactionHistory = () => {
         </Col>
         <Col>
           <Space>
-            <Button icon={<FilterOutlined />} onClick={showFilterModal}>
+            <Button
+              icon={<FilterOutlined />}
+              onClick={showFilterModal}
+              aria-label="Mở bộ lọc giao dịch"
+            >
               Bộ lọc
             </Button>
             <Button onClick={handleClearAllFilters}>
@@ -229,9 +241,10 @@ const TransactionHistory = () => {
       </Row>
 
       <Modal
-        title="Bộ lọc giao dịch"
+        title={<h2 id="filter-modal-title">Bộ lọc giao dịch</h2>}
         visible={isFilterModalVisible}
         onCancel={handleModalCancel}
+        aria-labelledby="filter-modal-title"
         footer={[
           <Button key="clear" onClick={handleClearModalFilters}>
             Xóa lựa chọn trong bộ lọc
@@ -246,9 +259,10 @@ const TransactionHistory = () => {
       >
         <Space direction="vertical" style={{ width: '100%' }}>
           <Row gutter={[16, 8]} align="middle">
-            <Col span={8}><label>Trạng thái:</label></Col>
+            <Col span={8}><label htmlFor="filter-status-select">Trạng thái:</label></Col>
             <Col span={16}>
               <Select
+                id="filter-status-select" // Thêm ID
                 placeholder="Chọn trạng thái"
                 value={tempFilterStatus}
                 onChange={(value) => setTempFilterStatus(value)}
@@ -262,9 +276,10 @@ const TransactionHistory = () => {
             </Col>
           </Row>
           <Row gutter={[16, 8]} align="middle">
-            <Col span={8}><label>Phương thức thanh toán:</label></Col>
+            <Col span={8}><label htmlFor="filter-payment-method-select">Phương thức thanh toán:</label></Col>
             <Col span={16}>
               <Select
+                id="filter-payment-method-select" // Thêm ID
                 placeholder="Chọn PTTT"
                 value={tempFilterPaymentMethod}
                 onChange={(value) => setTempFilterPaymentMethod(value)}
@@ -278,9 +293,10 @@ const TransactionHistory = () => {
             </Col>
           </Row>
           <Row gutter={[16, 8]} align="middle">
-            <Col span={8}><label>Khoảng ngày:</label></Col>
+            <Col span={8}><label htmlFor="filter-date-range-picker">Khoảng ngày:</label></Col>
             <Col span={16}>
               <RangePicker
+                id="filter-date-range-picker"
                 style={{ width: "100%" }}
                 value={tempFilterDateRange}
                 onChange={(dates) => setTempFilterDateRange(dates)}
@@ -296,8 +312,19 @@ const TransactionHistory = () => {
       {
         loading ? (
           <div style={{ textAlign: 'center', padding: '50px' }}>
-            <Spin size="large" />
-            <p>Đang tải dữ liệu...</p>
+            <Spin spinning={loading} tip="Đang tải dữ liệu giao dịch..." size="large">
+              <Table
+                dataSource={filteredTransactions}
+                columns={columns}
+                rowKey="_id"
+                scroll={{ x: true }}
+                locale={{
+                  emptyText: filteredTransactions.length === 0 && (searchText || appliedFilterStatus || appliedFilterPaymentMethod || appliedFilterDateRange)
+                    ? 'Không có giao dịch nào phù hợp với tiêu chí lọc.'
+                    : 'Chưa có giao dịch nào.'
+                }}
+              />
+            </Spin>
           </div>
         ) : (
           <Table
