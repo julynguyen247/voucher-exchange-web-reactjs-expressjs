@@ -1,7 +1,13 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../../style/transactionPage.css";
-import { QRCode } from "antd";
+import { QRCode, Radio, Button, Spin, Alert, Typography, Card, Space, Image, message as antdMessage } from "antd";
+import {
+  CreditCardOutlined,
+  MobileOutlined,
+  BankOutlined,
+  ArrowLeftOutlined,
+} from "@ant-design/icons";
 import {
   processTransaction,
   getSellerPaymentDetails,
@@ -9,14 +15,15 @@ import {
 } from "../../../utils/api";
 import { AuthContext } from "../../../components/context/auth.context";
 
+const { Title, Text, Paragraph } = Typography;
+
 const TransactionPage = () => {
   const location = useLocation();
-  const { voucherId, voucherName, price } = location.state || {};
+  const navigate = useNavigate();
+  const { voucherId, voucherName = "Không có thông tin", price } = location.state || {};
+  const { auth } = useContext(AuthContext);
 
   const [selectedPaymentOption, setSelectedPaymentOption] = useState("");
-  const [message, setMessage] = useState("");
-  const { auth } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   const [sellerPhone, setSellerPhone] = useState("");
   const [sellerBankAccount, setSellerBankAccount] = useState("");
@@ -27,124 +34,86 @@ const TransactionPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    if (!voucherId || !voucherName || typeof price !== "number") {
-      setMessage("Thông tin voucher không hợp lệ. Vui lòng thử lại.");
+    if (!voucherId || typeof price !== "number") {
+      console.error("Thông tin voucher không hợp lệ.");
     }
-  }, [voucherId, voucherName, price]);
+  }, [voucherId, price]);
 
-  const handlePaymentOptionChange = async (event) => {
-    const newPaymentOption = event.target.value;
+  const handlePaymentOptionChange = async (e) => {
+    const newPaymentOption = e.target.value;
     setSelectedPaymentOption(newPaymentOption);
-    setMessage("");
     setSellerPhone("");
     setSellerBankAccount("");
     setSellerBankName("");
     setSellerAccountHolderName("");
 
-    if (newPaymentOption === "vnpay") {
+    if (newPaymentOption === "vnpay" || !newPaymentOption) {
       return;
     }
 
-    if (newPaymentOption) {
-      setIsLoadingSellerInfo(true);
-      try {
-        const response = await getSellerPaymentDetails(
-          voucherId,
-          newPaymentOption
-        );
-
-        if (response.data && response.data.EC === 0) {
-          const details = response.data.data;
-          if (newPaymentOption === "momo") {
-            setSellerPhone(details.sellerPhone || "");
-            if (!details.sellerPhone) {
-              setMessage(
-                `Không tìm thấy SĐT người bán cho ${newPaymentOption}.`
-              );
-            }
-          } else if (newPaymentOption === "vietqr_bank_transfer") {
-            setSellerBankName(details.sellerBankName || "");
-            setSellerBankAccount(details.sellerBankAccount || "");
-            setSellerAccountHolderName(details.sellerAccountHolderName || "");
-            if (
-              !details.sellerBankName ||
-              !details.sellerBankAccount ||
-              !details.sellerAccountHolderName
-            ) {
-              setMessage(
-                "Người bán chưa cập nhật đủ thông tin tài khoản ngân hàng (ngân hàng, STK, tên chủ TK)."
-              );
-            }
+    setIsLoadingSellerInfo(true);
+    try {
+      const response = await getSellerPaymentDetails(voucherId, newPaymentOption);
+      if (response.data && response.data.EC === 0) {
+        const details = response.data.data;
+        if (newPaymentOption === "momo") {
+          setSellerPhone(details.sellerPhone || "");
+          if (!details.sellerPhone) {
+            antdMessage.error(`Người bán chưa cung cấp SĐT Momo.`);
           }
-        } else {
-          setMessage(
-            response.data?.message ||
-            `Không thể lấy thông tin cho ${newPaymentOption}.`
-          );
+        } else if (newPaymentOption === "vietqr_bank_transfer") {
+          setSellerBankName(details.sellerBankName || "");
+          setSellerBankAccount(details.sellerBankAccount || "");
+          setSellerAccountHolderName(details.sellerAccountHolderName || "");
+          if (!details.sellerBankName || !details.sellerBankAccount || !details.sellerAccountHolderName) {
+            antdMessage.error("Người bán chưa cập nhật đủ thông tin tài khoản ngân hàng.");
+          }
         }
-      } catch (error) {
-        console.error("Lỗi khi lấy thông tin thanh toán:", error);
-        setMessage(
-          error.response?.data?.message ||
-          "Lỗi kết nối khi lấy thông tin thanh toán."
-        );
-      } finally {
-        setIsLoadingSellerInfo(false);
+      } else {
+        antdMessage.error(response.data?.message || `Không thể lấy thông tin cho ${newPaymentOption}.`);
       }
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin thanh toán:", error);
+      antdMessage.error(error.response?.data?.message || "Lỗi kết nối khi lấy thông tin thanh toán.");
+    } finally {
+      setIsLoadingSellerInfo(false);
     }
   };
 
   const handleVnpayPayment = async () => {
-    setMessage("");
     setIsProcessing(true);
-
     if (!auth?.user?.id) {
-      setMessage("Người dùng chưa được xác thực.");
+      antdMessage.error("Người dùng chưa được xác thực.");
       setIsProcessing(false);
       return;
     }
-
     try {
-      const paymentData = {
-        userId: auth.user.id,
-        voucherId,
-        voucherName,
-        price
-      };
-
+      const paymentData = { userId: auth.user.id, voucherId, voucherName, price };
       const response = await createVnpayPayment(paymentData);
-      if (response.data && response.data.EC === 0) {
+      if (response.data && response.data.EC === 0 && response.data.data.paymentUrl) {
         window.location.href = response.data.data.paymentUrl;
       } else {
-        setMessage(response.data?.message || "Không thể tạo thanh toán VNPAY.");
+        antdMessage.error(response.data?.message || "Không thể tạo thanh toán VNPAY. Vui lòng thử lại.");
       }
     } catch (error) {
       console.error("Lỗi khi tạo thanh toán VNPAY:", error);
-      setMessage(error.response?.data?.message || "Lỗi khi xử lý yêu cầu thanh toán.");
+      antdMessage.error(error.response?.data?.message || "Lỗi khi xử lý yêu cầu thanh toán VNPAY.");
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleTransaction = async () => {
-    setMessage("");
-    setIsProcessing(true);
-
     if (!auth?.user?.id) {
-      setMessage("Người dùng chưa được xác thực.");
-      setIsProcessing(false);
+      antdMessage.error("Người dùng chưa được xác thực.");
       return;
     }
-
     if (!selectedPaymentOption) {
-      setMessage("Vui lòng chọn một phương thức thanh toán.");
-      setIsProcessing(false);
+      antdMessage.warning("Vui lòng chọn một phương thức thanh toán.");
       return;
     }
-
     if (isLoadingSellerInfo) {
-      setMessage("Đang tải thông tin, vui lòng đợi.");
-      setIsProcessing(false);
+      antdMessage.info("Đang tải thông tin người bán, vui lòng đợi.");
       return;
     }
 
@@ -153,24 +122,16 @@ const TransactionPage = () => {
       return;
     }
 
-    if (
-      (selectedPaymentOption === "momo") &&
-      !sellerPhone
-    ) {
-      setMessage(`Thông tin SĐT cho ${selectedPaymentOption} chưa sẵn sàng.`);
-      setIsProcessing(false);
+    if (selectedPaymentOption === "momo" && !sellerPhone) {
+      antdMessage.error("Thông tin SĐT Momo của người bán chưa sẵn sàng. Vui lòng chọn lại hoặc thử lại sau.");
+      return;
+    }
+    if (selectedPaymentOption === "vietqr_bank_transfer" && (!sellerBankAccount || !sellerBankName || !sellerAccountHolderName)) {
+      antdMessage.error("Thông tin tài khoản ngân hàng của người bán chưa sẵn sàng. Vui lòng chọn lại hoặc thử lại sau.");
       return;
     }
 
-    if (
-      selectedPaymentOption === "vietqr_bank_transfer" &&
-      (!sellerBankAccount || !sellerBankName || !sellerAccountHolderName)
-    ) {
-      setMessage("Thông tin tài khoản ngân hàng của người bán chưa sẵn sàng.");
-      setIsProcessing(false);
-      return;
-    }
-
+    setIsProcessing(true);
     try {
       const transactionData = {
         userId: auth.user.id,
@@ -178,21 +139,20 @@ const TransactionPage = () => {
         voucherName,
         price,
         paymentMethod: selectedPaymentOption,
-        status: "pending",
-        deleted: true
+        status: "Pending",
+        deleted: false
       };
-
       const response = await processTransaction(transactionData);
       if (response.data && response.data.EC === 0) {
-        setMessage(response.data.message || "Giao dịch thành công!");
+        antdMessage.success(response.data.message || "Yêu cầu thanh toán đã được ghi nhận! Vui lòng hoàn tất thanh toán và chờ xác nhận.");
         setTimeout(() => {
           navigate("/transaction-history");
-        }, 1500);
+        }, 2500);
       } else {
-        setMessage(response.data?.message || "Giao dịch thất bại.");
+        antdMessage.success(response.data?.message || "Giao dịch thành công.");
       }
     } catch (error) {
-      setMessage(error.response?.data?.message || "Lỗi khi xử lý giao dịch.");
+      antdMessage.error(error.response?.data?.message || "Lỗi khi xử lý giao dịch.");
     } finally {
       setIsProcessing(false);
     }
@@ -200,207 +160,159 @@ const TransactionPage = () => {
 
   const renderPaymentInstructions = () => {
     if (isLoadingSellerInfo) {
-      return <p>Đang tải thông tin thanh toán...</p>;
+      return (
+        <div style={{ textAlign: 'center', padding: '20px 0' }}>
+          <Spin tip="Đang tải thông tin thanh toán..." size="large" />
+        </div>
+      );
     }
 
     if (selectedPaymentOption === "vnpay") {
       return (
-        <div>
-          <h3>Thanh toán qua VNPAY</h3>
-          <div className="vnpay-info">
-            <img
-              src="/vnpay-logo.png"
-              alt="VNPAY"
-              style={{ maxWidth: 200, margin: "10px 0" }}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "https://sandbox.vnpayment.vn/paymentv2/Images/brands/logo.svg";
-              }}
-            />
-            <p>Bạn sẽ được chuyển đến cổng thanh toán VNPAY để hoàn tất thanh toán.</p>
-            <p>VNPAY hỗ trợ thanh toán bằng QR Code, thẻ ATM nội địa, thẻ quốc tế và ví điện tử.</p>
-          </div>
-        </div>
+        <Space direction="vertical" align="center" style={{ width: '100%', padding: '20px 0' }}>
+          <Image
+            src="/vnpay-logo.png"
+            alt="VNPAY Logo"
+            width={120}
+            preview={false}
+            style={{ marginBottom: 16 }}
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
+          <Paragraph style={{ textAlign: 'center', maxWidth: 400 }}>
+            Bạn sẽ được chuyển đến cổng thanh toán VNPAY để hoàn tất giao dịch.
+            VNPAY hỗ trợ thanh toán bằng QR Code, thẻ ATM nội địa, thẻ quốc tế và ví điện tử.
+          </Paragraph>
+        </Space>
       );
     }
 
     if (selectedPaymentOption === "momo" && sellerPhone) {
+      const momoQRCodeValue = `2|99|${sellerPhone}|||${price}|${encodeURIComponent(
+        `TT ${voucherName.substring(0, 15)} ID ${voucherId}`
+      )}|0|0`;
       return (
-        <div>
-          <h3>Quét mã QR để thanh toán bằng Momo</h3>
-          <QRCode style={{ margin: "16px auto" }}
-            value={`2|99|${sellerPhone}|||${price}|${encodeURIComponent(
-              `TT Voucher ${voucherName.substring(0, 10)}`
-            )}|0|0&orderID=${voucherId}`}
-            size={256}
-          />
-          <p>
-            <strong>SĐT người nhận:</strong> {sellerPhone}
-          </p>
-          <p>
-            <strong>Số tiền:</strong> {price.toLocaleString("vi-VN")} VND
-          </p>
-          <p>
-            <strong>Nội dung:</strong> TT Voucher{" "}
-            {voucherName.substring(0, 10)}
-          </p>
-        </div>
+        <Space direction="vertical" align="center" style={{ width: '100%', padding: '20px 0' }}>
+          <Title level={5} style={{ marginBottom: 0 }}>Quét mã QR để thanh toán Momo</Title>
+          <QRCode value={momoQRCodeValue} size={180} style={{ margin: "16px 0" }} />
+          <Paragraph><strong>SĐT người nhận:</strong> <Text copyable>{sellerPhone}</Text></Paragraph>
+          <Paragraph><strong>Số tiền:</strong> <Text strong style={{ color: '#fa8c16' }}>{price.toLocaleString("vi-VN")} VND</Text></Paragraph>
+          <Paragraph><strong>Nội dung:</strong> <Text copyable>{`TT ${voucherName.substring(0, 15)} ID ${voucherId}`}</Text></Paragraph>
+          <Alert message="Sau khi thanh toán, vui lòng nhấn nút 'Xác Nhận Đã Thanh Toán' bên dưới." type="info" showIcon style={{ marginTop: 10, maxWidth: 400 }} />
+        </Space>
       );
     }
 
-    if (
-      selectedPaymentOption === "vietqr_bank_transfer" &&
-      sellerBankAccount &&
-      sellerBankName &&
-      sellerAccountHolderName
-    ) {
+    if (selectedPaymentOption === "vietqr_bank_transfer" && sellerBankAccount && sellerBankName && sellerAccountHolderName) {
       return (
-        <div>
-          <h3>Chuyển khoản thủ công</h3>
-          <p>
-            <strong>Ngân hàng người bán:</strong>{" "}
-            {sellerBankName.toUpperCase()}
-          </p>
-          <p>
-            <strong>Chủ tài khoản:</strong> {sellerAccountHolderName}
-          </p>
-          <p>
-            <strong>Số tài khoản:</strong> {sellerBankAccount}
-          </p>
-          <p>
-            <strong>Số tiền:</strong> {price.toLocaleString("vi-VN")} VND
-          </p>
-          <p>
-            <strong>Nội dung:</strong>{" "}
-            {`TT VCR ${voucherName.substring(0, 10)}`}
-          </p>
-        </div>
+        <Space direction="vertical" style={{ width: '100%', padding: '20px 0', alignItems: 'flex-start' }}>
+          <Title level={5}>Thông tin chuyển khoản ngân hàng</Title>
+          <Paragraph><strong>Ngân hàng:</strong> {sellerBankName.toUpperCase()}</Paragraph>
+          <Paragraph><strong>Chủ tài khoản:</strong> {sellerAccountHolderName}</Paragraph>
+          <Paragraph><strong>Số tài khoản:</strong> <Text copyable>{sellerBankAccount}</Text></Paragraph>
+          <Paragraph><strong>Số tiền:</strong> <Text strong style={{ color: '#fa8c16' }}>{price.toLocaleString("vi-VN")} VND</Text></Paragraph>
+          <Paragraph><strong>Nội dung:</strong> <Text copyable>{`TT ${voucherName.substring(0, 15)} ID ${voucherId}`}</Text></Paragraph>
+          <Alert message="Sau khi chuyển khoản, vui lòng nhấn nút 'Xác Nhận Đã Thanh Toán' bên dưới." type="info" showIcon style={{ marginTop: 10, width: '100%' }} />
+        </Space>
       );
     }
-
-    if (!message) {
-      if ((selectedPaymentOption === "momo") && !sellerPhone) {
-        return (
-          <p>
-            Không thể tải thông tin SĐT cho {selectedPaymentOption}.
-            Vui lòng thử lại.
-          </p>
-        );
-      }
-
-      if (
-        selectedPaymentOption === "vietqr_bank_transfer" &&
-        (!sellerBankAccount || !sellerBankName || !sellerAccountHolderName)
-      ) {
-        return (
-          <p>
-            Không thể tải thông tin tài khoản ngân hàng. Vui lòng thử
-            lại.
-          </p>
-        );
-      }
+    // Xử lý trường hợp thông tin chưa tải xong hoặc lỗi tải cụ thể cho từng phương thức
+    if (selectedPaymentOption === "momo" && !sellerPhone && !isLoadingSellerInfo) {
+      return <Alert message="Không thể tải thông tin SĐT Momo của người bán. Vui lòng thử lại hoặc chọn phương thức khác." type="warning" showIcon style={{ marginTop: 16 }} />;
     }
-
+    if (selectedPaymentOption === "vietqr_bank_transfer" && (!sellerBankAccount || !sellerBankName || !sellerAccountHolderName) && !isLoadingSellerInfo) {
+      return <Alert message="Không thể tải thông tin tài khoản ngân hàng của người bán. Vui lòng thử lại hoặc chọn phương thức khác." type="warning" showIcon style={{ marginTop: 16 }} />;
+    }
     return null;
   };
 
   if (!voucherId || typeof price !== "number") {
     return (
-      <div className="transaction-container">
-        <h1>Lỗi</h1>
-        <p>{message || "Thông tin voucher không hợp lệ."}</p>
-        <button onClick={() => navigate(-1)} className="confirm-button">
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 200px)', padding: '20px' }}>
+        <Alert
+          message="Lỗi thông tin giao dịch"
+          description="Thông tin voucher không hợp lệ hoặc đã có lỗi xảy ra. Vui lòng thử lại."
+          type="error"
+          showIcon
+          style={{ marginBottom: 24, maxWidth: 600, textAlign: 'left' }}
+        />
+        <Button
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate(-1)}
+          size="large"
+        >
           Quay Lại
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <>
-      <div className="transaction-container">
-        <h1>Xác Nhận Thanh Toán</h1>
-        <div className="transaction-details">
-          <p>
-            <strong>Voucher:</strong> {voucherName}
-          </p>
-          <p>
-            <strong>Giá:</strong>{" "}
-            {price.toLocaleString("vi-VN", {
-              style: "currency",
-              currency: "VND",
-            })}
-          </p>
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '20px 0', minHeight: 'calc(100vh - 250px)' }}>
+        <Space direction="vertical" size="large" style={{ width: '100%', maxWidth: 600 }}>
+          <Card>
+            <Title level={3} style={{ textAlign: 'center', marginBottom: '24px' }}>Xác Nhận Thanh Toán</Title>
+            <Paragraph>
+              <strong>Voucher:</strong> {voucherName}
+            </Paragraph>
+            <Paragraph>
+              <strong>Giá thanh toán:</strong>{" "}
+              <Text strong style={{ color: '#fa8c16', fontSize: '18px' }}>
+                {price.toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                })}
+              </Text>
+            </Paragraph>
+          </Card>
 
-        <div className="payment-options">
-          <h2>Chọn Phương Thức Thanh Toán</h2>
-          <div className="payment-method-option">
-            <label>
-              <input
-                type="radio"
-                value="momo"
-                name="paymentOption"
-                checked={selectedPaymentOption === "momo"}
-                onChange={handlePaymentOptionChange}
-              />{" "}
-              Momo
-            </label>
-          </div>
-          <div className="payment-method-option">
-            <label>
-              <input
-                type="radio"
-                value="vietqr_bank_transfer"
-                name="paymentOption"
-                checked={selectedPaymentOption === "vietqr_bank_transfer"}
-                onChange={handlePaymentOptionChange}
-              />{" "}
-              Chuyển khoản ngân hàng
-            </label>
-          </div>
-          <div className="payment-method-option">
-            <label>
-              <input
-                type="radio"
-                value="vnpay"
-                name="paymentOption"
-                checked={selectedPaymentOption === "vnpay"}
-                onChange={handlePaymentOptionChange}
-              />{" "}
-              Thanh toán qua VNPAY
-            </label>
-          </div>
-        </div>
+          <Card title={<Title level={4} style={{ margin: 0 }}>Chọn Phương Thức Thanh Toán</Title>}>
+            <Radio.Group
+              onChange={handlePaymentOptionChange}
+              value={selectedPaymentOption}
+              style={{ width: '100%' }}
+              optionType="button"
+              buttonStyle="solid"
+            >
+              <Space direction="vertical" style={{ width: '100%' }}>
+                <Radio.Button value="momo" style={{ width: '100%', textAlign: 'left', height: 'auto', padding: '10px 15px', whiteSpace: 'normal' }}>
+                  <Space><MobileOutlined /> Thanh toán qua Momo</Space>
+                </Radio.Button>
+                <Radio.Button value="vietqr_bank_transfer" style={{ width: '100%', textAlign: 'left', height: 'auto', padding: '10px 15px', whiteSpace: 'normal' }}>
+                  <Space><BankOutlined /> Chuyển khoản ngân hàng</Space>
+                </Radio.Button>
+                <Radio.Button value="vnpay" style={{ width: '100%', textAlign: 'left', height: 'auto', padding: '10px 15px', whiteSpace: 'normal' }}>
+                  <Space><CreditCardOutlined /> Thanh toán qua VNPAY</Space>
+                </Radio.Button>
+              </Space>
+            </Radio.Group>
+          </Card>
 
-        {selectedPaymentOption && (
-          <div className="payment-instruction">
-            {renderPaymentInstructions()}
-          </div>
-        )}
+          {selectedPaymentOption && (
+            <Card title={<Title level={4} style={{ margin: 0 }}>Hướng Dẫn Thanh Toán</Title>}>
+              {renderPaymentInstructions()}
+            </Card>
+          )}
 
-        <button
-          onClick={handleTransaction}
-          className="confirm-button"
-          disabled={
-            isLoadingSellerInfo ||
-            isProcessing ||
-            !selectedPaymentOption ||
-            !voucherId ||
-            typeof price !== "number"
-          }
-        >
-          {isProcessing ? "Đang xử lý..." :
-            selectedPaymentOption === "vnpay" ? "Thanh Toán Qua VNPAY" : "Xác Nhận Đã Thanh Toán"}
-        </button>
-
-        {message && (
-          <div
-            className={`message ${message.toLowerCase().includes("success") ? "success" : "error"}`}
+          <Button
+            type="primary"
+            size="large"
+            block
+            onClick={handleTransaction}
+            loading={isProcessing}
+            disabled={
+              isLoadingSellerInfo ||
+              isProcessing ||
+              !selectedPaymentOption ||
+              (selectedPaymentOption === "momo" && !sellerPhone && !isLoadingSellerInfo) ||
+              (selectedPaymentOption === "vietqr_bank_transfer" && (!sellerBankAccount || !sellerBankName || !sellerAccountHolderName) && !isLoadingSellerInfo)
+            }
+            style={{ fontWeight: 'bold', marginTop: '8px' }}
           >
-            {message}
-          </div>
-        )}
+            {isProcessing ? "Đang xử lý..." :
+              selectedPaymentOption === "vnpay" ? "Tiến Hành Thanh Toán Qua VNPAY" : "Xác Nhận Đã Thanh Toán"}
+          </Button>
+        </Space>
       </div>
       <footer className="mt-12 bg-blue-50 rounded-2xl p-6 shadow-inner text-center">
         <div>
