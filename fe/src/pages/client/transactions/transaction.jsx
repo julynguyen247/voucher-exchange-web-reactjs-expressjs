@@ -228,7 +228,7 @@ const TransactionPage = () => {
       return (
         <div>
           <h3>Quét mã QR để thanh toán bằng Momo</h3>
-          <QRCode
+          <QRCode style={{ margin: "16px auto" }}
             value={`2|99|${sellerPhone}|||${price}|${encodeURIComponent(
               `TT Voucher ${voucherName.substring(0, 10)}`
             )}|0|0&orderID=${voucherId}`}
@@ -317,90 +317,121 @@ const TransactionPage = () => {
   }
 
   return (
-    <div className="transaction-container">
-      <h1>Xác Nhận Thanh Toán</h1>
-      <div className="transaction-details">
-        <p>
-          <strong>Voucher:</strong> {voucherName}
-        </p>
-        <p>
-          <strong>Giá:</strong>{" "}
-          {price.toLocaleString("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          })}
-        </p>
-      </div>
-
-      <div className="payment-options">
-        <h2>Chọn Phương Thức Thanh Toán</h2>
-        <div className="payment-method-option">
-          <label>
-            <input
-              type="radio"
-              value="momo"
-              name="paymentOption"
-              checked={selectedPaymentOption === "momo"}
-              onChange={handlePaymentOptionChange}
-            />{" "}
-            Momo
-          </label>
+    <>
+      <div className="transaction-container">
+        <h1>Xác Nhận Thanh Toán</h1>
+        <div className="transaction-details">
+          <p>
+            <strong>Voucher:</strong> {voucherName}
+          </p>
+          <p>
+            <strong>Giá:</strong>{" "}
+            {price.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}
+          </p>
         </div>
-        <div className="payment-method-option">
-          <label>
-            <input
-              type="radio"
-              value="vietqr_bank_transfer"
-              name="paymentOption"
-              checked={selectedPaymentOption === "vietqr_bank_transfer"}
-              onChange={handlePaymentOptionChange}
-            />{" "}
-            Chuyển khoản ngân hàng
-          </label>
-        </div>
-        <div className="payment-method-option">
-          <label>
-            <input
-              type="radio"
-              value="vnpay"
-              name="paymentOption"
-              checked={selectedPaymentOption === "vnpay"}
-              onChange={handlePaymentOptionChange}
-            />{" "}
-            Thanh toán qua VNPAY
-          </label>
-        </div>
-      </div>
 
-      {selectedPaymentOption && (
-        <div className="payment-instruction">
-          {renderPaymentInstructions()}
+        <div className="payment-options">
+          <h2>Chọn Phương Thức Thanh Toán</h2>
+          <div className="payment-method-option">
+            <label>
+              <input
+                type="radio"
+                value="momo"
+                name="paymentOption"
+                checked={selectedPaymentOption === "momo"}
+                onChange={handlePaymentOptionChange}
+              />{" "}
+              Momo
+            </label>
+          </div>
+          <div className="payment-method-option">
+            <label>
+              <input
+                type="radio"
+                value="vietqr_bank_transfer"
+                name="paymentOption"
+                checked={selectedPaymentOption === "vietqr_bank_transfer"}
+                onChange={handlePaymentOptionChange}
+              />{" "}
+              Chuyển khoản ngân hàng
+            </label>
+          </div>
+          <div className="payment-method-option">
+            <label>
+              <input
+                type="radio"
+                value="vnpay"
+                name="paymentOption"
+                checked={selectedPaymentOption === "vnpay"}
+                onChange={handlePaymentOptionChange}
+              />{" "}
+              Thanh toán qua VNPAY
+            </label>
+          </div>
         </div>
-      )}
 
-      <button
-        onClick={handleTransaction}
-        className="confirm-button"
-        disabled={
-          isLoadingSellerInfo ||
-          isProcessing ||
-          !selectedPaymentOption ||
-          !voucherId ||
-          typeof price !== "number"
-        }
-      >
-        {isProcessing ? "Đang xử lý..." :
-          selectedPaymentOption === "vnpay" ? "Thanh Toán Qua VNPAY" : "Xác Nhận Đã Thanh Toán"}
-      </button>
+        {selectedPaymentOption && (
+          <div className="payment-instruction">
+            {renderPaymentInstructions()}
+          </div>
+        )}
 
-      {message && (
-        <div
-          className={`message ${message.toLowerCase().includes("success") ? "success" : "error"}`}
+        <button
+          onClick={handleTransaction}
+          className="confirm-button"
+          disabled={
+            isLoadingSellerInfo ||
+            isProcessing ||
+            !selectedPaymentOption ||
+            !voucherId ||
+            typeof price !== "number"
+          }
         >
-          {message}
+          {isProcessing ? "Đang xử lý..." :
+            selectedPaymentOption === "vnpay" ? "Thanh Toán Qua VNPAY" : "Xác Nhận Đã Thanh Toán"}
+        </button>
+
+        {message && (
+          <div
+            className={`message ${message.toLowerCase().includes("success") ? "success" : "error"}`}
+          >
+            {message}
+          </div>
+        )}
+      </div>
+      <footer className="mt-12 bg-blue-50 rounded-2xl p-6 shadow-inner text-center">
+        <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+          Nền tảng <strong>mua bán voucher</strong> uy tín với hàng ngàn{" "}
+          <strong>mã giảm giá</strong> hấp dẫn từ Shopee, Lazada, Tiki,
+          Amazon,... Cập nhật mỗi ngày, giúp bạn{" "}
+          <strong>tiết kiệm chi phí</strong> và mua sắm thông minh hơn.
+        </p>
+      </footer>
+      <footer className="mt-24 text-center text-gray-500 pb-8">
+        <div>
+          <p>© 2025 Voucher Exchange. All rights reserved.</p>
+          <p className="mt-2">
+            Liên hệ:{" "}
+            <a
+              href="mailto:support@voucher-exchange.com"
+              className="text-green-600 hover:underline"
+            >
+              support@voucher-exchange.com
+            </a>
+            {" | "}
+            <a
+              href="https://facebook.com/voucher"
+              className="text-green-600 hover:underline"
+            >
+              fb.com/voucher
+            </a>
+          </p>
         </div>
-      )}
-    </div>
+      </footer>
+    </>
   );
 };
 
