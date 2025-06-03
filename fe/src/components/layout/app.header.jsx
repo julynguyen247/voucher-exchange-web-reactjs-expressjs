@@ -86,38 +86,27 @@ const AppHeader = () => {
         </Link>
 
         <nav className="hidden md:flex gap-6 text-gray-700 text-sm font-medium">
-          <Link
-            to="/"
-            className="hover:text-green-600"
-            style={{ textDecoration: "none" }}
-          >
+          <Link to="/" style={{ textDecoration: "none", color: "black" }}>
             Trang chủ
           </Link>
-          <Link
-            to="/ranking"
-            className="hover:text-green-600"
-            style={{ textDecoration: "none" }}
-          >
-            Xếp hạng
-          </Link>
-          <Link
-            to="/rating"
-            className="hover:text-green-600"
-            style={{ textDecoration: "none" }}
-          >
+          <Link to="/rating" style={{ textDecoration: "none", color: "black" }}>
             Đánh giá
           </Link>
           <Link
             to="/voucher"
-            className="hover:text-green-600"
-            style={{ textDecoration: "none" }}
+            style={{ textDecoration: "none", color: "black" }}
           >
             Mã giảm giá
           </Link>
           <Link
+            to="/profile"
+            style={{ textDecoration: "none", color: "black" }}
+          >
+            Trang cá nhân
+          </Link>
+          <Link
             to="/transaction-history"
-            className="hover:text-green-600"
-            style={{ textDecoration: "none" }}
+            style={{ textDecoration: "none", color: "black" }}
           >
             Lịch sử giao dịch
           </Link>
@@ -135,7 +124,7 @@ const AppHeader = () => {
 
           <Tooltip title="Yêu thích">
             <HeartOutlined
-              className="text-xl hover:text-green-600 cursor-pointer"
+              className="text-xl  cursor-pointer"
               onClick={() => navigate("/favorites")}
             />
           </Tooltip>

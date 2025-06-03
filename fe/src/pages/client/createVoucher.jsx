@@ -91,7 +91,7 @@ const CreateVoucherPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center bg-gradient-to-br from-green-100 to-cyan-100 min-h-screen py-10">
+    <div className="flex justify-center items-center bg-gradient-to-br from-blue-100 to-cyan-100 min-h-screen py-10">
       <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-8">
         <h1 className="text-3xl font-bold text-center text-green-600 mb-6">
           Thêm Voucher Mới
@@ -140,9 +140,8 @@ const CreateVoucherPage = () => {
             <Upload {...propsUpload}>
               {imageUrl ? (
                 <img
-                  src={`${
-                    import.meta.env.VITE_BACKEND_URL
-                  }/images/upload/${imageUrl}`}
+                  src={`${import.meta.env.VITE_BACKEND_URL
+                    }/images/upload/${imageUrl}`}
                   alt="preview"
                   style={{
                     width: "100%",
@@ -161,9 +160,9 @@ const CreateVoucherPage = () => {
           <Form.Item
             label="Giá trị giảm"
             name="discountValue"
-            rules={[{ required: true, message: "Nhập số tiền giảm!" }]}
+            rules={[{ required: true, message: "Nhập số phần trăm giảm!" }]}
           >
-            <Input type="number" placeholder="VD: 50000" />
+            <Input type="number" placeholder="VD: 50" />
           </Form.Item>
 
           <Form.Item

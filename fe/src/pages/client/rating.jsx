@@ -38,7 +38,7 @@ const Rating = () => {
 
       if (res.data && Array.isArray(res.data.users)) {
         setUserData(res.data.users);
-        
+
         if (res.data.pagination) {
           setPagination({
             current: res.data.pagination.page,
@@ -62,7 +62,7 @@ const Rating = () => {
 
   const handleRatingChange = async (newRating, record) => {
     const token = localStorage.getItem("access_token");
-    
+
     if (!token && !allowAnonymous) {
       message.warning("Bạn cần đăng nhập để đánh giá!");
       return;
@@ -89,17 +89,17 @@ const Rating = () => {
   const getColumns = () => {
     // Kiểm tra kích thước màn hình
     const isMobile = window.innerWidth < 768;
-    
+
     const baseColumns = [
       // Ở phần render của cột "Hạng"
-      {  
+      {
         title: "Hạng",
         key: "rank",
         width: isMobile ? 60 : 80,
         render: (_, record, index) => {
           // Tính toán thứ hạng thực tế dựa trên trang hiện tại
           const actualRank = (pagination.current - 1) * pagination.pageSize + index + 1;
-          
+
           // Chỉ rank 1 có định dạng đặc biệt
           if (actualRank === 1) {
             return (
@@ -110,7 +110,7 @@ const Rating = () => {
               </div>
             );
           }
-          
+
           // Tất cả các rank khác (2 trở lên) sẽ có định dạng giống nhau
           return (
             <div className="text-center font-medium text-gray-700">
@@ -119,7 +119,7 @@ const Rating = () => {
           );
         },
       },
-      
+
       {
         title: "Tên người dùng",
         dataIndex: "name",
@@ -127,16 +127,16 @@ const Rating = () => {
         render: (text, record, index) => {
           // Tính rank thực tế dựa trên vị trí trang
           const actualRank = (pagination.current - 1) * pagination.pageSize + index + 1;
-          
+
           return (
             <div className="flex items-center gap-2">
-              <Avatar 
+              <Avatar
                 size={isMobile ? "small" : "default"}
-                icon={<UserOutlined />} 
-                className={actualRank <= 3 ? "border-2 shadow-sm " + 
-                  (actualRank === 1 ? "border-yellow-400" : 
-                  actualRank === 2 ? "border-gray-300" : 
-                  "border-amber-500") : ""}
+                icon={<UserOutlined />}
+                className={actualRank <= 3 ? "border-2 shadow-sm " +
+                  (actualRank === 1 ? "border-yellow-400" :
+                    actualRank === 2 ? "border-gray-300" :
+                      "border-amber-500") : ""}
               />
               <Button
                 type="link"
@@ -204,13 +204,13 @@ const Rating = () => {
 
   // State để lưu trữ kích thước màn hình hiện tại
   const [windowSize, setWindowSize] = useState(window.innerWidth);
-  
+
   // Effect theo dõi thay đổi kích thước màn hình
   useEffect(() => {
     const handleResize = () => {
       setWindowSize(window.innerWidth);
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -222,187 +222,216 @@ const Rating = () => {
   const topUser = sortedData[0];
 
   return (
-    <div className="p-2 md:p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-xl md:text-3xl font-bold mb-4 md:mb-8 text-center text-indigo-700 flex items-center justify-center gap-2">
-          <CrownOutlined className="text-yellow-500" /> 
-          <span>Đánh giá người dùng</span>
-        </h1>
+    <>
+      <div className="p-2 md:p-6 bg-gray-50 min-h-screen">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-xl md:text-3xl font-bold mb-4 md:mb-8 text-center text-indigo-700 flex items-center justify-center gap-2">
+            <CrownOutlined className="text-yellow-500" />
+            <span>Đánh giá người dùng</span>
+          </h1>
 
-        <Row gutter={[12, 12]} className="mb-4 md:mb-8">
-          <Col xs={24} md={12}>
-            <Card
-              className="h-full shadow-md hover:shadow-lg transition-shadow"
-              style={{ 
-                borderColor: "#91d5ff", 
-                backgroundColor: "#e6f7ff", 
-                borderRadius: "12px",
-                padding: isMobile ? "8px" : "16px"
-              }}
-              bodyStyle={{ padding: isMobile ? "12px" : "24px" }}
-              headStyle={{ color: "#1890ff" }}
-            >
-              <Statistic
-                title={<span className="text-blue-800 font-medium text-sm md:text-base">Tổng số người dùng</span>}
-                value={pagination.total}
-                prefix={<UserOutlined className="text-blue-600 mr-1" />}
-                className="flex flex-col items-center justify-center h-full"
-                valueStyle={{ 
-                  color: "#1890ff", 
-                  fontWeight: "bold", 
-                  fontSize: isMobile ? "20px" : "28px" 
+          <Row gutter={[12, 12]} className="mb-4 md:mb-8">
+            <Col xs={24} md={12}>
+              <Card
+                className="h-full shadow-md hover:shadow-lg transition-shadow"
+                style={{
+                  borderColor: "#91d5ff",
+                  backgroundColor: "#e6f7ff",
+                  borderRadius: "12px",
+                  padding: isMobile ? "8px" : "16px"
                 }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} md={12}>
-            <Card
-              className="h-full shadow-md hover:shadow-lg transition-shadow"
-              style={{ 
-                borderColor: "#ffe58f", 
-                backgroundColor: "#fffbe6", 
-                borderRadius: "12px",
-                padding: isMobile ? "8px" : "16px"
-              }}
-              bodyStyle={{ padding: isMobile ? "12px" : "24px" }}
-              headStyle={{ color: "#faad14" }}
-            >
-              <Statistic
-                title={<span className="text-yellow-800 font-medium text-sm md:text-base">Top 1</span>}
-                value={topUser?.name || "Chưa có"}
-                prefix={<CrownOutlined className="text-yellow-500 mr-1" />}
-                className="flex flex-col items-center justify-center h-full"
-                valueStyle={{ 
-                  color: "#faad14", 
-                  fontWeight: "bold", 
-                  fontSize: isMobile ? "18px" : "28px",
-                  // Cắt ngắn tên nếu quá dài trên mobile
-                  textOverflow: "ellipsis",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  maxWidth: "100%"
-                }}
-              />
-            </Card>
-          </Col>
-        </Row>
-
-        <Card 
-          className="shadow-lg rounded-xl overflow-hidden border-0"
-          bodyStyle={{ padding: isMobile ? "8px" : "16px" }}
-        >
-          <div className="overflow-x-auto">
-            <Table
-              columns={columns}
-              dataSource={sortedData}
-              rowKey="_id"
-              pagination={{
-                current: pagination.current,
-                pageSize: isMobile ? 10 : pagination.pageSize,
-                total: pagination.total,
-                onChange: (page, pageSize) => fetchUsers(page, pageSize),
-                className: "pb-2 md:pb-4",
-                size: isMobile ? "small" : "default",
-                simple: isMobile, // Sử dụng simple pagination trên mobile
-                showSizeChanger: !isMobile
-              }}
-
-              className="rounded-lg"
-              size={isMobile ? "small" : "middle"}
-              scroll={{ x: isMobile ? 400 : undefined }}
-            />
-          </div>
-        </Card>
-      </div>
-
-      <Drawer
-        title={
-          <div className="flex items-center gap-3">
-            <Avatar 
-              size={isMobile ? "default" : "large"} 
-              icon={<UserOutlined />} 
-              className="border-2 border-indigo-300"
-            />
-            <span className={`${isMobile ? "text-base" : "text-xl"} font-bold`}>
-              Thông tin người dùng
-            </span>
-          </div>
-        }
-        placement="right"
-        width={isMobile ? "90%" : 360}
-        onClose={() => setOpen(false)}
-        open={open}
-        className="rounded-l-lg"
-        bodyStyle={{ padding: isMobile ? "12px" : "16px" }}
-      >
-        {selectedUser && (
-          <div className="space-y-4 md:space-y-6">
-            <Descriptions 
-              column={1} 
-              bordered 
-              size={isMobile ? "small" : "middle"}
-              className="rounded-lg overflow-hidden shadow-sm"
-              labelStyle={{ 
-                fontWeight: "bold", 
-                backgroundColor: "#f0f5ff",
-                fontSize: isMobile ? "12px" : "14px",
-                padding: isMobile ? "4px 8px" : "8px 16px"
-              }}
-              contentStyle={{ 
-                backgroundColor: "white",
-                fontSize: isMobile ? "12px" : "14px",
-                padding: isMobile ? "4px 8px" : "8px 16px"
-              }}
-            >
-              <Descriptions.Item label="Họ tên">
-                {selectedUser.name}
-              </Descriptions.Item>
-              <Descriptions.Item label="Email">
-                <span style={{ 
-                  wordBreak: "break-all", 
-                  display: "block",
-                  fontSize: isMobile ? "12px" : "14px"
-                }}>
-                  {selectedUser.email}
-                </span>
-              </Descriptions.Item>
-              <Descriptions.Item label="Số lượt đánh giá">
-                <span className="font-bold text-blue-600">
-                  {selectedUser.ratingCount}
-                </span>
-              </Descriptions.Item>
-              <Descriptions.Item label="Điểm trung bình">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-yellow-500">
-                    {selectedUser.ratingAvg.toFixed(1)}
-                  </span>
-                  <ReactStars
-                    count={5}
-                    value={selectedUser.ratingAvg}
-                    size={isMobile ? 16 : 18}
-                    edit={false}
-                    isHalf={true}
-                    activeColor="#fadb14"
-                  />
-                </div>
-              </Descriptions.Item>
-            </Descriptions>
-            
-            <div className="pt-2 md:pt-4">
-              <Button 
-                block 
-                type="primary" 
-                onClick={() => setOpen(false)}
-                className="bg-indigo-600 hover:bg-indigo-700 h-8 md:h-10 rounded-lg"
-                style={{ fontSize: isMobile ? "14px" : "16px" }}
+                bodyStyle={{ padding: isMobile ? "12px" : "24px" }}
+                headStyle={{ color: "#1890ff" }}
               >
-                Đóng
-              </Button>
+                <Statistic
+                  title={<span className="text-blue-800 font-medium text-sm md:text-base">Tổng số người dùng</span>}
+                  value={pagination.total}
+                  prefix={<UserOutlined className="text-blue-600 mr-1" />}
+                  className="flex flex-col items-center justify-center h-full"
+                  valueStyle={{
+                    color: "#1890ff",
+                    fontWeight: "bold",
+                    fontSize: isMobile ? "20px" : "28px"
+                  }}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} md={12}>
+              <Card
+                className="h-full shadow-md hover:shadow-lg transition-shadow"
+                style={{
+                  borderColor: "#ffe58f",
+                  backgroundColor: "#fffbe6",
+                  borderRadius: "12px",
+                  padding: isMobile ? "8px" : "16px"
+                }}
+                bodyStyle={{ padding: isMobile ? "12px" : "24px" }}
+                headStyle={{ color: "#faad14" }}
+              >
+                <Statistic
+                  title={<span className="text-yellow-800 font-medium text-sm md:text-base">Top 1</span>}
+                  value={topUser?.name || "Chưa có"}
+                  prefix={<CrownOutlined className="text-yellow-500 mr-1" />}
+                  className="flex flex-col items-center justify-center h-full"
+                  valueStyle={{
+                    color: "#faad14",
+                    fontWeight: "bold",
+                    fontSize: isMobile ? "18px" : "28px",
+                    // Cắt ngắn tên nếu quá dài trên mobile
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    maxWidth: "100%"
+                  }}
+                />
+              </Card>
+            </Col>
+          </Row>
+
+          <Card
+            className="shadow-lg rounded-xl overflow-hidden border-0"
+            bodyStyle={{ padding: isMobile ? "8px" : "16px" }}
+          >
+            <div className="overflow-x-auto">
+              <Table
+                columns={columns}
+                dataSource={sortedData}
+                rowKey="_id"
+                pagination={{
+                  current: pagination.current,
+                  pageSize: isMobile ? 10 : pagination.pageSize,
+                  total: pagination.total,
+                  onChange: (page, pageSize) => fetchUsers(page, pageSize),
+                  className: "pb-2 md:pb-4",
+                  size: isMobile ? "small" : "default",
+                  simple: isMobile, // Sử dụng simple pagination trên mobile
+                  showSizeChanger: !isMobile
+                }}
+
+                className="rounded-lg"
+                size={isMobile ? "small" : "middle"}
+                scroll={{ x: isMobile ? 400 : undefined }}
+              />
             </div>
-          </div>
-        )}
-      </Drawer>
-    </div>
+          </Card>
+        </div>
+
+        <Drawer
+          title={
+            <div className="flex items-center gap-3">
+              <Avatar
+                size={isMobile ? "default" : "large"}
+                icon={<UserOutlined />}
+                className="border-2 border-indigo-300"
+              />
+              <span className={`${isMobile ? "text-base" : "text-xl"} font-bold`}>
+                Thông tin người dùng
+              </span>
+            </div>
+          }
+          placement="right"
+          width={isMobile ? "90%" : 360}
+          onClose={() => setOpen(false)}
+          open={open}
+          className="rounded-l-lg"
+          bodyStyle={{ padding: isMobile ? "12px" : "16px" }}
+        >
+          {selectedUser && (
+            <div className="space-y-4 md:space-y-6">
+              <Descriptions
+                column={1}
+                bordered
+                size={isMobile ? "small" : "middle"}
+                className="rounded-lg overflow-hidden shadow-sm"
+                labelStyle={{
+                  fontWeight: "bold",
+                  backgroundColor: "#f0f5ff",
+                  fontSize: isMobile ? "12px" : "14px",
+                  padding: isMobile ? "4px 8px" : "8px 16px"
+                }}
+                contentStyle={{
+                  backgroundColor: "white",
+                  fontSize: isMobile ? "12px" : "14px",
+                  padding: isMobile ? "4px 8px" : "8px 16px"
+                }}
+              >
+                <Descriptions.Item label="Họ tên">
+                  {selectedUser.name}
+                </Descriptions.Item>
+                <Descriptions.Item label="Email">
+                  <span style={{
+                    wordBreak: "break-all",
+                    display: "block",
+                    fontSize: isMobile ? "12px" : "14px"
+                  }}>
+                    {selectedUser.email}
+                  </span>
+                </Descriptions.Item>
+                <Descriptions.Item label="Số lượt đánh giá">
+                  <span className="font-bold text-blue-600">
+                    {selectedUser.ratingCount}
+                  </span>
+                </Descriptions.Item>
+                <Descriptions.Item label="Điểm trung bình">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-yellow-500">
+                      {selectedUser.ratingAvg.toFixed(1)}
+                    </span>
+                    <ReactStars
+                      count={5}
+                      value={selectedUser.ratingAvg}
+                      size={isMobile ? 16 : 18}
+                      edit={false}
+                      isHalf={true}
+                      activeColor="#fadb14"
+                    />
+                  </div>
+                </Descriptions.Item>
+              </Descriptions>
+
+              <div className="pt-2 md:pt-4">
+                <Button
+                  block
+                  type="primary"
+                  onClick={() => setOpen(false)}
+                  className="bg-indigo-600 hover:bg-indigo-700 h-8 md:h-10 rounded-lg"
+                  style={{ fontSize: isMobile ? "14px" : "16px" }}
+                >
+                  Đóng
+                </Button>
+              </div>
+            </div>
+          )}
+        </Drawer>
+      </div>
+      <footer className="mt-12 bg-blue-50 rounded-2xl p-6 shadow-inner text-center">
+        <div>
+          <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+            Nền tảng <strong>mua bán voucher</strong> uy tín với hàng ngàn{" "}
+            <strong>mã giảm giá</strong> hấp dẫn từ Shopee, Lazada, Tiki,
+            Amazon,... Cập nhật mỗi ngày, giúp bạn{" "}
+            <strong>tiết kiệm chi phí</strong> và mua sắm thông minh hơn.
+          </p>
+          <p>© 2025 Voucher Exchange. All rights reserved.</p>
+          <p className="mt-2">
+            Liên hệ:{" "}
+            <a
+              href="mailto:support@voucher-exchange.com"
+              className="text-green-600 hover:underline"
+            >
+              support@voucher-exchange.com
+            </a>
+            {" | "}
+            <a
+              href="https://facebook.com/voucher"
+              className="text-green-600 hover:underline"
+            >
+              fb.com/voucher
+            </a>
+          </p>
+        </div>
+      </footer>
+    </>
   );
 };
 
