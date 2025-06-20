@@ -16,6 +16,7 @@ import { AuthContext } from "../../components/context/auth.context.jsx";
 import queryString from "query-string";
 import { Helmet } from "react-helmet-async";
 import { PLATFORM_IMAGES } from "../../utils/imageImports.js";
+import VoucherDetailModal from "../../components/client/voucher/VoucherDetailModal.jsx";
 
 const VoucherPage = () => {
   const navigate = useNavigate();
@@ -30,7 +31,18 @@ const VoucherPage = () => {
   const { search } = useLocation();
   const query = queryString.parse(search);
   const searchTerm = (query.search || "").toLowerCase();
+  const [selectedVoucher, setSelectedVoucher] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
+  const handleShowDetail = (voucher) => {
+    setSelectedVoucher(voucher);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleCloseDetail = () => {
+    setIsDetailModalOpen(false);
+    setSelectedVoucher(null);
+  };
   useEffect(() => {
     const fetchVoucher = async () => {
       const res = await getVoucher();
@@ -38,18 +50,18 @@ const VoucherPage = () => {
         const allVouchers = Array.isArray(res.data.data.vouchers)
           ? res.data.data.vouchers
           : Array.isArray(res.data.data)
-            ? res.data.data
-            : [];
+          ? res.data.data
+          : [];
 
         setVoucherData(allVouchers);
 
         const filtered = searchTerm
           ? allVouchers.filter(
-            (item) =>
-              item.category?.toLowerCase().includes(searchTerm) ||
-              item.platform?.toLowerCase().includes(searchTerm) ||
-              item.code?.toLowerCase().includes(searchTerm)
-          )
+              (item) =>
+                item.category?.toLowerCase().includes(searchTerm) ||
+                item.platform?.toLowerCase().includes(searchTerm) ||
+                item.code?.toLowerCase().includes(searchTerm)
+            )
           : allVouchers;
 
         setFilteredVouchers(filtered);
@@ -108,9 +120,9 @@ const VoucherPage = () => {
 
   const paginatedVouchers = Array.isArray(filteredVouchers)
     ? filteredVouchers.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage
-    )
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      )
     : [];
 
   const structuredData = {
@@ -137,7 +149,8 @@ const VoucherPage = () => {
       <div className="p-4 max-w-7xl mx-auto">
         <Helmet>
           <title>
-            Mua Bán Voucher Uy Tín | Giảm Giá Shopee, Tiki, Lazada - Siêu Voucher
+            Mua Bán Voucher Uy Tín | Giảm Giá Shopee, Tiki, Lazada - Siêu
+            Voucher
           </title>
           <meta
             name="description"
@@ -220,40 +233,50 @@ const VoucherPage = () => {
                 )}
               </div>
 
-              {PLATFORM_IMAGES[item.platform] && (
-                <img
-                  src={PLATFORM_IMAGES[item.platform]}
-                  alt={`Mã giảm giá ${item.platform} - ${item.category}`}
-                  className="w-full h-24 object-contain rounded-md mb-3"
-                  loading="lazy"
-                />
-              )}
+              <div
+                className="cursor-pointer flex-1"
+                onClick={() => handleShowDetail(item)}
+              >
+                {PLATFORM_IMAGES[item.platform] && (
+                  <img
+                    src={PLATFORM_IMAGES[item.platform]}
+                    alt={`Mã giảm giá ${item.platform} - ${item.category}`}
+                    className="w-full h-24 object-contain rounded-md mb-3"
+                    loading="lazy"
+                  />
+                )}
 
-              <div className="text-sm flex-1">
-                <p className="font-semibold mb-1">
-                  Giảm {item.discountValue}% đơn tối thiểu {item.minimumOrder}đ
-                </p>
-                <p className="text-gray-500 text-xs mb-2">{item.platform}</p>
+                <div className="text-sm">
+                  <p className="font-semibold mb-1">
+                    Giảm {item.discountValue}% đơn tối thiểu {item.minimumOrder}
+                    đ
+                  </p>
+                  <p className="text-gray-500 text-xs mb-2">{item.platform}</p>
 
-                <div className="mb-2">
-                  <Rate disabled allowHalf defaultValue={item.rating || 0} />
-                  <span className="text-xs text-gray-500 ml-2">
-                    ({item.rating || 0}/5)
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-xs">
-                    <RiDiscountPercentLine size={14} />
-                    <span>{item.category}</span>
+                  <div className="mb-2">
+                    <Rate disabled allowHalf defaultValue={item.rating || 0} />
+                    <span className="text-xs text-gray-500 ml-2">
+                      ({item.rating || 0}/5)
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <MdAccessTime size={14} />
-                    <span>{dayjs(item.expirationDate).format("DD/MM/YYYY")}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <MdAttachMoney size={14} />
-                    <span>{item.price === 0 ? "Free" : `${item.price}đ`}</span>
+
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-xs">
+                      <RiDiscountPercentLine size={14} />
+                      <span>{item.category}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <MdAccessTime size={14} />
+                      <span>
+                        {dayjs(item.expirationDate).format("DD/MM/YYYY")}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <MdAttachMoney size={14} />
+                      <span>
+                        {item.price === 0 ? "Free" : `${item.price}đ`}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -282,7 +305,9 @@ const VoucherPage = () => {
           <Pagination
             current={currentPage}
             pageSize={itemsPerPage}
-            total={Array.isArray(filteredVouchers) ? filteredVouchers.length : 0}
+            total={
+              Array.isArray(filteredVouchers) ? filteredVouchers.length : 0
+            }
             onChange={(page) => setCurrentPage(page)}
             showSizeChanger={false}
           />
@@ -321,6 +346,11 @@ const VoucherPage = () => {
           </p>
         </div>
       </footer>
+      <VoucherDetailModal
+        visible={isDetailModalOpen}
+        onClose={handleCloseDetail}
+        voucher={selectedVoucher}
+      />
     </>
   );
 };

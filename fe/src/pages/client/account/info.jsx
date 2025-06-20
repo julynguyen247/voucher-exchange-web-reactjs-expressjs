@@ -32,24 +32,7 @@ const Info = () => {
   }/images/upload/${userAvatar}`;
   const navigate = useNavigate();
   const handleLogout = async () => {
-    const res = await logoutApi();
-    if (res && res.data) {
-      localStorage.removeItem("access_token");
-      setAuth({
-        isAuthenticated: false,
-        user: {
-          email: "",
-          name: "",
-          phone: "",
-          id: "",
-          image: "",
-          accountNumber: "",
-          bank: "",
-          role: "",
-        },
-      });
-      navigate("/login");
-    }
+    navigate("/");
   };
   useEffect(() => {
     console.log(auth);
