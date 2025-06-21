@@ -13,7 +13,7 @@ const AccountPage = () => {
     {
       key: "2",
       label: "Đổi mật khẩu",
-      children: <ChangePassword></ChangePassword>,
+      children: <ChangePasswzord></ChangePasswzord>,
     },
   ];
   return (

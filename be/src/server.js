@@ -188,13 +188,6 @@ if (process.env.NODE_ENV === 'production') {
       console.log(`✅ RASA server is running and reachable at ${rasaURL}`);
     } catch (rasaErr) {
       console.warn("⚠️ WARNING: RASA server appears to be down or unreachable");
-
-      console.warn(
-        "Chatbot functionality will be limited until RASA server is available"
-      );
-      console.warn(
-        "To start RASA server, run: cd chatbot && rasa run --enable-api"
-      );
     }
 
     server.listen(port, hostname, () => {

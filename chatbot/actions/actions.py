@@ -46,8 +46,8 @@ class MongoDBConnection:
     def __init__(self):
         # Kết nối MongoDB (thay đổi URL và thông tin kết nối của bạn)
         self.client = pymongo.MongoClient(os.getenv("MONGODB_URI"))
-        self.db = self.client['test']  # Thay đổi với tên database của bạn
-        self.collection = self.db['vouchers']  # Thay đổi với tên collection của bạn
+        self.db = self.client['test']  # tên db
+        self.collection = self.db['vouchers']  # tên collection
 
 class ValidateVoucherSearchForm(FormValidationAction):
     def name(self) -> Text:

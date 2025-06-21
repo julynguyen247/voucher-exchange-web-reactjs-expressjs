@@ -47,7 +47,7 @@ const HomePage = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Title level={2} className="text-green-600 mb-2">
+          <Title level={2} className=" mb-2">
             Chào mừng đến với Vouchers & Mã giảm giá!
           </Title>
           <Paragraph className="text-gray-600 max-w-2xl mx-auto text-base leading-relaxed">

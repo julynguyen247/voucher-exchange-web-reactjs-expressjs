@@ -4,6 +4,12 @@
 
 ---
 
+## Thông tin nhóm 
+1. Vũ Ngọc Bảo Thắng - 23521435 - nhóm trưởng 
+2. Võ Minh An - 23520033
+3. Nguyễn Bá Trọng Khôi - 23520772
+4. Trần Hữu Đức - 23520321
+
 ## 📚 Mục Lục
 
 * [Tổng Quan Dự Án](#tổng-quan-dự-án)
@@ -83,12 +89,11 @@ mongo --version
 git --version
 ```
 
-* ✅ Node.js (>= 16)
-* ✅ Python (>= 3.8)
-* ✅ Git
-* ✅ MongoDB
-* ✅ RASA (`pip install rasa`)
-* ✅ Docker (tuỳ chọn)
+*  Node.js (>= 16)
+*  Python (>= 3.8)
+*  Git
+*  MongoDB
+*  RASA (`pip install rasa`)
 
 ---
 
@@ -206,12 +211,12 @@ rasa run actions
 
 ## Chạy Dự Án
 
-1. ✅ **Chạy Backend** tại `http://localhost:8081`
-2. ✅ **Chạy Frontend** tại `http://localhost:5173`
-3. ✅ **Chạy RASA Server** tại `http://localhost:5005`
-4. ✅ **Chatbot** được tích hợp vào frontend qua API.
+1. **Chạy Backend** tại `http://localhost:8081`
+2. **Chạy Frontend** tại `http://localhost:5173`
+3. **Chạy RASA Server** tại `http://localhost:5005`
+4. **Chatbot** được tích hợp vào backend thông qua WebSocket (wss)
 
-**Có thể chạy cả backend, frontend và RASA chỉ bằng 1 lệnh mà không cần dùng nhiều terminal:**
+**Có thể chạy cả backend, frontend chỉ bằng 1 lệnh mà không cần dùng nhiều terminal:**
 ```bash
 ./start.bat
 ```
