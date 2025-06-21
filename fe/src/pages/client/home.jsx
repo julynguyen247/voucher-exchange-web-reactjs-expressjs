@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Typography, Carousel, Card } from "antd";
 import { useNavigate } from "react-router-dom";
-import { getVoucher } from "../../utils/api.js";
+import { fetchAccountApi, getVoucher } from "../../utils/api.js";
 import { PLATFORM_IMAGES, BANNERS, BRANDS } from "../../utils/imageImports.js";
 
 const { Title, Paragraph } = Typography;
@@ -9,7 +9,32 @@ const { Title, Paragraph } = Typography;
 const HomePage = () => {
   const navigate = useNavigate();
   const [vouchers, setVouchers] = useState([]);
-
+  const refreshAuthFromApi = async () => {
+    try {
+      const res = await fetchAccountApi();
+      console.log(res);
+      if (res?.data?.data) {
+        const data = res.data.data;
+        const updatedAuth = {
+          isAuthenticated: true,
+          user: {
+            email: data.email ?? "",
+            name: data.name ?? "",
+            phone: data.phone ?? "",
+            id: data._id ?? "",
+            image: data.image ?? "",
+            role: data.role ?? "",
+            bank: data.bank ?? "",
+            accountNumber: data.accountNumber ?? "",
+          },
+        };
+        setAuth(updatedAuth);
+        localStorage.setItem("auth", JSON.stringify(updatedAuth));
+      }
+    } catch (err) {
+      console.error("Lỗi khi làm mới thông tin người dùng:", err);
+    }
+  };
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
@@ -22,6 +47,7 @@ const HomePage = () => {
       }
     };
     fetchVouchers();
+    refreshAuthFromApi();
   }, []);
 
   return (

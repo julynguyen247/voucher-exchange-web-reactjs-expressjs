@@ -11,13 +11,9 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import { AuthContext } from "../../../components/context/auth.context";
-import {
-  getBankListApi,
-  updateUserApi,
-  uploadApi,
-  logoutApi,
-} from "../../../utils/api";
+import { getBankListApi, updateUserApi, uploadApi } from "../../../utils/api";
 import { useNavigate } from "react-router-dom";
+
 const { Option } = Select;
 
 const Info = () => {
@@ -27,15 +23,17 @@ const Info = () => {
   const [bankList, setBankList] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [fileList, setFileList] = useState([]);
+  const navigate = useNavigate();
+
   const urlAvatar = `${
     import.meta.env.VITE_BACKEND_URL
   }/images/upload/${userAvatar}`;
-  const navigate = useNavigate();
-  const handleLogout = async () => {
+
+  const handleLogout = () => {
     navigate("/");
   };
+
   useEffect(() => {
-    console.log(auth);
     form.setFieldsValue({
       name: auth.user.name,
       email: auth.user.email,
@@ -56,24 +54,29 @@ const Info = () => {
         message.error("Lấy danh sách ngân hàng thất bại");
       }
     };
-
     fetchBanks();
   }, []);
 
   const handleUploadFile = async (options) => {
     const { onSuccess, file } = options;
-    const res = await uploadApi(file, "avatar");
-
-    if (res?.data?.path) {
-      const fileName = res.data.path.split("/").pop();
-      setUserAvatar(fileName);
-      onSuccess?.("ok");
-
-      message.success("Upload thành công!");
-    } else {
-      message.error("Upload thất bại!");
+    setUploading(true);
+    try {
+      const res = await uploadApi(file, "avatar");
+      if (res?.data?.path) {
+        const fileName = res.data.path.split("/").pop();
+        setUserAvatar(fileName);
+        onSuccess?.("ok");
+        message.success("Upload thành công!");
+      } else {
+        message.error("Upload thất bại!");
+      }
+    } catch (err) {
+      message.error("Lỗi upload ảnh");
+    } finally {
+      setUploading(false);
     }
   };
+
   const propsUpload = {
     maxCount: 1,
     multiple: false,
@@ -83,33 +86,56 @@ const Info = () => {
   };
 
   const onFinish = async (values) => {
-    const { name, id, phone, email, bank, accountNumber } = values;
+    const updatedData = {
+      id: values.id,
+      name: values.name || auth.user.name,
+      email: auth.user.email,
+      phone: values.phone || auth.user.phone,
+      bank: values.bank || auth.user.bank,
+      accountNumber: values.accountNumber || auth.user.accountNumber,
+      image: userAvatar || auth.user.image,
+    };
+
+    const hasChanged =
+      updatedData.name !== auth.user.name ||
+      updatedData.phone !== auth.user.phone ||
+      updatedData.bank !== auth.user.bank ||
+      updatedData.accountNumber !== auth.user.accountNumber ||
+      updatedData.image !== auth.user.image;
+
+    if (!hasChanged) {
+      message.info("Không có thay đổi nào để cập nhật");
+      return;
+    }
 
     const res = await updateUserApi(
-      id,
-      name,
-      email,
+      updatedData.id,
+      updatedData.name,
+      updatedData.email,
       undefined,
-      phone,
-      userAvatar,
-      accountNumber,
-      bank
+      updatedData.phone,
+      updatedData.image,
+      updatedData.accountNumber,
+      updatedData.bank
     );
-    console.log(res);
+
     if (res && res.data) {
       message.success("Cập nhật thành công");
-      setAuth((prevAuth) => ({
-        ...prevAuth,
+      localStorage.removeItem("access_token");
+      setAuth({
+        isAuthenticated: false,
         user: {
-          ...prevAuth.user,
-          name,
-          phone,
-          image: userAvatar,
-          bank,
-          accountNumber,
+          email: "",
+          name: "",
+          phone: "",
+          id: "",
+          image: "",
+          role: "",
+          bank: "",
+          accountNumber: "",
         },
-      }));
-      handleLogout();
+      });
+      navigate("/");
     } else {
       message.error("Cập nhật thất bại");
     }
@@ -117,7 +143,7 @@ const Info = () => {
 
   return (
     <div className="flex justify-center mt-10 px-4">
-      <Card className="w-full max-w-xl shadow-xl " variant={false}>
+      <Card className="w-full max-w-xl shadow-xl" variant={false}>
         <div className="flex flex-col items-center gap-6 mb-6">
           <Avatar
             size={120}
@@ -129,13 +155,16 @@ const Info = () => {
               backgroundColor: "#f0f0f0",
             }}
           />
-
           <Upload {...propsUpload}>
             <Button icon={<UploadOutlined />} loading={uploading}>
               {uploading ? "Đang tải..." : "Thay ảnh đại diện"}
             </Button>
           </Upload>
         </div>
+
+        <p className="text-sm text-gray-500 italic mb-4 text-center">
+          * Bạn chỉ cần điền những trường muốn thay đổi
+        </p>
 
         <Form
           form={form}
@@ -151,30 +180,16 @@ const Info = () => {
             <Input disabled />
           </Form.Item>
 
-          <Form.Item
-            label="Họ và tên"
-            name="name"
-            rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
-          >
-            <Input />
+          <Form.Item label="Họ và tên" name="name">
+            <Input placeholder="Không thay đổi thì để trống" />
           </Form.Item>
 
-          <Form.Item
-            label="Số điện thoại"
-            name="phone"
-            rules={[
-              { required: true, message: "Vui lòng nhập số điện thoại!" },
-            ]}
-          >
-            <Input />
+          <Form.Item label="Số điện thoại" name="phone">
+            <Input placeholder="Không thay đổi thì để trống" />
           </Form.Item>
 
-          <Form.Item
-            label="Ngân hàng"
-            name="bank"
-            rules={[{ required: true, message: "Vui lòng chọn ngân hàng!" }]}
-          >
-            <Select placeholder="Chọn ngân hàng">
+          <Form.Item label="Ngân hàng" name="bank">
+            <Select placeholder="Không thay đổi thì để trống">
               {bankList.map((bank) => (
                 <Option key={bank.code} value={bank.code}>
                   {bank.name} ({bank.code})
@@ -183,12 +198,8 @@ const Info = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item
-            label="Số tài khoản"
-            name="accountNumber"
-            rules={[{ required: true, message: "Vui lòng nhập số tài khoản!" }]}
-          >
-            <Input />
+          <Form.Item label="Số tài khoản" name="accountNumber">
+            <Input placeholder="Không thay đổi thì để trống" />
           </Form.Item>
 
           <Form.Item>
